@@ -4,6 +4,7 @@ import { getManager } from "typeorm";
 
 import config from "../config";
 import { Sms, SmsType } from "../entity/sms";
+import { decrypt, encrypt } from "./_encryption";
 
 const client = new Twilio(config.twilio.accountSid, config.twilio.authToken);
 const phoneNumber = "+33757592025";
@@ -33,7 +34,10 @@ export default class SmsController {
 				acc[recipient] = [];
 			}
 
-			acc[recipient].push(message);
+			acc[recipient].push({
+				...message,
+				content: decrypt(message.content), // TODO: should probably decrypt on the phone
+			});
 
 			return acc;
 		}, {});
@@ -49,7 +53,7 @@ export default class SmsController {
 		const sms = new Sms();
 		sms.type = SmsType.SENT;
 		sms.sentAt = new Date();
-		sms.content = content;
+		sms.content = encrypt(content); // TODO: should probably encrypt on the phone
 		sms.to = to;
 		sms.from = phoneNumber;
 		await smsRepository.save(sms);
@@ -67,10 +71,12 @@ export default class SmsController {
 		const sms = new Sms();
 		sms.type = SmsType.RECEIVED;
 		sms.sentAt = new Date();
-		sms.content = body.Body;
+		sms.content = encrypt(body.Body);
 		sms.to = body.To;
 		sms.from = body.From;
 		await smsRepository.save(sms);
+
+		// TODO: send notification to `body.To` and let him know he received an SMS
 
 		ctx.status = 200;
 		ctx.body = undefined;
