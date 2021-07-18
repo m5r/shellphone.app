@@ -7,9 +7,6 @@ import listen from "test-listen";
 import fetch from "isomorphic-fetch";
 import crypto from "crypto";
 
-import CookieStore from "../lib/cookie-store";
-import Session from "../lib/session";
-
 type Authentication =
 	| "none"
 	| "auth0"
@@ -93,15 +90,13 @@ function writeSessionToCookie(
 	res: ServerResponse,
 	authentication: Authentication,
 ) {
-	const cookieStore = new CookieStore();
-	const session: Session = new Session({
+	const session = {
 		id: `${authentication}|userId`,
 		email: "test@fss.test",
 		name: "Groot",
 		teamId: "teamId",
 		role: "owner",
-	});
-	cookieStore.save(req, res, session);
+	};
 
 	const setCookieHeader = res.getHeader("Set-Cookie") as string[];
 	// write it to request headers to immediately have access to the user's session

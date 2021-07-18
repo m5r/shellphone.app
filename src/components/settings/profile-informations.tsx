@@ -30,7 +30,7 @@ const ProfileInformations: FunctionComponent = () => {
 	const [errorMessage, setErrorMessage] = useState("");
 
 	useEffect(() => {
-		setValue("name", user.userProfile?.name ?? "");
+		setValue("name", user.userProfile?.user_metadata.name ?? "");
 		setValue("email", user.userProfile?.email ?? "");
 	}, [setValue, user.userProfile]);
 
@@ -40,7 +40,7 @@ const ProfileInformations: FunctionComponent = () => {
 		}
 
 		try {
-			await user.updateUser({ name, email });
+			await user.updateUser({ email, data: { name } });
 		} catch (error) {
 			logger.error(error.response, "error updating user infos");
 
