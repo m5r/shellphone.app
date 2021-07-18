@@ -1,2 +1,13 @@
-node_modules/
-.idea/
+.next/*
+node_modules/*
+.idea/*
+build/*
+.env
+coverage/
+
+
+mosaic
+*.tgz
+*.zip
+aOf719eN
+old

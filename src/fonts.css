@@ -1,0 +1,17 @@
+@font-face {
+	font-family: "Inter var";
+	font-weight: 100 900;
+	font-display: optional;
+	font-style: normal;
+	font-named-instance: "Regular";
+	src: url("/static/fonts/inter/Inter-roman.var.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "Inter var";
+	font-weight: 100 900;
+	font-display: optional;
+	font-style: italic;
+	font-named-instance: "Italic";
+	src: url("/static/fonts/inter/Inter-italic.var.woff2") format("woff2");
+}
