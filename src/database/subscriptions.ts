@@ -1,5 +1,6 @@
 import type { PlanId } from "../subscription/plans";
 import appLogger from "../../lib/logger";
+import supabase from "../supabase/server";
 
 const logger = appLogger.child({ module: "subscriptions" });
 
@@ -32,12 +33,6 @@ export type Subscription = {
 	updatedAt: Date;
 };
 
-type FirestoreSubscription = FirestoreEntry<Subscription>;
-
-const subscriptions = firestoreCollection<FirestoreSubscription>(
-	"subscriptions",
-);
-
 type CreateSubscriptionParams = Pick<
 	Subscription,
 	| "userId"
@@ -62,24 +57,25 @@ export async function createSubscription({
 	cancelUrl,
 	lastEventTime,
 }: CreateSubscriptionParams): Promise<Subscription> {
-	const createdAt = FieldValue.serverTimestamp() as Timestamp;
-	await subscriptions.doc(paddleSubscriptionId).set({
-		userId,
-		planId,
-		paddleCheckoutId,
-		paddleSubscriptionId,
-		nextBillDate,
-		status,
-		updateUrl,
-		cancelUrl,
-		lastEventTime,
-		createdAt,
-		updatedAt: createdAt,
-	});
+	const createdAt = new Date();
+	const { data } = await supabase
+		.from<Subscription>("subscription")
+		.insert({
+			userId,
+			planId,
+			paddleCheckoutId,
+			paddleSubscriptionId,
+			nextBillDate,
+			status,
+			updateUrl,
+			cancelUrl,
+			lastEventTime,
+			createdAt,
+			updatedAt: createdAt,
+		})
+		.throwOnError();
 
-	const subscription = await findSubscription({ paddleSubscriptionId });
-
-	return subscription!;
+	return data![0];
 }
 
 type GetSubscriptionParams = Pick<Subscription, "paddleSubscriptionId">;
@@ -87,14 +83,15 @@ type GetSubscriptionParams = Pick<Subscription, "paddleSubscriptionId">;
 export async function findSubscription({
 	paddleSubscriptionId,
 }: GetSubscriptionParams): Promise<Subscription | undefined> {
-	const subscriptionDocument = await subscriptions
-		.doc(paddleSubscriptionId)
-		.get();
-	if (!subscriptionDocument.exists) {
-		return;
-	}
+	const { error, data } = await supabase
+		.from<Subscription>("subscription")
+		.select("*")
+		.eq("paddleSubscriptionId", paddleSubscriptionId)
+		.single();
 
-	return convertFromFirestore(subscriptionDocument.data()!);
+	if (error) throw error;
+
+	return data!;
 }
 
 type FindUserSubscriptionParams = Pick<Subscription, "userId">;
@@ -102,18 +99,16 @@ type FindUserSubscriptionParams = Pick<Subscription, "userId">;
 export async function findUserSubscription({
 	userId,
 }: FindUserSubscriptionParams): Promise<Subscription | null> {
-	const subscriptionDocumentsSnapshot = await subscriptions
-		.where("userId", "==", userId)
-		.where("status", "!=", "deleted")
-		.get();
-	if (subscriptionDocumentsSnapshot.docs.length === 0) {
-		logger.warn(`No subscription found for user ${userId}`);
-		return null;
-	}
+	const { error, data } = await supabase
+		.from<Subscription>("subscription")
+		.select("*")
+		.eq("userId", userId)
+		.neq("status", "deleted")
+		.single();
 
-	const subscriptionDocument = subscriptionDocumentsSnapshot.docs[0].data();
+	if (error) throw error;
 
-	return convertFromFirestore(subscriptionDocument);
+	return data!;
 }
 
 type UpdateSubscriptionParams = Pick<Subscription, "paddleSubscriptionId"> &
@@ -135,17 +130,22 @@ export async function updateSubscription(
 	update: UpdateSubscriptionParams,
 ): Promise<void> {
 	const paddleSubscriptionId = update.paddleSubscriptionId;
-	await subscriptions.doc(paddleSubscriptionId).set(
-		{
+	await supabase
+		.from<Subscription>("subscription")
+		.update({
 			...update,
-			updatedAt: FieldValue.serverTimestamp() as Timestamp,
-		},
-		{ merge: true },
-	);
+			updatedAt: new Date(),
+		})
+		.eq("paddleSubscriptionId", paddleSubscriptionId)
+		.throwOnError();
 }
 
 export async function deleteSubscription({
 	paddleSubscriptionId,
 }: Pick<Subscription, "paddleSubscriptionId">): Promise<void> {
-	await subscriptions.doc(paddleSubscriptionId).delete();
+	await supabase
+		.from<Subscription>("subscription")
+		.delete()
+		.eq("paddleSubscriptionId", paddleSubscriptionId)
+		.throwOnError();
 }

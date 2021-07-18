@@ -1,36 +1,28 @@
-jest.mock("../../../../pages/api/user/_auth0", () => ({
-	setAppMetadata: jest.fn(),
-}));
 jest.mock("../../../../pages/api/_send-email", () => ({
 	sendEmail: jest.fn(),
 }));
-jest.mock("../../../../database/users", () => ({ createUser: jest.fn() }));
-jest.mock("../../../../database/teams", () => ({ createTeam: jest.fn() }));
+jest.mock("../../../../database/customer", () => ({ createCustomer: jest.fn() }));
 
 import { parse } from "set-cookie-parser";
 
 import { callApiHandler } from "../../../../../jest/helpers";
 import signUpHandler from "../../../../pages/api/auth/sign-up";
-import { sessionName } from "../../../../../lib/cookie-store";
 import { sendEmail } from "../../../../pages/api/_send-email";
-import { createUser } from "../../../../database/users";
-import { createTeam } from "../../../../database/teams";
+import { createCustomer } from "../../../../database/customer";
+
+const sessionName = "";
 
 describe("/api/auth/sign-up", () => {
 	const mockedSendEmail = sendEmail as jest.Mock<
 		ReturnType<typeof sendEmail>
 	>;
-	const mockedCreateUser = createUser as jest.Mock<
-		ReturnType<typeof createUser>
-	>;
-	const mockedCreateTeam = createTeam as jest.Mock<
-		ReturnType<typeof createTeam>
+	const mockedCreateCustomer = createCustomer as jest.Mock<
+		ReturnType<typeof createCustomer>
 	>;
 
 	beforeEach(() => {
 		mockedSendEmail.mockClear();
-		mockedCreateUser.mockClear();
-		mockedCreateTeam.mockClear();
+		mockedCreateCustomer.mockClear();
 	});
 
 	test("responds 405 to GET", async () => {
@@ -46,22 +38,11 @@ describe("/api/auth/sign-up", () => {
 	});
 
 	test("responds 200 to POST with body from email login", async () => {
-		mockedCreateUser.mockResolvedValue({
+		/*mockedCreateCustomer.mockResolvedValue({
 			id: "auth0|1234567",
-			teamId: "98765",
-			role: "owner",
 			email: "test@fss.dev",
 			name: "Groot",
-			createdAt: new Date(),
-			updatedAt: new Date(),
-		});
-		mockedCreateTeam.mockResolvedValue({
-			id: "98765",
-			subscriptionId: null,
-			teamMembersLimit: 1,
-			createdAt: new Date(),
-			updatedAt: new Date(),
-		});
+		});*/
 
 		const body = {
 			accessToken:

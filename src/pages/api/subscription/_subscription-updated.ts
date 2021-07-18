@@ -8,9 +8,10 @@ import {
 	SUBSCRIPTION_STATUSES,
 	updateSubscription,
 } from "../../../database/subscriptions";
-import { PAID_PLANS } from "../../../subscription/plans";
+import { PLANS } from "../../../subscription/plans";
 import appLogger from "../../../../lib/logger";
 import { sendEmail } from "../_send-email";
+import { findCustomer } from "../../../database/customer";
 
 const logger = appLogger.child({ module: "subscription-updated" });
 
@@ -69,7 +70,7 @@ export async function subscriptionUpdated(
 	const updateUrl = body.update_url;
 	const cancelUrl = body.cancel_url;
 	const planId = body.subscription_plan_id;
-	const nextPlan = PAID_PLANS[planId];
+	const nextPlan = PLANS[planId];
 	await updateSubscription({
 		paddleSubscriptionId,
 		planId,
@@ -79,7 +80,7 @@ export async function subscriptionUpdated(
 		cancelUrl,
 	});
 
-	const user = await findUser({ id: subscription.userId });
+	const user = await findCustomer(subscription.userId);
 
 	sendEmail({
 		subject: "Thanks for your purchase",

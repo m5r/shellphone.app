@@ -24,7 +24,7 @@ const bodySchema = Joi.object<Body>({
 export default withApiAuthRequired<Response>(async function updateSubscription(
 	req,
 	res,
-	session,
+	user,
 ) {
 	if (req.method !== "POST") {
 		const statusCode = 405;
@@ -57,7 +57,7 @@ export default withApiAuthRequired<Response>(async function updateSubscription(
 	const { planId }: Body = validationResult.value;
 
 	const subscription = await findUserSubscription({
-		teamId: session.user.teamId,
+		userId: user.id,
 	});
 	if (!subscription) {
 		const statusCode = 500;

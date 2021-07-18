@@ -11,7 +11,7 @@ import {
 import { sendEmail } from "../_send-email";
 import type { ApiError } from "../_types";
 import appLogger from "../../../../lib/logger";
-import { PAID_PLANS } from "../../../subscription/plans";
+import { PLANS } from "../../../subscription/plans";
 
 const logger = appLogger.child({ module: "subscription-created" });
 
@@ -94,7 +94,7 @@ export async function subscriptionCreatedHandler(
 			cancelUrl,
 		});
 
-		const nextPlan = PAID_PLANS[planId];
+		const nextPlan = PLANS[planId];
 		sendEmail({
 			subject: "Thanks for your purchase",
 			body: `Welcome to ${nextPlan.name} plan`,

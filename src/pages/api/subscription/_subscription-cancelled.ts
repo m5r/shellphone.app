@@ -8,7 +8,6 @@ import {
 	SUBSCRIPTION_STATUSES,
 	updateSubscription,
 } from "../../../database/subscriptions";
-import { FREE } from "../../../subscription/plans";
 import appLogger from "../../../../lib/logger";
 
 const logger = appLogger.child({ module: "subscription-cancelled" });
