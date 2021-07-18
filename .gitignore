@@ -5,9 +5,3 @@ build/*
 .env
 coverage/
 
-
-mosaic
-*.tgz
-*.zip
-aOf719eN
-old
