@@ -24,7 +24,8 @@ const insertMessagesQueue = Queue<Payload>(
 			from: message.from,
 			to: message.to,
 			type: ["received", "receiving"].includes(message.status) ? SmsType.RECEIVED : SmsType.SENT,
-			sentAt: message.dateSent,
+			messageSid: message.sid,
+			sentAt: message.dateSent.toISOString(),
 		}));
 		await insertManySms(sms);
 	},

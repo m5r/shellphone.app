@@ -50,11 +50,10 @@ const Keypad: NextPage<Props> = () => {
 						<Digit digit="#" />
 					</Row>
 					<Row>
-						<div
-							className="col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-green-800 rounded-full">
+						<div className="select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-green-800 rounded-full">
 							<FontAwesomeIcon icon={faPhone} color="white" size="lg" />
 						</div>
-						<div className="my-auto" onClick={pressBackspace}>
+						<div className="select-none my-auto" onClick={pressBackspace}>
 							<FontAwesomeIcon icon={faBackspace} size="lg" />
 						</div>
 					</Row>
@@ -83,7 +82,7 @@ const Digit: FunctionComponent<{ digit: string }> = ({ children, digit }) => {
 	const onClick = () => pressDigit(digit);
 
 	return (
-		<div onClick={onClick} className="text-3xl cursor-pointer">
+		<div onClick={onClick} className="text-3xl cursor-pointer select-none">
 			{digit}
 			{children}
 		</div>

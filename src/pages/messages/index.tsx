@@ -1,14 +1,14 @@
 import type { InferGetServerSidePropsType, NextPage } from "next";
 import Link from "next/link";
 
-import { withPageOnboardingRequired } from "../../lib/session-helpers";
-import Layout from "../components/layout";
-import useUser from "../hooks/use-user";
-import type { Sms } from "../database/_types";
-import { SmsType } from "../database/_types";
-import {  findCustomerMessages } from "../database/sms";
-import { findCustomer } from "../database/customer";
-import { decrypt } from "../database/_encryption";
+import { withPageOnboardingRequired } from "../../../lib/session-helpers";
+import type { Sms } from "../../database/_types";
+import { SmsType } from "../../database/_types";
+import {  findCustomerMessages } from "../../database/sms";
+import { findCustomer } from "../../database/customer";
+import { decrypt } from "../../database/_encryption";
+import useUser from "../../hooks/use-user";
+import Layout from "../../components/layout";
 
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
 
@@ -21,21 +21,19 @@ const Messages: NextPage<Props> = ({ conversations }) => {
 		return <Layout title={pageTitle}>Loading...</Layout>;
 	}
 
-	console.log("conversations", conversations);
-
 	return (
 		<Layout title={pageTitle}>
 			<div className="flex flex-col space-y-6 p-6">
 				<p>Messages page</p>
 				<ul>
-					{Object.entries(conversations).map(([recipient, conversation]) => {
-						const lastMessage = conversation[conversation.length - 1];
+					{Object.entries(conversations).map(([recipient, message]) => {
 						return (
 							<li key={recipient}>
 								<Link href={`/messages/${recipient}`}>
 									<a>
 										<div>{recipient}</div>
-										<div>{lastMessage.content}</div>
+										<div>{message.content}</div>
+										<div>{new Date(message.sentAt).toLocaleDateString()}</div>
 									</a>
 								</Link>
 							</li>
@@ -54,7 +52,9 @@ export const getServerSideProps = withPageOnboardingRequired(
 	async (context, user) => {
 		const customer = await findCustomer(user.id);
 		const messages = await findCustomerMessages(user.id);
-		const conversations = messages.reduce<Conversation>((acc, message) => {
+
+		let conversations: Record<Recipient, Sms> = {};
+		for (const message of messages) {
 			let recipient: string;
 			if (message.type === SmsType.SENT) {
 				recipient = message.to;
@@ -62,17 +62,19 @@ export const getServerSideProps = withPageOnboardingRequired(
 				recipient = message.from;
 			}
 
-			if (!acc[recipient]) {
-				acc[recipient] = [];
+			if (
+				!conversations[recipient] ||
+				message.sentAt > conversations[recipient].sentAt
+			) {
+				conversations[recipient] = {
+					...message,
+					content: decrypt(message.content, customer.encryptionKey), // TODO: should probably decrypt on the phone
+				};
 			}
-
-			acc[recipient].push({
-				...message,
-				content: decrypt(message.content, customer.encryptionKey), // TODO: should probably decrypt on the phone
-			});
-
-			return acc;
-		}, {});
+		}
+		conversations = Object.fromEntries(
+			Object.entries(conversations).sort(([,a], [,b]) => b.sentAt.localeCompare(a.sentAt))
+		);
 
 		return {
 			props: { conversations },
