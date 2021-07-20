@@ -46,7 +46,7 @@ const StepThree: NextPage<Props> = ({ hasTwilioCredentials, availablePhoneNumber
 				previous={{ href: "/welcome/step-two", label: "Back" }}
 			>
 				<div className="flex flex-col space-y-4 items-center">
-					<span>You don't have any phone number, fill your Twilio credentials first</span>
+					<span>You don&#39;t have any phone number, fill your Twilio credentials first</span>
 				</div>
 			</OnboardingLayout>
 		)
@@ -90,7 +90,7 @@ const StepThree: NextPage<Props> = ({ hasTwilioCredentials, availablePhoneNumber
 
 export const getServerSideProps = withPageAuthRequired(async (context, user) => {
 	const customer = await findCustomer(user.id);
-	const hasTwilioCredentials = customer.accountSid.length > 0 && customer.authToken.length > 0;
+	const hasTwilioCredentials = customer.accountSid?.length && customer.authToken?.length;
 	const incomingPhoneNumbers = await twilio(customer.accountSid, customer.authToken)
 		.incomingPhoneNumbers
 		.list();

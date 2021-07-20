@@ -1,32 +1,92 @@
+import { useEffect } from "react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft } from "@fortawesome/pro-regular-svg-icons";
 import clsx from "clsx";
+import { useForm } from "react-hook-form";
 
 import { withPageOnboardingRequired } from "../../../lib/session-helpers";
-import Layout from "../../components/layout";
-import useUser from "../../hooks/use-user";
 import { findConversation } from "../../database/sms";
-import { decrypt } from "../../database/_encryption";
-import { findCustomer } from "../../database/customer";
 import type { Sms } from "../../database/_types";
 import { SmsType } from "../../database/_types";
+import supabase from "../../supabase/client";
+import useUser from "../../hooks/use-user";
+import useConversation from "../../hooks/use-conversation";
+import Layout from "../../components/layout";
 
 type Props = {
 	recipient: string;
 	conversation: Sms[];
-};
+}
 
-const Messages: NextPage<Props> = ({ conversation }) => {
+type Form = {
+	content: string;
+}
+
+const Messages: NextPage<Props> = (props) => {
 	const { userProfile } = useUser();
 	const router = useRouter();
-	const pageTitle = `Messages with ${router.query.recipient}`;
+	const recipient = router.query.recipient as string;
+	const { conversation, error, refetch, sendMessage } = useConversation({
+		initialData: props.conversation,
+		recipient,
+	});
+	const pageTitle = `Messages with ${recipient}`;
+	const {
+		register,
+		handleSubmit,
+		setValue,
+		formState: {
+			isSubmitting,
+		},
+	} = useForm<Form>();
 
-	console.log("userProfile", userProfile);
+	const onSubmit = handleSubmit(async ({ content }) => {
+		if (isSubmitting) {
+			return;
+		}
+
+		sendMessage.mutate({
+			to: recipient,
+			content,
+		});
+		setValue("content", "");
+	});
+
+	useEffect(() => {
+		if (!userProfile) {
+			return;
+		}
+
+		const subscription = supabase
+			.from<Sms>(`sms:customerId=eq.${userProfile.id}`)
+			.on("INSERT", (payload) => {
+				const message = payload.new;
+				if ([message.from, message.to].includes(recipient)) {
+					refetch();
+				}
+			})
+			.subscribe();
+
+		return () => void subscription.unsubscribe();
+	}, [userProfile, recipient, refetch]);
 
 	if (!userProfile) {
-		return <Layout title={pageTitle}>Loading...</Layout>;
+		return (
+			<Layout title={pageTitle}>
+				Loading...
+			</Layout>
+		);
+	}
+
+	if (error) {
+		console.error("error", error);
+		return (
+			<Layout title={pageTitle}>
+				Oops, something unexpected happened. Please try reloading the page.
+			</Layout>
+		);
 	}
 
 	return (
@@ -38,7 +98,7 @@ const Messages: NextPage<Props> = ({ conversation }) => {
 			</header>
 			<div className="flex flex-col space-y-6 p-6">
 				<ul>
-					{conversation.map(message => {
+					{conversation!.map(message => {
 						return (
 							<li key={message.id} className={clsx(message.type === SmsType.SENT ? "text-right" : "text-left")}>
 								{message.content}
@@ -47,6 +107,10 @@ const Messages: NextPage<Props> = ({ conversation }) => {
 					})}
 				</ul>
 			</div>
+			<form onSubmit={onSubmit}>
+				<textarea{...register("content")} />
+				<button type="submit">Send</button>
+			</form>
 		</Layout>
 	);
 };
@@ -63,18 +127,12 @@ export const getServerSideProps = withPageOnboardingRequired<Props>(
 			};
 		}
 
-		const customer = await findCustomer(user.id);
 		const conversation = await findConversation(user.id, recipient);
-		console.log("conversation", conversation);
 
-		console.log("recipient", recipient);
 		return {
 			props: {
 				recipient,
-				conversation: conversation.map(message => ({
-					...message,
-					content: decrypt(message.content, customer.encryptionKey),
-				})),
+				conversation,
 			},
 		};
 	},

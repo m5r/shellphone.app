@@ -4,11 +4,13 @@ export enum SmsType {
 }
 
 export type Sms = {
-	id: number;
+	id: string;
 	customerId: string;
 	content: string;
 	from: string;
 	to: string;
 	type: SmsType;
-	sentAt: Date;
+	twilioSid?: string;
+	// status: sent/delivered/received
+	sentAt: string; // timestampz
 };

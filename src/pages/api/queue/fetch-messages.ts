@@ -29,6 +29,8 @@ const fetchMessagesQueue = Queue<Payload>(
 		await insertMessagesQueue.enqueue({
 			customerId,
 			messages,
+		}, {
+			id: `insert-messages-${customerId}`,
 		});
 	},
 );

@@ -30,11 +30,23 @@ export async function createPhoneNumber({
 	return data![0];
 }
 
-export async function findPhoneNumber({ id }: Pick<PhoneNumber, "id">): Promise<PhoneNumber> {
+export async function findPhoneNumberById({ id }: Pick<PhoneNumber, "id">): Promise<PhoneNumber> {
 	const { error, data } = await supabase
 		.from<PhoneNumber>("phone-number")
 		.select("*")
 		.eq("id", id)
+		.single();
+
+	if (error) throw error;
+
+	return data!;
+}
+
+export async function findPhoneNumber(phoneNumber: PhoneNumber["phoneNumber"]): Promise<PhoneNumber> {
+	const { error, data } = await supabase
+		.from<PhoneNumber>("phone-number")
+		.select("*")
+		.eq("phoneNumber", phoneNumber)
 		.single();
 
 	if (error) throw error;

@@ -7,7 +7,8 @@
         "dev": "next",
         "test": "jest --coverage",
         "test:watch": "jest --watchAll",
-        "lint": "next lint"
+        "lint": "next lint",
+        "sync-types": "openapi-typescript https://jsoxsegjhedmsfedvqoh.supabase.co/rest/v1/?apikey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYyNTQxMjUyMCwiZXhwIjoxOTQwOTg4NTIwfQ.ub24E4zDCTkObW7NfIzwd2v0eB6hNYvTwuzYrqMCGIA --output ./src/types/supabase.ts"
     },
     "dependencies": {
         "@devoxa/paddle-sdk": "0.2.1",
@@ -77,6 +78,7 @@
         "isomorphic-fetch": "3.0.0",
         "jest": "27.0.5",
         "msw": "0.30.0",
+        "openapi-typescript": "^4.0.2",
         "postcss": "8.3.5",
         "react-refresh": "0.10.0",
         "set-cookie-parser": "2.4.8",

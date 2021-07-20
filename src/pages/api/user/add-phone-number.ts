@@ -7,6 +7,7 @@ import appLogger from "../../../../lib/logger";
 import { createPhoneNumber } from "../../../database/phone-number";
 import { findCustomer } from "../../../database/customer";
 import fetchMessagesQueue from "../queue/fetch-messages";
+import setTwilioWebhooks from "../queue/set-twilio-webhooks";
 
 const logger = appLogger.child({ route: "/api/user/add-phone-number" });
 
@@ -14,11 +15,11 @@ type Body = {
 	phoneNumberSid: string;
 }
 
-export default withApiAuthRequired(async function addPhoneNumberHandler(req, res, user) {
-	const bodySchema = Joi.object<Body>({
-		phoneNumberSid: Joi.string().required(),
-	});
+const bodySchema = Joi.object<Body>({
+	phoneNumberSid: Joi.string().required(),
+});
 
+export default withApiAuthRequired(async function addPhoneNumberHandler(req, res, user) {
 	const validationResult = bodySchema.validate(req.body, { stripUnknown: true });
 	const validationError = validationResult.error;
 	if (validationError) {
@@ -46,7 +47,10 @@ export default withApiAuthRequired(async function addPhoneNumberHandler(req, res
 		phoneNumber: phoneNumber.phoneNumber,
 	});
 
-	await fetchMessagesQueue.enqueue({ customerId });
+	await Promise.all([
+		fetchMessagesQueue.enqueue({ customerId }, { id: `fetch-messages-${customerId}` }),
+		setTwilioWebhooks.enqueue({ customerId }, { id: `set-twilio-webhooks-${customerId}` }),
+	]);
 
 	return res.status(200).end();
 });
