@@ -9,14 +9,14 @@ type Payload = {
 }
 
 const setTwilioWebhooks = Queue<Payload>(
-	"api/queue/send-message",
+	"api/queue/set-twilio-webhooks",
 	async ({ customerId }) => {
 		const customer = await findCustomer(customerId);
 		const twimlApp = await twilio(customer.accountSid, customer.authToken)
 			.applications
 			.create({
 				friendlyName: "Virtual Phone",
-				smsUrl: "https://phone.mokhtar.dev/api/webhook/incoming-sms",
+				smsUrl: "https://phone.mokhtar.dev/api/webhook/incoming-message",
 				smsMethod: "POST",
 				voiceUrl: "https://phone.mokhtar.dev/api/webhook/incoming-call",
 				voiceMethod: "POST",

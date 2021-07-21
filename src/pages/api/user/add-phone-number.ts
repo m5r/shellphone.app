@@ -7,6 +7,7 @@ import appLogger from "../../../../lib/logger";
 import { createPhoneNumber } from "../../../database/phone-number";
 import { findCustomer } from "../../../database/customer";
 import fetchMessagesQueue from "../queue/fetch-messages";
+import fetchCallsQueue from "../queue/fetch-calls";
 import setTwilioWebhooks from "../queue/set-twilio-webhooks";
 
 const logger = appLogger.child({ route: "/api/user/add-phone-number" });
@@ -49,6 +50,7 @@ export default withApiAuthRequired(async function addPhoneNumberHandler(req, res
 
 	await Promise.all([
 		fetchMessagesQueue.enqueue({ customerId }, { id: `fetch-messages-${customerId}` }),
+		fetchCallsQueue.enqueue({ customerId }, { id: `fetch-messages-${customerId}` }),
 		setTwilioWebhooks.enqueue({ customerId }, { id: `set-twilio-webhooks-${customerId}` }),
 	]);
 

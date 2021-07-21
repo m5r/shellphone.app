@@ -7,9 +7,8 @@ import clsx from "clsx";
 import { useForm } from "react-hook-form";
 
 import { withPageOnboardingRequired } from "../../../lib/session-helpers";
-import { findConversation } from "../../database/sms";
-import type { Sms } from "../../database/_types";
-import { SmsType } from "../../database/_types";
+import type { Message } from "../../database/message";
+import { findConversation } from "../../database/message";
 import supabase from "../../supabase/client";
 import useUser from "../../hooks/use-user";
 import useConversation from "../../hooks/use-conversation";
@@ -17,7 +16,7 @@ import Layout from "../../components/layout";
 
 type Props = {
 	recipient: string;
-	conversation: Sms[];
+	conversation: Message[];
 }
 
 type Form = {
@@ -60,7 +59,7 @@ const Messages: NextPage<Props> = (props) => {
 		}
 
 		const subscription = supabase
-			.from<Sms>(`sms:customerId=eq.${userProfile.id}`)
+			.from<Message>(`sms:customerId=eq.${userProfile.id}`)
 			.on("INSERT", (payload) => {
 				const message = payload.new;
 				if ([message.from, message.to].includes(recipient)) {
@@ -98,12 +97,28 @@ const Messages: NextPage<Props> = (props) => {
 			</header>
 			<div className="flex flex-col space-y-6 p-6">
 				<ul>
-					{conversation!.map(message => {
+					{conversation!.map((message, index) => {
+						const isOutbound = message.direction === "outbound";
+						const isSameSender = message.from === conversation![index + 1]?.from;
+						const isLast = index === conversation!.length;
 						return (
-							<li key={message.id} className={clsx(message.type === SmsType.SENT ? "text-right" : "text-left")}>
-								{message.content}
+							<li
+								key={message.id}
+								className={clsx(
+									isSameSender || isLast ? "pb-3" : "pb-4",
+									isOutbound ? "text-right" : "text-left",
+								)}
+							>
+								<span
+									className={clsx(
+										"p-2 rounded-lg text-white",
+										isOutbound ? "bg-[#3194ff] rounded-br-none" : "bg-black rounded-bl-none",
+									)}
+								>
+									{message.content}
+								</span>
 							</li>
-						)
+						);
 					})}
 				</ul>
 			</div>

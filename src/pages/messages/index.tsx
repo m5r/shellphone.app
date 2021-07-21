@@ -2,9 +2,8 @@ import type { InferGetServerSidePropsType, NextPage } from "next";
 import Link from "next/link";
 
 import { withPageOnboardingRequired } from "../../../lib/session-helpers";
-import type { Sms } from "../../database/_types";
-import { SmsType } from "../../database/_types";
-import {  findCustomerMessages } from "../../database/sms";
+import type { Message } from "../../database/message";
+import {  findCustomerMessages } from "../../database/message";
 import { findCustomer } from "../../database/customer";
 import { decrypt } from "../../database/_encryption";
 import useUser from "../../hooks/use-user";
@@ -25,15 +24,17 @@ const Messages: NextPage<Props> = ({ conversations }) => {
 		<Layout title={pageTitle}>
 			<div className="flex flex-col space-y-6 p-6">
 				<p>Messages page</p>
-				<ul>
+				<ul className="divide-y">
 					{Object.entries(conversations).map(([recipient, message]) => {
 						return (
-							<li key={recipient}>
+							<li key={recipient} className="py-2">
 								<Link href={`/messages/${recipient}`}>
-									<a>
-										<div>{recipient}</div>
+									<a className="flex flex-col">
+										<div className="flex flex-row justify-between">
+											<strong>{recipient}</strong>
+											<div>{new Date(message.sentAt).toLocaleString("fr-FR")}</div>
+										</div>
 										<div>{message.content}</div>
-										<div>{new Date(message.sentAt).toLocaleDateString()}</div>
 									</a>
 								</Link>
 							</li>
@@ -59,10 +60,10 @@ export const getServerSideProps = withPageOnboardingRequired(
 			findCustomerMessages(user.id),
 		]);
 
-		let conversations: Record<Recipient, Sms> = {};
+		let conversations: Record<Recipient, Message> = {};
 		for (const message of messages) {
 			let recipient: string;
-			if (message.type === SmsType.SENT) {
+			if (message.direction === "outbound") {
 				recipient = message.to;
 			} else {
 				recipient = message.from;
