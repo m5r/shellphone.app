@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -35,7 +35,7 @@ const Messages: NextPage<Props> = (props) => {
 		initialData: props.conversation,
 		recipient,
 	});
-	const pageTitle = `Messages with ${recipient}`;
+	const formRef = useRef<HTMLFormElement>(null);
 	const {
 		register,
 		handleSubmit,
@@ -44,7 +44,7 @@ const Messages: NextPage<Props> = (props) => {
 			isSubmitting,
 		},
 	} = useForm<Form>();
-
+	const pageTitle = `Messages with ${recipient}`;
 	const onSubmit = handleSubmit(async ({ content }) => {
 		if (isSubmitting) {
 			return;
@@ -75,6 +75,12 @@ const Messages: NextPage<Props> = (props) => {
 		return () => void subscription.unsubscribe();
 	}, [userProfile, recipient, refetch]);
 
+	useEffect(() => {
+		if (formRef.current) {
+			formRef.current.scrollIntoView();
+		}
+	}, []);
+
 	if (!userProfile) {
 		return (
 			<Layout title={pageTitle}>
@@ -91,6 +97,8 @@ const Messages: NextPage<Props> = (props) => {
 			</Layout>
 		);
 	}
+
+	console.log("conversation", conversation);
 
 	return (
 		<Layout title={pageTitle}>
@@ -110,30 +118,44 @@ const Messages: NextPage<Props> = (props) => {
 				<ul>
 					{conversation!.map((message, index) => {
 						const isOutbound = message.direction === "outbound";
-						const isSameSender = message.from === conversation![index + 1]?.from;
-						const isLast = index === conversation!.length;
+						const nextMessage = conversation![index + 1];
+						const previousMessage = conversation![index - 1];
+						const isSameNext = message.from === nextMessage?.from;
+						const isSamePrevious = message.from === previousMessage?.from;
+						const differenceInMinutes = previousMessage ? (new Date(message.sentAt).getTime() - new Date(previousMessage.sentAt).getTime()) / 1000 / 60 : 0;
+						const isTooLate = differenceInMinutes > 15;
 						return (
-							<li
-								key={message.id}
-								className={clsx(
-									isSameSender || isLast ? "pb-1" : "pb-4",
-									isOutbound ? "text-right" : "text-left",
-								)}
-							>
-								<span
+							<li key={message.id}>
+								{
+									(!isSamePrevious || isTooLate) && (
+										<div className="flex py-2 space-x-1 text-xs justify-center">
+											<strong>{new Date(message.sentAt).toLocaleDateString("fr-FR", { weekday: "long", day: "2-digit", month: "short" })}</strong>
+											<span>{new Date(message.sentAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</span>
+										</div>
+									)
+								}
+
+								<div
 									className={clsx(
-										"inline-block text-left w-[fit-content] p-2 rounded-lg text-white",
-										isOutbound ? "bg-[#3194ff] rounded-br-none" : "bg-black rounded-bl-none",
+										isSameNext ? "pb-1" : "pb-2",
+										isOutbound ? "text-right" : "text-left",
 									)}
 								>
-									{message.content}
-								</span>
+									<span
+										className={clsx(
+											"inline-block text-left w-[fit-content] p-2 rounded-lg text-white",
+											isOutbound ? "bg-[#3194ff] rounded-br-none" : "bg-black rounded-bl-none",
+										)}
+									>
+										{message.content}
+									</span>
+								</div>
 							</li>
 						);
 					})}
 				</ul>
 			</div>
-			<form onSubmit={onSubmit}>
+			<form ref={formRef} onSubmit={onSubmit}>
 				<textarea{...register("content")} />
 				<button type="submit">Send</button>
 			</form>

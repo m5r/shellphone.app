@@ -28,7 +28,7 @@ const Messages: NextPage<Props> = ({ conversations }) => {
 					{Object.entries(conversations).map(([recipient, message]) => {
 						return (
 							<li key={recipient} className="py-2">
-								<Link href={`/messages/${recipient}`}>
+								<Link href={`/messages/${encodeURIComponent(recipient)}`}>
 									<a className="flex flex-col">
 										<div className="flex flex-row justify-between">
 											<strong>{recipient}</strong>
