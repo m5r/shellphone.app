@@ -65,7 +65,7 @@ const Keypad: NextPage<Props> = () => {
 
 const ZeroDigit: FunctionComponent = () => {
 	return (
-		<div className="text-3xl cursor-pointer">
+		<div className="text-3xl cursor-pointer select-none">
 			0 <DigitLetters>+</DigitLetters>
 		</div>
 	);
@@ -117,12 +117,6 @@ const pressBackspaceAtom = atom(
 	},
 );
 
-export const getServerSideProps = withPageOnboardingRequired(
-	async (context, user) => {
-		return {
-			props: { userId: user.id, ddd: 23 as const },
-		};
-	},
-);
+export const getServerSideProps = withPageOnboardingRequired();
 
 export default Keypad;

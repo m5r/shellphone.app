@@ -46,12 +46,13 @@ const Messages: NextPage<Props> = ({ conversations }) => {
 };
 
 type Recipient = string;
-export type Conversation = Record<Recipient, Sms[]>;
 
 export const getServerSideProps = withPageOnboardingRequired(
 	async (context, user) => {
-		const customer = await findCustomer(user.id);
-		const messages = await findCustomerMessages(user.id);
+		const [customer, messages] = await Promise.all([
+			findCustomer(user.id),
+			findCustomerMessages(user.id),
+		]);
 
 		let conversations: Record<Recipient, Sms> = {};
 		for (const message of messages) {

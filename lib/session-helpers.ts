@@ -114,10 +114,9 @@ export function withPageAuthRequired<Props extends EmptyProps = EmptyProps>(
 			};
 		}
 
-		const getServerSidePropsResult = await getServerSideProps(
-			context,
-			user,
-		);
+		const start = Date.now();
+		const getServerSidePropsResult = await getServerSideProps(context, user);
+		console.log("getServerSideProps took", Date.now() - start);
 		if (!hasProps(getServerSidePropsResult)) {
 			return getServerSidePropsResult;
 		}
