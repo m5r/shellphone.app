@@ -1,11 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import axios from "axios";
-import type { Sms } from "../database/_types";
-import { SmsType } from "../database/_types";
+import type { Message } from "../database/message";
 import useUser from "./use-user";
 
 type UseConversationParams = {
-	initialData?: Sms[];
+	initialData?: Message[];
 	recipient: string;
 }
 
@@ -16,11 +15,11 @@ export default function useConversation({
 	const user = useUser();
 	const getConversationUrl = `/api/conversation/${encodeURIComponent(recipient)}`;
 	const fetcher = async () => {
-		const { data } = await axios.get<Sms[]>(getConversationUrl);
+		const { data } = await axios.get<Message[]>(getConversationUrl);
 		return data;
 	};
 	const queryClient = useQueryClient();
-	const getConversationQuery = useQuery<Sms[]>(
+	const getConversationQuery = useQuery<Message[]>(
 		getConversationUrl,
 		fetcher,
 		{
@@ -31,21 +30,22 @@ export default function useConversation({
 	);
 
 	const sendMessage = useMutation(
-		(sms: Pick<Sms, "to" | "content">) => axios.post(`/api/conversation/${sms.to}/send-message`, sms, { withCredentials: true }),
+		(sms: Pick<Message, "to" | "content">) => axios.post(`/api/conversation/${sms.to}/send-message`, sms, { withCredentials: true }),
 		{
-			onMutate: async (sms: Pick<Sms, "to" | "content">) => {
+			onMutate: async (sms: Pick<Message, "to" | "content">) => {
 				await queryClient.cancelQueries(getConversationUrl);
-				const previousMessages = queryClient.getQueryData<Sms[]>(getConversationUrl);
+				const previousMessages = queryClient.getQueryData<Message[]>(getConversationUrl);
 
 				if (previousMessages) {
-					queryClient.setQueryData<Sms[]>(getConversationUrl, [
+					queryClient.setQueryData<Message[]>(getConversationUrl, [
 						...previousMessages,
 						{
 							id: "", // TODO: somehow generate an id
 							from: "", // TODO: get user's phone number
 							customerId: user.userProfile!.id,
 							sentAt: new Date().toISOString(),
-							type: SmsType.SENT,
+							direction: "outbound",
+							status: "queued",
 							content: sms.content,
 							to: sms.to,
 						},
@@ -56,7 +56,7 @@ export default function useConversation({
 			},
 			onError: (error, variables, context) => {
 				if (context?.previousMessages) {
-					queryClient.setQueryData<Sms[]>(getConversationUrl, context.previousMessages);
+					queryClient.setQueryData<Message[]>(getConversationUrl, context.previousMessages);
 				}
 			},
 			onSettled: () => queryClient.invalidateQueries(getConversationUrl),

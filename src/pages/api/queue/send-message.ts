@@ -3,7 +3,7 @@ import twilio from "twilio";
 
 import { findCustomer } from "../../../database/customer";
 import { findCustomerPhoneNumber } from "../../../database/phone-number";
-import { setTwilioSid } from "../../../database/sms";
+import { setTwilioSid } from "../../../database/message";
 
 type Payload = {
 	id: string;

@@ -1,19 +1,19 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { insertSms } from "../../database/sms";
-import { SmsType } from "../../database/_types";
+import { insertMessage } from "../../database/message";
 import { encrypt } from "../../database/_encryption";
 import twilio from "twilio";
+import fetchCallsQueue from "./queue/fetch-calls";
 
 export default async function ddd(req: NextApiRequest, res: NextApiResponse) {
 	const accountSid = "ACa886d066be0832990d1cf43fb1d53362";
 	const authToken = "8696a59a64b94bb4eba3548ed815953b";
 	// const ddd = await twilio(accountSid, authToken).incomingPhoneNumbers.list();
 	const phoneNumber = "+33757592025";
-	const ddd = await twilio(accountSid, authToken)
+	/*const ddd = await twilio(accountSid, authToken)
 		.messages
 		.list({
 			to: phoneNumber,
-		});
+		});*/
 
 	/*const ddd = await insertSms({
 		to: "+213",
@@ -42,6 +42,9 @@ export default async function ddd(req: NextApiRequest, res: NextApiResponse) {
 			smsApplicationSid: appSid,
 			voiceApplicationSid: appSid,
 		});*/
+
+	const customerId = "bcb723bc-9706-4811-a964-cc03018bd2ac";
+	const ddd = fetchCallsQueue.enqueue({ customerId }, { id: `fetch-messages-${customerId}` })
 
 	console.log("ddd", ddd);
 

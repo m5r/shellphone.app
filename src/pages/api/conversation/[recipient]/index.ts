@@ -1,7 +1,7 @@
 import Joi from "joi";
 
 import { withApiAuthRequired } from "../../../../../lib/session-helpers";
-import { findConversation } from "../../../../database/sms";
+import { findConversation } from "../../../../database/message";
 import type { ApiError } from "../../_types";
 import appLogger from "../../../../../lib/logger";
 

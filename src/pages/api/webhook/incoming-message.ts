@@ -3,14 +3,13 @@ import twilio from "twilio";
 
 import type { ApiError } from "../_types";
 import appLogger from "../../../../lib/logger";
-import { Customer, findCustomerByPhoneNumber } from "../../../database/customer";
-import { insertSms } from "../../../database/sms";
-import { SmsType } from "../../../database/_types";
+import { findCustomerByPhoneNumber } from "../../../database/customer";
+import { insertMessage } from "../../../database/message";
 import { encrypt } from "../../../database/_encryption";
 
-const logger = appLogger.child({ route: "/api/webhook/incoming-sms" });
+const logger = appLogger.child({ route: "/api/webhook/incoming-message" });
 
-export default async function incomingSmsHandler(req: NextApiRequest, res: NextApiResponse) {
+export default async function incomingMessageHandler(req: NextApiRequest, res: NextApiResponse) {
 	if (req.method !== "POST") {
 		const statusCode = 405;
 		const apiError: ApiError = {
@@ -41,7 +40,7 @@ export default async function incomingSmsHandler(req: NextApiRequest, res: NextA
 	try {
 		const phoneNumber = req.body.To;
 		const customer = await findCustomerByPhoneNumber(phoneNumber);
-		const url = "https://phone.mokhtar.dev/api/webhook/incoming-sms";
+		const url = "https://phone.mokhtar.dev/api/webhook/incoming-message";
 		const isRequestValid = twilio.validateRequest(customer.authToken!, twilioSignature, url, req.body);
 		if (!isRequestValid) {
 			const statusCode = 400;
@@ -55,11 +54,12 @@ export default async function incomingSmsHandler(req: NextApiRequest, res: NextA
 			return;
 		}
 
-		await insertSms({
+		await insertMessage({
 			customerId: customer.id,
 			to: req.body.To,
 			from: req.body.From,
-			type: SmsType.RECEIVED,
+			status: "received",
+			direction: "inbound",
 			sentAt: req.body.DateSent,
 			content: encrypt(req.body.Body, customer.encryptionKey),
 		});

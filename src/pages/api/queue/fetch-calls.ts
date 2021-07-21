@@ -3,38 +3,38 @@ import twilio from "twilio";
 
 import { findCustomerPhoneNumber } from "../../../database/phone-number";
 import { findCustomer } from "../../../database/customer";
-import insertMessagesQueue from "./insert-messages";
+import insertCallsQueue from "./insert-calls";
 
 type Payload = {
 	customerId: string;
 }
 
-const fetchMessagesQueue = Queue<Payload>(
-	"api/queue/fetch-messages",
+const fetchCallsQueue = Queue<Payload>(
+	"api/queue/fetch-calls",
 	async ({ customerId }) => {
 		const customer = await findCustomer(customerId);
 		const phoneNumber = await findCustomerPhoneNumber(customerId);
 
-		const [messagesSent, messagesReceived] = await Promise.all([
+		const [callsSent, callsReceived] = await Promise.all([
 			twilio(customer.accountSid, customer.authToken)
-				.messages
+				.calls
 				.list({ from: phoneNumber.phoneNumber }),
 			twilio(customer.accountSid, customer.authToken)
-				.messages
-				.list({ to: phoneNumber.phoneNumber }),
+				.calls
+				.list({ to: phoneNumber.phoneNumber })
 		]);
-		const messages = [
-			...messagesSent,
-			...messagesReceived,
-		].sort((a, b) => a.dateSent.getTime() - b.dateSent.getTime());
+		const calls = [
+			...callsSent,
+			...callsReceived,
+		].sort((a, b) => a.dateCreated.getTime() - b.dateCreated.getTime());
 
-		await insertMessagesQueue.enqueue({
+		await insertCallsQueue.enqueue({
 			customerId,
-			messages,
+			calls,
 		}, {
-			id: `insert-messages-${customerId}`,
+			id: `insert-calls-${customerId}`,
 		});
 	},
 );
 
-export default fetchMessagesQueue;
+export default fetchCallsQueue;
