@@ -49,6 +49,15 @@ const Settings: NextPage<Props> = (props) => {
 	);
 };
 
-export const getServerSideProps = withPageOnboardingRequired();
+export const getServerSideProps = withPageOnboardingRequired(
+	async ({ res }) => {
+		res.setHeader(
+			"Cache-Control",
+			"private, s-maxage=15, stale-while-revalidate=59",
+		);
+
+		return { props: {} };
+	},
+);
 
 export default Settings;

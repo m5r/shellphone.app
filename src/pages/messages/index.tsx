@@ -49,6 +49,11 @@ type Recipient = string;
 
 export const getServerSideProps = withPageOnboardingRequired(
 	async (context, user) => {
+		context.res.setHeader(
+			"Cache-Control",
+			"private, s-maxage=15, stale-while-revalidate=59",
+		);
+
 		const [customer, messages] = await Promise.all([
 			findCustomer(user.id),
 			findCustomerMessages(user.id),

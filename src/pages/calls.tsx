@@ -27,10 +27,13 @@ const Calls: NextPage<Props> = (props) => {
 };
 
 export const getServerSideProps = withPageOnboardingRequired(
-	async (context, user) => {
-		return {
-			props: { userId: user.id, ddd: 23 as const },
-		};
+	async ({ res }) => {
+		res.setHeader(
+			"Cache-Control",
+			"private, s-maxage=15, stale-while-revalidate=59",
+		);
+
+		return { props: {} };
 	},
 );
 

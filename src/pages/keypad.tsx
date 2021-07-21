@@ -50,7 +50,8 @@ const Keypad: NextPage<Props> = () => {
 						<Digit digit="#" />
 					</Row>
 					<Row>
-						<div className="select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-green-800 rounded-full">
+						<div
+							className="select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-green-800 rounded-full">
 							<FontAwesomeIcon icon={faPhone} color="white" size="lg" />
 						</div>
 						<div className="select-none my-auto" onClick={pressBackspace}>
@@ -117,6 +118,13 @@ const pressBackspaceAtom = atom(
 	},
 );
 
-export const getServerSideProps = withPageOnboardingRequired();
+export const getServerSideProps = withPageOnboardingRequired(({ res }) => {
+	res.setHeader(
+		"Cache-Control",
+		"private, s-maxage=15, stale-while-revalidate=59",
+	);
+
+	return { props: {} };
+});
 
 export default Keypad;
