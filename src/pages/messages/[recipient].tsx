@@ -2,7 +2,11 @@ import { useEffect } from "react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLongArrowLeft } from "@fortawesome/pro-regular-svg-icons";
+import {
+	faLongArrowLeft,
+	faInfoCircle,
+	faPhoneAlt as faPhone,
+} from "@fortawesome/pro-regular-svg-icons";
 import clsx from "clsx";
 import { useForm } from "react-hook-form";
 
@@ -92,9 +96,15 @@ const Messages: NextPage<Props> = (props) => {
 		<Layout title={pageTitle}>
 			<header className="grid grid-cols-3 items-center">
 				<span className="col-start-1 col-span-1 pl-2 cursor-pointer" onClick={router.back}>
-					<FontAwesomeIcon className="h-8 w-8" icon={faLongArrowLeft} />
+					<FontAwesomeIcon size="lg" className="h-8 w-8" icon={faLongArrowLeft} />
 				</span>
-				<strong className="col-span-1">{recipient}</strong>
+				<strong className="col-span-1">
+					{recipient}
+				</strong>
+				<span className="col-span-1 text-right space-x-4 pr-2">
+					<FontAwesomeIcon size="lg" className="h-8 w-8" icon={faPhone} />
+					<FontAwesomeIcon size="lg" className="h-8 w-8" icon={faInfoCircle} />
+				</span>
 			</header>
 			<div className="flex flex-col space-y-6 p-6">
 				<ul>
