@@ -105,13 +105,13 @@ const Messages: NextPage<Props> = (props) => {
 							<li
 								key={message.id}
 								className={clsx(
-									isSameSender || isLast ? "pb-3" : "pb-4",
+									isSameSender || isLast ? "pb-1" : "pb-4",
 									isOutbound ? "text-right" : "text-left",
 								)}
 							>
 								<span
 									className={clsx(
-										"p-2 rounded-lg text-white",
+										"inline-block text-left w-[fit-content] p-2 rounded-lg text-white",
 										isOutbound ? "bg-[#3194ff] rounded-br-none" : "bg-black rounded-bl-none",
 									)}
 								>
