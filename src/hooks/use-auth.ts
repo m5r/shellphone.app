@@ -15,6 +15,7 @@ export default function useAuth() {
 
 	useEffect(() => {
 		const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
+			console.log("event", event);
 			if (["SIGNED_IN", "SIGNED_OUT"].includes(event)) {
 				await axios.post("/api/auth/session", { event, session });
 

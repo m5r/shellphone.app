@@ -14,6 +14,7 @@ import type { Subscription } from "../../database/subscriptions";
 import { findUserSubscription } from "../../database/subscriptions";
 
 import appLogger from "../../../lib/logger";
+import ConnectedLayout from "../../components/connected-layout";
 
 const logger = appLogger.child({ page: "/account/settings/billing" });
 
@@ -31,51 +32,53 @@ const Billing: NextPage<Props> = ({ subscription }) => {
 	const { cancelSubscription, updatePaymentMethod } = useSubscription();
 
 	return (
-		<SettingsLayout>
-			<div className="flex flex-col space-y-6 p-6">
-				{subscription ? (
-					<>
-						<SettingsSection title="Payment method">
-							<PaddleLink
-								onClick={() =>
-									updatePaymentMethod({
-										updateUrl: subscription.updateUrl,
-									})
-								}
-								text="Update payment method on Paddle"
-							/>
-						</SettingsSection>
+		<ConnectedLayout>
+			<SettingsLayout>
+				<div className="flex flex-col space-y-6 p-6">
+					{subscription ? (
+						<>
+							<SettingsSection title="Payment method">
+								<PaddleLink
+									onClick={() =>
+										updatePaymentMethod({
+											updateUrl: subscription.updateUrl,
+										})
+									}
+									text="Update payment method on Paddle"
+								/>
+							</SettingsSection>
 
-						<div className="hidden lg:block">
-							<Divider />
-						</div>
+							<div className="hidden lg:block">
+								<Divider />
+							</div>
 
+							<SettingsSection title="Plan">
+								<BillingPlans activePlanId={subscription?.planId} />
+							</SettingsSection>
+
+							<div className="hidden lg:block">
+								<Divider />
+							</div>
+
+							<SettingsSection title="Cancel subscription">
+								<PaddleLink
+									onClick={() =>
+										cancelSubscription({
+											cancelUrl: subscription.cancelUrl,
+										})
+									}
+									text="Cancel subscription on Paddle"
+								/>
+							</SettingsSection>
+						</>
+					) : (
 						<SettingsSection title="Plan">
-							<BillingPlans activePlanId={subscription?.planId} />
+							<BillingPlans />
 						</SettingsSection>
-
-						<div className="hidden lg:block">
-							<Divider />
-						</div>
-
-						<SettingsSection title="Cancel subscription">
-							<PaddleLink
-								onClick={() =>
-									cancelSubscription({
-										cancelUrl: subscription.cancelUrl,
-									})
-								}
-								text="Cancel subscription on Paddle"
-							/>
-						</SettingsSection>
-					</>
-				) : (
-					<SettingsSection title="Plan">
-						<BillingPlans />
-					</SettingsSection>
-				)}
-			</div>
-		</SettingsLayout>
+					)}
+				</div>
+			</SettingsLayout>
+		</ConnectedLayout>
 	);
 };
 

@@ -26,7 +26,7 @@ type Form = {
 };
 
 const BillingPlans: FunctionComponent<Props> = ({ activePlanId = FREE.id }) => {
-	const { userProfile } = useUser();
+	const { customer } = useUser();
 	const { subscribe, changePlan } = useSubscription();
 	const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(
 		false,
@@ -78,8 +78,8 @@ const BillingPlans: FunctionComponent<Props> = ({ activePlanId = FREE.id }) => {
 			return;
 		}
 
-		const email = userProfile!.email!;
-		const userId = userProfile!.id;
+		const email = customer!.email!;
+		const userId = customer!.id;
 		const selectedPlanId = selectedPlan.id;
 
 		const isMovingToPaidPlan =

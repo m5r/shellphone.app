@@ -8,7 +8,7 @@ import Avatar from "../avatar";
 import useUser from "../../hooks/use-user";
 
 export default function Header() {
-	const { userProfile } = useUser();
+	const { customer } = useUser();
 
 	return (
 		<header
@@ -35,7 +35,7 @@ export default function Header() {
 										aria-haspopup="true"
 									>
 										<Avatar
-											name={userProfile?.email ?? "FSS"}
+											name={customer?.email ?? "FSS"}
 										/>
 									</Menu.Button>
 

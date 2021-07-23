@@ -1,11 +1,12 @@
-import { useContext } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import type { User, UserAttributes } from "@supabase/supabase-js";
 
-import { SessionContext } from "../session-context";
 import appLogger from "../../lib/logger";
 import supabase from "../supabase/client";
+import { useAtom } from "jotai";
+import { customerAtom } from "../state";
+import { Customer } from "../database/customer";
 
 const logger = appLogger.child({ module: "useUser" });
 
@@ -16,28 +17,27 @@ type UseUser = {
 	| {
 			isLoading: true;
 			error: null;
-			userProfile: null;
+			customer: null;
 	  }
 	| {
 			isLoading: false;
 			error: Error;
-			userProfile: User | null;
+			customer: Customer | null;
 	  }
 	| {
 			isLoading: false;
 			error: null;
-			userProfile: User;
+			customer: Customer;
 	  }
 );
 
 export default function useUser(): UseUser {
-	const session = useContext(SessionContext);
+	const [customer] = useAtom(customerAtom);
 	const router = useRouter();
 
 	return {
-		isLoading: session.state.user === null,
-		userProfile: session.state.user,
-		error: session.state.error,
+		isLoading: customer === null,
+		customer,
 		async deleteUser() {
 			await axios.post("/api/user/delete-user", null, {
 				withCredentials: true,

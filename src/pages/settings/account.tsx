@@ -9,13 +9,10 @@ import Divider from "../../components/divider";
 import UpdatePassword from "../../components/settings/update-password";
 import DangerZone from "../../components/settings/danger-zone";
 import { withPageOnboardingRequired } from "../../../lib/session-helpers";
+import ConnectedLayout from "../../components/connected-layout";
 
 const Account: NextPage = () => {
 	const user = useUser();
-
-	if (user.isLoading) {
-		return <SettingsLayout>Loading...</SettingsLayout>;
-	}
 
 	if (user.error !== null) {
 		return (
@@ -32,23 +29,25 @@ const Account: NextPage = () => {
 	}
 
 	return (
-		<SettingsLayout>
-			<div className="flex flex-col space-y-6 p-6">
-				<ProfileInformations />
+		<ConnectedLayout>
+			<SettingsLayout>
+				<div className="flex flex-col space-y-6 p-6">
+					<ProfileInformations />
 
-				<div className="hidden lg:block">
-					<Divider />
+					<div className="hidden lg:block">
+						<Divider />
+					</div>
+
+					<UpdatePassword />
+
+					<div className="hidden lg:block">
+						<Divider />
+					</div>
+
+					<DangerZone />
 				</div>
-
-				<UpdatePassword />
-
-				<div className="hidden lg:block">
-					<Divider />
-				</div>
-
-				<DangerZone />
-			</div>
-		</SettingsLayout>
+			</SettingsLayout>
+		</ConnectedLayout>
 	);
 };
 
