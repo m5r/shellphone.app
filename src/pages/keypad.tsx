@@ -7,60 +7,58 @@ import { faBackspace, faPhoneAlt as faPhone } from "@fortawesome/pro-solid-svg-i
 import { withPageOnboardingRequired } from "../../lib/session-helpers";
 import Layout from "../components/layout";
 import useUser from "../hooks/use-user";
+import ConnectedLayout from "../components/connected-layout";
 
-type Props = InferGetServerSidePropsType<typeof getServerSideProps>;
+type Props = {};
 
 const pageTitle = "Keypad";
 
 const Keypad: NextPage<Props> = () => {
-	const { userProfile } = useUser();
 	const phoneNumber = useAtom(phoneNumberAtom)[0];
 	const pressBackspace = useAtom(pressBackspaceAtom)[1];
 
-	if (!userProfile) {
-		return <Layout title={pageTitle}>Loading...</Layout>;
-	}
-
 	return (
-		<Layout title={pageTitle}>
-			<div className="w-96 h-full flex flex-col justify-around py-5 mx-auto text-center text-black bg-white">
-				<div className="h-16 text-3xl text-gray-700">
-					<span>{phoneNumber}</span>
-				</div>
+		<ConnectedLayout>
+			<Layout title={pageTitle}>
+				<div className="w-96 h-full flex flex-col justify-around py-5 mx-auto text-center text-black bg-white">
+					<div className="h-16 text-3xl text-gray-700">
+						<span>{phoneNumber}</span>
+					</div>
 
-				<section>
-					<Row>
-						<Digit digit="1" />
-						<Digit digit="2"><DigitLetters>ABC</DigitLetters></Digit>
-						<Digit digit="3"><DigitLetters>DEF</DigitLetters></Digit>
-					</Row>
-					<Row>
-						<Digit digit="4"><DigitLetters>GHI</DigitLetters></Digit>
-						<Digit digit="5"><DigitLetters>JKL</DigitLetters></Digit>
-						<Digit digit="6"><DigitLetters>MNO</DigitLetters></Digit>
-					</Row>
-					<Row>
-						<Digit digit="7"><DigitLetters>PQRS</DigitLetters></Digit>
-						<Digit digit="8"><DigitLetters>TUV</DigitLetters></Digit>
-						<Digit digit="9"><DigitLetters>WXYZ</DigitLetters></Digit>
-					</Row>
-					<Row>
-						<Digit digit="*" />
-						<ZeroDigit />
-						<Digit digit="#" />
-					</Row>
-					<Row>
-						<div
-							className="select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-green-800 rounded-full">
-							<FontAwesomeIcon icon={faPhone} color="white" size="lg" />
-						</div>
-						<div className="select-none my-auto" onClick={pressBackspace}>
-							<FontAwesomeIcon icon={faBackspace} size="lg" />
-						</div>
-					</Row>
-				</section>
-			</div>
-		</Layout>
+					<section>
+						<Row>
+							<Digit digit="1" />
+							<Digit digit="2"><DigitLetters>ABC</DigitLetters></Digit>
+							<Digit digit="3"><DigitLetters>DEF</DigitLetters></Digit>
+						</Row>
+						<Row>
+							<Digit digit="4"><DigitLetters>GHI</DigitLetters></Digit>
+							<Digit digit="5"><DigitLetters>JKL</DigitLetters></Digit>
+							<Digit digit="6"><DigitLetters>MNO</DigitLetters></Digit>
+						</Row>
+						<Row>
+							<Digit digit="7"><DigitLetters>PQRS</DigitLetters></Digit>
+							<Digit digit="8"><DigitLetters>TUV</DigitLetters></Digit>
+							<Digit digit="9"><DigitLetters>WXYZ</DigitLetters></Digit>
+						</Row>
+						<Row>
+							<Digit digit="*" />
+							<ZeroDigit />
+							<Digit digit="#" />
+						</Row>
+						<Row>
+							<div
+								className="select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-green-800 rounded-full">
+								<FontAwesomeIcon icon={faPhone} color="white" size="lg" />
+							</div>
+							<div className="select-none my-auto" onClick={pressBackspace}>
+								<FontAwesomeIcon icon={faBackspace} size="lg" />
+							</div>
+						</Row>
+					</section>
+				</div>
+			</Layout>
+		</ConnectedLayout>
 	);
 };
 
@@ -117,14 +115,5 @@ const pressBackspaceAtom = atom(
 		set(phoneNumberAtom, prevState => prevState.slice(0, -1));
 	},
 );
-
-export const getServerSideProps = withPageOnboardingRequired(({ res }) => {
-	res.setHeader(
-		"Cache-Control",
-		"private, s-maxage=15, stale-while-revalidate=59",
-	);
-
-	return { props: {} };
-});
 
 export default Keypad;

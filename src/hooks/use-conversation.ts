@@ -1,33 +1,38 @@
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import axios from "axios";
+import { useAtom } from "jotai";
+
 import type { Message } from "../database/message";
 import useUser from "./use-user";
+import { conversationsAtom, customerAtom, customerPhoneNumberAtom } from "../state";
+import { useEffect } from "react";
 
-type UseConversationParams = {
-	initialData?: Message[];
-	recipient: string;
-}
-
-export default function useConversation({
-	initialData,
-	recipient,
-}: UseConversationParams) {
-	const user = useUser();
+export default function useConversation(recipient: string) {
+	const customer = useAtom(customerAtom)[0];
+	const customerPhoneNumber = useAtom(customerPhoneNumberAtom)[0];
 	const getConversationUrl = `/api/conversation/${encodeURIComponent(recipient)}`;
 	const fetcher = async () => {
 		const { data } = await axios.get<Message[]>(getConversationUrl);
 		return data;
 	};
 	const queryClient = useQueryClient();
-	const getConversationQuery = useQuery<Message[]>(
+	const [conversations] = useAtom(conversationsAtom);
+	const getConversationQuery = useQuery<Message[] | null>(
 		getConversationUrl,
 		fetcher,
 		{
-			initialData,
+			initialData: null,
 			refetchInterval: false,
 			refetchOnWindowFocus: false,
 		},
 	);
+
+	useEffect(() => {
+		const conversation = conversations[recipient];
+		if (getConversationQuery.data?.length === 0) {
+			queryClient.setQueryData(getConversationUrl, conversation);
+		}
+	}, [queryClient, getConversationQuery.data, conversations, recipient, getConversationUrl]);
 
 	const sendMessage = useMutation(
 		(sms: Pick<Message, "to" | "content">) => axios.post(`/api/conversation/${sms.to}/send-message`, sms, { withCredentials: true }),
@@ -41,8 +46,8 @@ export default function useConversation({
 						...previousMessages,
 						{
 							id: "", // TODO: somehow generate an id
-							from: "", // TODO: get user's phone number
-							customerId: user.userProfile!.id,
+							from: customerPhoneNumber!.phoneNumber,
+							customerId: customer!.id,
 							sentAt: new Date().toISOString(),
 							direction: "outbound",
 							status: "queued",
@@ -54,12 +59,6 @@ export default function useConversation({
 
 				return { previousMessages };
 			},
-			onError: (error, variables, context) => {
-				if (context?.previousMessages) {
-					queryClient.setQueryData<Message[]>(getConversationUrl, context.previousMessages);
-				}
-			},
-			onSettled: () => queryClient.invalidateQueries(getConversationUrl),
 		},
 	);
 

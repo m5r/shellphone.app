@@ -32,8 +32,6 @@ export async function createCustomer({ id, email, name }: CreateCustomerParams):
 
 	if (error) throw error;
 
-	console.log("data", data);
-
 	return data![0];
 }
 

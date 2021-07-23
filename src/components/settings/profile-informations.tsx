@@ -30,9 +30,9 @@ const ProfileInformations: FunctionComponent = () => {
 	const [errorMessage, setErrorMessage] = useState("");
 
 	useEffect(() => {
-		setValue("name", user.userProfile?.user_metadata.name ?? "");
-		setValue("email", user.userProfile?.email ?? "");
-	}, [setValue, user.userProfile]);
+		setValue("name", user.customer?.name ?? "");
+		setValue("email", user.customer?.email ?? "");
+	}, [setValue, user.customer]);
 
 	const onSubmit = handleSubmit(async ({ name, email }) => {
 		if (isSubmitting) {
