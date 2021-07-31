@@ -1,12 +1,13 @@
-import type { BlitzPage } from "blitz";
-import { Routes, useMutation, useRouter } from "blitz";
+import type { BlitzPage, GetServerSideProps } from "blitz";
+import { getSession, Routes, useMutation, useRouter } from "blitz";
 import clsx from "clsx";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
+import db from "db";
+import setTwilioApiFields from "../../mutations/set-twilio-api-fields";
 import OnboardingLayout from "../../components/onboarding-layout";
 import useCurrentCustomer from "../../../core/hooks/use-current-customer";
-import setTwilioApiFields from "../../mutations/set-twilio-api-fields";
 
 type Form = {
 	twilioAccountSid: string;
@@ -99,5 +100,30 @@ const StepTwo: BlitzPage = () => {
 };
 
 StepTwo.authenticate = true;
+
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+	const session = await getSession(req, res);
+	if (!session.userId) {
+		await session.$revoke();
+		return {
+			redirect: {
+				destination: Routes.Home().pathname,
+				permanent: false,
+			},
+		};
+	}
+
+	const phoneNumber = await db.phoneNumber.findFirst({ where: { customerId: session.userId } });
+	if (!phoneNumber) {
+		return { props: {} };
+	}
+
+	return {
+		redirect: {
+			destination: Routes.Messages().pathname,
+			permanent: false,
+		},
+	};
+};
 
 export default StepTwo;

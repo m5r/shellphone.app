@@ -1,4 +1,4 @@
-import getConfig from "next/config";
+import { getConfig } from "blitz";
 import got from "got";
 
 const { serverRuntimeConfig } = getConfig();

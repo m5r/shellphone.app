@@ -1,8 +1,7 @@
 import type { ErrorInfo, FunctionComponent } from "react";
 import { Component } from "react";
-import Head from "next/head";
+import { Head, withRouter } from "blitz";
 import type { WithRouterProps } from "next/dist/client/with-router";
-import { withRouter } from "next/router";
 
 import appLogger from "../../../../integrations/logger";
 

@@ -1,7 +1,9 @@
-import type { BlitzPage } from "blitz";
+import type { BlitzPage, GetServerSideProps } from "blitz";
+import { getSession, Routes } from "blitz";
 
 import OnboardingLayout from "../../components/onboarding-layout";
 import useCurrentCustomer from "../../../core/hooks/use-current-customer";
+import db from "../../../../db";
 
 const StepOne: BlitzPage = () => {
 	useCurrentCustomer(); // preload for step two
@@ -19,5 +21,30 @@ const StepOne: BlitzPage = () => {
 };
 
 StepOne.authenticate = true;
+
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+	const session = await getSession(req, res);
+	if (!session.userId) {
+		await session.$revoke();
+		return {
+			redirect: {
+				destination: Routes.Home().pathname,
+				permanent: false,
+			},
+		};
+	}
+
+	const phoneNumber = await db.phoneNumber.findFirst({ where: { customerId: session.userId } });
+	if (!phoneNumber) {
+		return { props: {} };
+	}
+
+	return {
+		redirect: {
+			destination: Routes.Messages().pathname,
+			permanent: false,
+		},
+	};
+};
 
 export default StepOne;

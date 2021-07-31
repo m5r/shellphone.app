@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
-import { useRouter } from "next/router";
+import { Link, useRouter } from "blitz";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
 	faPhoneAlt as fasPhone,

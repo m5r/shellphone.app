@@ -89,7 +89,27 @@ StepThree.authenticate = true;
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res }) => {
 	const session = await getSession(req, res);
-	const customer = await db.customer.findFirst({ where: { id: session.userId! } });
+	if (!session.userId) {
+		await session.$revoke();
+		return {
+			redirect: {
+				destination: Routes.Home().pathname,
+				permanent: false,
+			},
+		};
+	}
+
+	const phoneNumber = await db.phoneNumber.findFirst({ where: { customerId: session.userId } });
+	if (phoneNumber) {
+		return {
+			redirect: {
+				destination: Routes.Messages().pathname,
+				permanent: false,
+			},
+		};
+	}
+
+	const customer = await db.customer.findFirst({ where: { id: session.userId } });
 	if (!customer) {
 		return {
 			redirect: {
