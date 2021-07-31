@@ -1,17 +1,17 @@
-import type { BlitzPage } from "blitz"
-import { Routes, useMutation, useRouter } from "blitz"
-import clsx from "clsx"
-import { useEffect } from "react"
-import { useForm } from "react-hook-form"
+import type { BlitzPage } from "blitz";
+import { Routes, useMutation, useRouter } from "blitz";
+import clsx from "clsx";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 
-import OnboardingLayout from "../../components/onboarding-layout"
-import useCurrentCustomer from "../../../core/hooks/use-current-customer"
-import setTwilioApiFields from "../../mutations/set-twilio-api-fields"
+import OnboardingLayout from "../../components/onboarding-layout";
+import useCurrentCustomer from "../../../core/hooks/use-current-customer";
+import setTwilioApiFields from "../../mutations/set-twilio-api-fields";
 
 type Form = {
-	twilioAccountSid: string
-	twilioAuthToken: string
-}
+	twilioAccountSid: string;
+	twilioAuthToken: string;
+};
 
 const StepTwo: BlitzPage = () => {
 	const {
@@ -19,31 +19,31 @@ const StepTwo: BlitzPage = () => {
 		handleSubmit,
 		setValue,
 		formState: { isSubmitting },
-	} = useForm<Form>()
-	const router = useRouter()
-	const { customer } = useCurrentCustomer()
-	const [setTwilioApiFieldsMutation] = useMutation(setTwilioApiFields)
+	} = useForm<Form>();
+	const router = useRouter();
+	const { customer } = useCurrentCustomer();
+	const [setTwilioApiFieldsMutation] = useMutation(setTwilioApiFields);
 
-	const initialAuthToken = customer?.authToken ?? ""
-	const initialAccountSid = customer?.accountSid ?? ""
-	const hasTwilioCredentials = initialAccountSid.length > 0 && initialAuthToken.length > 0
+	const initialAuthToken = customer?.authToken ?? "";
+	const initialAccountSid = customer?.accountSid ?? "";
+	const hasTwilioCredentials = initialAccountSid.length > 0 && initialAuthToken.length > 0;
 	useEffect(() => {
-		setValue("twilioAuthToken", initialAuthToken)
-		setValue("twilioAccountSid", initialAccountSid)
-	}, [initialAuthToken, initialAccountSid])
+		setValue("twilioAuthToken", initialAuthToken);
+		setValue("twilioAccountSid", initialAccountSid);
+	}, [initialAuthToken, initialAccountSid]);
 
 	const onSubmit = handleSubmit(async ({ twilioAccountSid, twilioAuthToken }) => {
 		if (isSubmitting) {
-			return
+			return;
 		}
 
 		await setTwilioApiFieldsMutation({
 			twilioAccountSid,
 			twilioAuthToken,
-		})
+		});
 
-		await router.push(Routes.StepThree())
-	})
+		await router.push(Routes.StepThree());
+	});
 
 	return (
 		<OnboardingLayout
@@ -95,9 +95,9 @@ const StepTwo: BlitzPage = () => {
 				</form>
 			</div>
 		</OnboardingLayout>
-	)
-}
+	);
+};
 
-StepTwo.authenticate = true
+StepTwo.authenticate = true;
 
-export default StepTwo
+export default StepTwo;

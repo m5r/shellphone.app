@@ -1,17 +1,17 @@
-import { DefaultCtx, SessionContext, SimpleRolesIsAuthorized } from "blitz"
+import { DefaultCtx, SessionContext, SimpleRolesIsAuthorized } from "blitz";
 
-import { User, Role } from "./db"
+import { User, Role } from "./db";
 
 declare module "blitz" {
 	export interface Ctx extends DefaultCtx {
-		session: SessionContext
+		session: SessionContext;
 	}
 
 	export interface Session {
-		isAuthorized: SimpleRolesIsAuthorized<Role>
+		isAuthorized: SimpleRolesIsAuthorized<Role>;
 		PublicData: {
-			userId: User["id"]
-			role: Role
-		}
+			userId: User["id"];
+			role: Role;
+		};
 	}
 }

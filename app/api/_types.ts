@@ -1,4 +1,4 @@
 export type ApiError = {
-	statusCode: number
-	errorMessage: string
-}
+	statusCode: number;
+	errorMessage: string;
+};

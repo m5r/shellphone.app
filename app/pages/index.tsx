@@ -1,9 +1,9 @@
-import { Suspense } from "react"
-import { Link, BlitzPage, useMutation, Routes } from "blitz"
+import { Suspense } from "react";
+import { Link, BlitzPage, useMutation, Routes } from "blitz";
 
-import BaseLayout from "../core/layouts/base-layout"
-import logout from "../auth/mutations/logout"
-import useCurrentCustomer from "../core/hooks/use-current-customer"
+import BaseLayout from "../core/layouts/base-layout";
+import logout from "../auth/mutations/logout";
+import useCurrentCustomer from "../core/hooks/use-current-customer";
 
 /*
  * This file is just for a pleasant getting started page for your new app.
@@ -11,8 +11,8 @@ import useCurrentCustomer from "../core/hooks/use-current-customer"
  */
 
 const UserInfo = () => {
-	const { customer } = useCurrentCustomer()
-	const [logoutMutation] = useMutation(logout)
+	const { customer } = useCurrentCustomer();
+	const [logoutMutation] = useMutation(logout);
 
 	if (customer) {
 		return (
@@ -20,7 +20,7 @@ const UserInfo = () => {
 				<button
 					className="button small"
 					onClick={async () => {
-						await logoutMutation()
+						await logoutMutation();
 					}}
 				>
 					Logout
@@ -31,7 +31,7 @@ const UserInfo = () => {
 					User role: <code>{customer.encryptionKey}</code>
 				</div>
 			</>
-		)
+		);
 	} else {
 		return (
 			<>
@@ -46,9 +46,9 @@ const UserInfo = () => {
 					</a>
 				</Link>
 			</>
-		)
+		);
 	}
-}
+};
 
 const Home: BlitzPage = () => {
 	return (
@@ -264,10 +264,10 @@ const Home: BlitzPage = () => {
 				}
 			`}</style>
 		</div>
-	)
-}
+	);
+};
 
-Home.suppressFirstRenderFlicker = true
-Home.getLayout = (page) => <BaseLayout title="Home">{page}</BaseLayout>
+Home.suppressFirstRenderFlicker = true;
+Home.getLayout = (page) => <BaseLayout title="Home">{page}</BaseLayout>;
 
-export default Home
+export default Home;

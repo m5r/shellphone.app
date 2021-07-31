@@ -1,10 +1,10 @@
-import type { BlitzPage } from "blitz"
+import type { BlitzPage } from "blitz";
 
-import OnboardingLayout from "../../components/onboarding-layout"
-import useCurrentCustomer from "../../../core/hooks/use-current-customer"
+import OnboardingLayout from "../../components/onboarding-layout";
+import useCurrentCustomer from "../../../core/hooks/use-current-customer";
 
 const StepOne: BlitzPage = () => {
-	useCurrentCustomer() // preload for step two
+	useCurrentCustomer(); // preload for step two
 
 	return (
 		<OnboardingLayout
@@ -15,9 +15,9 @@ const StepOne: BlitzPage = () => {
 				<span>Welcome, let’s set up your virtual phone!</span>
 			</div>
 		</OnboardingLayout>
-	)
-}
+	);
+};
 
-StepOne.authenticate = true
+StepOne.authenticate = true;
 
-export default StepOne
+export default StepOne;

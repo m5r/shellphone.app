@@ -1,4 +1,4 @@
-import pino from "pino"
+import pino from "pino";
 
 const appLogger = pino({
 	level: "debug",
@@ -7,6 +7,6 @@ const appLogger = pino({
 		revision: process.env.VERCEL_GITHUB_COMMIT_SHA,
 	},
 	prettyPrint: true,
-})
+});
 
-export default appLogger
+export default appLogger;

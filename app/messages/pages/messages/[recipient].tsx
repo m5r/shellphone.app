@@ -1,19 +1,22 @@
-import { Suspense } from "react"
-import { BlitzPage, useRouter } from "blitz"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { Suspense } from "react";
+import { BlitzPage, useRouter } from "blitz";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
 	faLongArrowLeft,
 	faInfoCircle,
 	faPhoneAlt as faPhone,
-} from "@fortawesome/pro-regular-svg-icons"
+} from "@fortawesome/pro-regular-svg-icons";
 
-import Layout from "../../../core/layouts/layout"
-import Conversation from "../../components/conversation"
+import Layout from "../../../core/layouts/layout";
+import Conversation from "../../components/conversation";
+import useRequireOnboarding from "../../../core/hooks/use-require-onboarding";
 
 const ConversationPage: BlitzPage = () => {
-	const router = useRouter()
-	const recipient = router.params.recipient
-	const pageTitle = `Messages with ${recipient}`
+	useRequireOnboarding();
+
+	const router = useRouter();
+	const recipient = router.params.recipient;
+	const pageTitle = `Messages with ${recipient}`;
 
 	return (
 		<Layout title={pageTitle} hideFooter>
@@ -31,9 +34,9 @@ const ConversationPage: BlitzPage = () => {
 				<Conversation />
 			</Suspense>
 		</Layout>
-	)
-}
+	);
+};
 
-ConversationPage.authenticate = true
+ConversationPage.authenticate = true;
 
-export default ConversationPage
+export default ConversationPage;

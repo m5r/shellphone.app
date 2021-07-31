@@ -1,20 +1,20 @@
-import type { ErrorInfo, FunctionComponent } from "react"
-import { Component } from "react"
-import Head from "next/head"
-import type { WithRouterProps } from "next/dist/client/with-router"
-import { withRouter } from "next/router"
+import type { ErrorInfo, FunctionComponent } from "react";
+import { Component } from "react";
+import Head from "next/head";
+import type { WithRouterProps } from "next/dist/client/with-router";
+import { withRouter } from "next/router";
 
-import appLogger from "../../../../integrations/logger"
+import appLogger from "../../../../integrations/logger";
 
-import Footer from "./footer"
+import Footer from "./footer";
 
 type Props = {
-	title: string
-	pageTitle?: string
-	hideFooter?: true
-}
+	title: string;
+	pageTitle?: string;
+	hideFooter?: true;
+};
 
-const logger = appLogger.child({ module: "Layout" })
+const logger = appLogger.child({ module: "Layout" });
 
 const Layout: FunctionComponent<Props> = ({
 	children,
@@ -41,33 +41,33 @@ const Layout: FunctionComponent<Props> = ({
 				</div>
 			</div>
 		</>
-	)
-}
+	);
+};
 
 type ErrorBoundaryState =
 	| {
-			isError: false
+			isError: false;
 	  }
 	| {
-			isError: true
-			errorMessage: string
-	  }
+			isError: true;
+			errorMessage: string;
+	  };
 
 const ErrorBoundary = withRouter(
 	class ErrorBoundary extends Component<WithRouterProps, ErrorBoundaryState> {
 		public readonly state = {
 			isError: false,
-		} as const
+		} as const;
 
 		static getDerivedStateFromError(error: Error): ErrorBoundaryState {
 			return {
 				isError: true,
 				errorMessage: error.message,
-			}
+			};
 		}
 
 		public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-			logger.error(error, errorInfo.componentStack)
+			logger.error(error, errorInfo.componentStack);
 		}
 
 		public render() {
@@ -90,12 +90,12 @@ const ErrorBoundary = withRouter(
 							?
 						</p>
 					</>
-				)
+				);
 			}
 
-			return this.props.children
+			return this.props.children;
 		}
 	}
-)
+);
 
-export default Layout
+export default Layout;

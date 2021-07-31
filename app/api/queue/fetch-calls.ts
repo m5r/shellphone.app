@@ -1,16 +1,16 @@
-import { Queue } from "quirrel/blitz"
-import twilio from "twilio"
+import { Queue } from "quirrel/blitz";
+import twilio from "twilio";
 
-import db from "../../../db"
-import insertCallsQueue from "./insert-calls"
+import db from "../../../db";
+import insertCallsQueue from "./insert-calls";
 
 type Payload = {
-	customerId: string
-}
+	customerId: string;
+};
 
 const fetchCallsQueue = Queue<Payload>("api/queue/fetch-calls", async ({ customerId }) => {
-	const customer = await db.customer.findFirst({ where: { id: customerId } })
-	const phoneNumber = await db.phoneNumber.findFirst({ where: { customerId } })
+	const customer = await db.customer.findFirst({ where: { id: customerId } });
+	const phoneNumber = await db.phoneNumber.findFirst({ where: { customerId } });
 
 	const [callsSent, callsReceived] = await Promise.all([
 		twilio(customer!.accountSid!, customer!.authToken!).calls.list({
@@ -19,10 +19,10 @@ const fetchCallsQueue = Queue<Payload>("api/queue/fetch-calls", async ({ custome
 		twilio(customer!.accountSid!, customer!.authToken!).calls.list({
 			to: phoneNumber!.phoneNumber,
 		}),
-	])
+	]);
 	const calls = [...callsSent, ...callsReceived].sort(
 		(a, b) => a.dateCreated.getTime() - b.dateCreated.getTime()
-	)
+	);
 
 	await insertCallsQueue.enqueue(
 		{
@@ -32,7 +32,7 @@ const fetchCallsQueue = Queue<Payload>("api/queue/fetch-calls", async ({ custome
 		{
 			id: `insert-calls-${customerId}`,
 		}
-	)
-})
+	);
+});
 
-export default fetchCallsQueue
+export default fetchCallsQueue;
