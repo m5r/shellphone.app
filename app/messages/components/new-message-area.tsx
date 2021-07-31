@@ -1,40 +1,40 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPaperPlane } from "@fortawesome/pro-regular-svg-icons"
-import { useForm } from "react-hook-form"
-import { useMutation, useQuery, useRouter } from "blitz"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPaperPlane } from "@fortawesome/pro-regular-svg-icons";
+import { useForm } from "react-hook-form";
+import { useMutation, useQuery, useRouter } from "blitz";
 
-import sendMessage from "../mutations/send-message"
-import { Direction, Message, MessageStatus } from "../../../db"
-import getConversationsQuery from "../queries/get-conversations"
-import useCurrentCustomer from "../../core/hooks/use-current-customer"
-import useCustomerPhoneNumber from "../../core/hooks/use-customer-phone-number"
+import sendMessage from "../mutations/send-message";
+import { Direction, Message, MessageStatus } from "../../../db";
+import getConversationsQuery from "../queries/get-conversations";
+import useCurrentCustomer from "../../core/hooks/use-current-customer";
+import useCustomerPhoneNumber from "../../core/hooks/use-customer-phone-number";
 
 type Form = {
-	content: string
-}
+	content: string;
+};
 
 export default function NewMessageArea() {
-	const router = useRouter()
-	const recipient = router.params.recipient
-	const { customer } = useCurrentCustomer()
-	const phoneNumber = useCustomerPhoneNumber()
-	const sendMessageMutation = useMutation(sendMessage)[0]
+	const router = useRouter();
+	const recipient = router.params.recipient;
+	const { customer } = useCurrentCustomer();
+	const phoneNumber = useCustomerPhoneNumber();
+	const sendMessageMutation = useMutation(sendMessage)[0];
 	const { setQueryData: setConversationsQueryData, refetch: refetchConversations } = useQuery(
 		getConversationsQuery,
 		{}
-	)[1]
+	)[1];
 	const {
 		register,
 		handleSubmit,
 		setValue,
 		formState: { isSubmitting },
-	} = useForm<Form>()
+	} = useForm<Form>();
 	const onSubmit = handleSubmit(async ({ content }) => {
 		if (isSubmitting) {
-			return
+			return;
 		}
 
-		const id = uuidv4()
+		const id = uuidv4();
 		const message: Message = {
 			id,
 			customerId: customer!.id,
@@ -45,24 +45,24 @@ export default function NewMessageArea() {
 			direction: Direction.Outbound,
 			status: MessageStatus.Queued,
 			sentAt: new Date(),
-		}
+		};
 
 		await setConversationsQueryData(
 			(conversations) => {
-				const nextConversations = { ...conversations }
+				const nextConversations = { ...conversations };
 				if (!nextConversations[recipient]) {
-					nextConversations[recipient] = []
+					nextConversations[recipient] = [];
 				}
 
-				nextConversations[recipient] = [...nextConversations[recipient]!, message]
-				return nextConversations
+				nextConversations[recipient] = [...nextConversations[recipient]!, message];
+				return nextConversations;
 			},
 			{ refetch: false }
-		)
-		setValue("content", "")
-		await sendMessageMutation({ to: recipient, content })
-		await refetchConversations({ cancelRefetch: true })
-	})
+		);
+		setValue("content", "");
+		await sendMessageMutation({ to: recipient, content });
+		await refetchConversations({ cancelRefetch: true });
+	});
 
 	return (
 		<form
@@ -82,13 +82,13 @@ export default function NewMessageArea() {
 				<FontAwesomeIcon size="2x" className="h-8 w-8 pl-1 pr-2" icon={faPaperPlane} />
 			</button>
 		</form>
-	)
+	);
 }
 
 function uuidv4() {
 	return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
 		const r = (Math.random() * 16) | 0,
-			v = c == "x" ? r : (r & 0x3) | 0x8
-		return v.toString(16)
-	})
+			v = c == "x" ? r : (r & 0x3) | 0x8;
+		return v.toString(16);
+	});
 }

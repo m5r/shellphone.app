@@ -1,19 +1,19 @@
-import { Queue } from "quirrel/blitz"
-import type { MessageInstance } from "twilio/lib/rest/api/v2010/account/message"
+import { Queue } from "quirrel/blitz";
+import type { MessageInstance } from "twilio/lib/rest/api/v2010/account/message";
 
-import db, { MessageStatus, Direction, Message } from "../../../db"
-import { encrypt } from "../../../db/_encryption"
+import db, { MessageStatus, Direction, Message } from "../../../db";
+import { encrypt } from "../../../db/_encryption";
 
 type Payload = {
-	customerId: string
-	messages: MessageInstance[]
-}
+	customerId: string;
+	messages: MessageInstance[];
+};
 
 const insertMessagesQueue = Queue<Payload>(
 	"api/queue/insert-messages",
 	async ({ messages, customerId }) => {
-		const customer = await db.customer.findFirst({ where: { id: customerId } })
-		const encryptionKey = customer!.encryptionKey
+		const customer = await db.customer.findFirst({ where: { id: customerId } });
+		const encryptionKey = customer!.encryptionKey;
 
 		const sms = messages
 			.map<Omit<Message, "id">>((message) => ({
@@ -26,53 +26,53 @@ const insertMessagesQueue = Queue<Payload>(
 				twilioSid: message.sid,
 				sentAt: new Date(message.dateSent),
 			}))
-			.sort((a, b) => a.sentAt.getTime() - b.sentAt.getTime())
+			.sort((a, b) => a.sentAt.getTime() - b.sentAt.getTime());
 
-		await db.message.createMany({ data: sms })
+		await db.message.createMany({ data: sms });
 	}
-)
+);
 
-export default insertMessagesQueue
+export default insertMessagesQueue;
 
 function translateDirection(direction: MessageInstance["direction"]): Direction {
 	switch (direction) {
 		case "inbound":
-			return Direction.Inbound
+			return Direction.Inbound;
 		case "outbound-api":
 		case "outbound-call":
 		case "outbound-reply":
 		default:
-			return Direction.Outbound
+			return Direction.Outbound;
 	}
 }
 
 function translateStatus(status: MessageInstance["status"]): MessageStatus {
 	switch (status) {
 		case "accepted":
-			return MessageStatus.Accepted
+			return MessageStatus.Accepted;
 		case "canceled":
-			return MessageStatus.Canceled
+			return MessageStatus.Canceled;
 		case "delivered":
-			return MessageStatus.Delivered
+			return MessageStatus.Delivered;
 		case "failed":
-			return MessageStatus.Failed
+			return MessageStatus.Failed;
 		case "partially_delivered":
-			return MessageStatus.PartiallyDelivered
+			return MessageStatus.PartiallyDelivered;
 		case "queued":
-			return MessageStatus.Queued
+			return MessageStatus.Queued;
 		case "read":
-			return MessageStatus.Read
+			return MessageStatus.Read;
 		case "received":
-			return MessageStatus.Received
+			return MessageStatus.Received;
 		case "receiving":
-			return MessageStatus.Receiving
+			return MessageStatus.Receiving;
 		case "scheduled":
-			return MessageStatus.Scheduled
+			return MessageStatus.Scheduled;
 		case "sending":
-			return MessageStatus.Sending
+			return MessageStatus.Sending;
 		case "sent":
-			return MessageStatus.Sent
+			return MessageStatus.Sent;
 		case "undelivered":
-			return MessageStatus.Undelivered
+			return MessageStatus.Undelivered;
 	}
 }

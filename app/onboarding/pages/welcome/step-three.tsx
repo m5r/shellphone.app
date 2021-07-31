@@ -1,26 +1,26 @@
-import type { BlitzPage, GetServerSideProps } from "blitz"
-import { Routes, getSession, useRouter, useMutation } from "blitz"
-import { useEffect } from "react"
-import twilio from "twilio"
-import { useForm } from "react-hook-form"
-import clsx from "clsx"
+import type { BlitzPage, GetServerSideProps } from "blitz";
+import { Routes, getSession, useRouter, useMutation } from "blitz";
+import { useEffect } from "react";
+import twilio from "twilio";
+import { useForm } from "react-hook-form";
+import clsx from "clsx";
 
-import db from "../../../../db"
-import OnboardingLayout from "../../components/onboarding-layout"
-import setPhoneNumber from "../../mutations/set-phone-number"
+import db from "../../../../db";
+import OnboardingLayout from "../../components/onboarding-layout";
+import setPhoneNumber from "../../mutations/set-phone-number";
 
 type PhoneNumber = {
-	phoneNumber: string
-	sid: string
-}
+	phoneNumber: string;
+	sid: string;
+};
 
 type Props = {
-	availablePhoneNumbers: PhoneNumber[]
-}
+	availablePhoneNumbers: PhoneNumber[];
+};
 
 type Form = {
-	phoneNumberSid: string
-}
+	phoneNumberSid: string;
+};
 
 const StepThree: BlitzPage<Props> = ({ availablePhoneNumbers }) => {
 	const {
@@ -28,24 +28,24 @@ const StepThree: BlitzPage<Props> = ({ availablePhoneNumbers }) => {
 		handleSubmit,
 		setValue,
 		formState: { isSubmitting },
-	} = useForm<Form>()
-	const router = useRouter()
-	const [setPhoneNumberMutation] = useMutation(setPhoneNumber)
+	} = useForm<Form>();
+	const router = useRouter();
+	const [setPhoneNumberMutation] = useMutation(setPhoneNumber);
 
 	useEffect(() => {
 		if (availablePhoneNumbers[0]) {
-			setValue("phoneNumberSid", availablePhoneNumbers[0].sid)
+			setValue("phoneNumberSid", availablePhoneNumbers[0].sid);
 		}
-	})
+	});
 
 	const onSubmit = handleSubmit(async ({ phoneNumberSid }) => {
 		if (isSubmitting) {
-			return
+			return;
 		}
 
-		await setPhoneNumberMutation({ phoneNumberSid })
-		await router.push(Routes.Messages())
-	})
+		await setPhoneNumberMutation({ phoneNumberSid });
+		await router.push(Routes.Messages());
+	});
 
 	return (
 		<OnboardingLayout currentStep={3} previous={{ href: "/welcome/step-two", label: "Back" }}>
@@ -82,21 +82,21 @@ const StepThree: BlitzPage<Props> = ({ availablePhoneNumbers }) => {
 				</form>
 			</div>
 		</OnboardingLayout>
-	)
-}
+	);
+};
 
-StepThree.authenticate = true
+StepThree.authenticate = true;
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res }) => {
-	const session = await getSession(req, res)
-	const customer = await db.customer.findFirst({ where: { id: session.userId! } })
+	const session = await getSession(req, res);
+	const customer = await db.customer.findFirst({ where: { id: session.userId! } });
 	if (!customer) {
 		return {
 			redirect: {
 				destination: Routes.StepOne().pathname,
 				permanent: false,
 			},
-		}
+		};
 	}
 
 	if (!customer.accountSid || !customer.authToken) {
@@ -105,20 +105,20 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res }
 				destination: Routes.StepTwo().pathname,
 				permanent: false,
 			},
-		}
+		};
 	}
 
 	const incomingPhoneNumbers = await twilio(
 		customer.accountSid,
 		customer.authToken
-	).incomingPhoneNumbers.list()
-	const phoneNumbers = incomingPhoneNumbers.map(({ phoneNumber, sid }) => ({ phoneNumber, sid }))
+	).incomingPhoneNumbers.list();
+	const phoneNumbers = incomingPhoneNumbers.map(({ phoneNumber, sid }) => ({ phoneNumber, sid }));
 
 	return {
 		props: {
 			availablePhoneNumbers: phoneNumbers,
 		},
-	}
-}
+	};
+};
 
-export default StepThree
+export default StepThree;

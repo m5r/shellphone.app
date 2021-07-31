@@ -1,37 +1,37 @@
-import { Suspense, useEffect, useRef } from "react"
-import { useRouter } from "blitz"
-import clsx from "clsx"
+import { Suspense, useEffect, useRef } from "react";
+import { useRouter } from "blitz";
+import clsx from "clsx";
 
-import { Direction } from "../../../db"
-import useConversation from "../hooks/use-conversation"
-import NewMessageArea from "./new-message-area"
+import { Direction } from "../../../db";
+import useConversation from "../hooks/use-conversation";
+import NewMessageArea from "./new-message-area";
 
 export default function Conversation() {
-	const router = useRouter()
-	const conversation = useConversation(router.params.recipient)[0]
-	const messagesListRef = useRef<HTMLUListElement>(null)
+	const router = useRouter();
+	const conversation = useConversation(router.params.recipient)[0];
+	const messagesListRef = useRef<HTMLUListElement>(null);
 
 	useEffect(() => {
-		messagesListRef.current?.querySelector("li:last-child")?.scrollIntoView()
-	}, [conversation, messagesListRef])
+		messagesListRef.current?.querySelector("li:last-child")?.scrollIntoView();
+	}, [conversation, messagesListRef]);
 
 	return (
 		<>
 			<div className="flex flex-col space-y-6 p-6 pt-12 pb-16">
 				<ul ref={messagesListRef}>
 					{conversation.map((message, index) => {
-						const isOutbound = message.direction === Direction.Outbound
-						const nextMessage = conversation![index + 1]
-						const previousMessage = conversation![index - 1]
-						const isSameNext = message.from === nextMessage?.from
-						const isSamePrevious = message.from === previousMessage?.from
+						const isOutbound = message.direction === Direction.Outbound;
+						const nextMessage = conversation![index + 1];
+						const previousMessage = conversation![index - 1];
+						const isSameNext = message.from === nextMessage?.from;
+						const isSamePrevious = message.from === previousMessage?.from;
 						const differenceInMinutes = previousMessage
 							? (new Date(message.sentAt).getTime() -
 									new Date(previousMessage.sentAt).getTime()) /
 							  1000 /
 							  60
-							: 0
-						const isTooLate = differenceInMinutes > 15
+							: 0;
+						const isTooLate = differenceInMinutes > 15;
 						return (
 							<li key={message.id}>
 								{(!isSamePrevious || isTooLate) && (
@@ -70,7 +70,7 @@ export default function Conversation() {
 									</span>
 								</div>
 							</li>
-						)
+						);
 					})}
 				</ul>
 			</div>
@@ -78,5 +78,5 @@ export default function Conversation() {
 				<NewMessageArea />
 			</Suspense>
 		</>
-	)
+	);
 }

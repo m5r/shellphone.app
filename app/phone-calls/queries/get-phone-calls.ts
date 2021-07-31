@@ -1,9 +1,9 @@
-import { paginate, resolver } from "blitz"
-import db, { Prisma, Customer } from "db"
+import { paginate, resolver } from "blitz";
+import db, { Prisma, Customer } from "db";
 
 interface GetPhoneCallsInput
 	extends Pick<Prisma.PhoneCallFindManyArgs, "where" | "orderBy" | "skip" | "take"> {
-	customerId: Customer["id"]
+	customerId: Customer["id"];
 }
 
 export default resolver.pipe(
@@ -20,13 +20,13 @@ export default resolver.pipe(
 			take,
 			count: () => db.phoneCall.count({ where }),
 			query: (paginateArgs) => db.phoneCall.findMany({ ...paginateArgs, where, orderBy }),
-		})
+		});
 
 		return {
 			phoneCalls,
 			nextPage,
 			hasMore,
 			count,
-		}
+		};
 	}
-)
+);

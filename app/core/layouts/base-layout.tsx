@@ -1,10 +1,10 @@
-import { ReactNode } from "react"
-import { Head } from "blitz"
+import { ReactNode } from "react";
+import { Head } from "blitz";
 
 type LayoutProps = {
-	title?: string
-	children: ReactNode
-}
+	title?: string;
+	children: ReactNode;
+};
 
 const BaseLayout = ({ title, children }: LayoutProps) => {
 	return (
@@ -16,7 +16,7 @@ const BaseLayout = ({ title, children }: LayoutProps) => {
 
 			{children}
 		</>
-	)
-}
+	);
+};
 
-export default BaseLayout
+export default BaseLayout;

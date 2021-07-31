@@ -1,9 +1,9 @@
-import { Ctx } from "blitz"
+import { Ctx } from "blitz";
 
-import db from "../../../db"
+import db from "../../../db";
 
 export default async function getCurrentCustomer(_ = null, { session }: Ctx) {
-	if (!session.userId) return null
+	if (!session.userId) return null;
 
 	return db.customer.findFirst({
 		where: { id: session.userId },
@@ -17,5 +17,5 @@ export default async function getCurrentCustomer(_ = null, { session }: Ctx) {
 			paddleSubscriptionId: true,
 			user: true,
 		},
-	})
+	});
 }

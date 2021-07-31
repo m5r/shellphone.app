@@ -1,18 +1,18 @@
-import { Link, useQuery } from "blitz"
+import { Link, useQuery } from "blitz";
 
-import getConversationsQuery from "../queries/get-conversations"
+import getConversationsQuery from "../queries/get-conversations";
 
 export default function ConversationsList() {
-	const conversations = useQuery(getConversationsQuery, {})[0]
+	const conversations = useQuery(getConversationsQuery, {})[0];
 
 	if (Object.keys(conversations).length === 0) {
-		return <div>empty state</div>
+		return <div>empty state</div>;
 	}
 
 	return (
 		<ul className="divide-y">
 			{Object.entries(conversations).map(([recipient, messages]) => {
-				const lastMessage = messages[messages.length - 1]!
+				const lastMessage = messages[messages.length - 1]!;
 				return (
 					<li key={recipient} className="py-2">
 						<Link href={`/messages/${encodeURIComponent(recipient)}`}>
@@ -27,8 +27,8 @@ export default function ConversationsList() {
 							</a>
 						</Link>
 					</li>
-				)
+				);
 			})}
 		</ul>
-	)
+	);
 }

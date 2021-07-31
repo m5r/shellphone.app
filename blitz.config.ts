@@ -1,4 +1,4 @@
-import { BlitzConfig, sessionMiddleware, simpleRolesIsAuthorized } from "blitz"
+import { BlitzConfig, sessionMiddleware, simpleRolesIsAuthorized } from "blitz";
 
 const config: BlitzConfig = {
 	middleware: [
@@ -32,5 +32,5 @@ const config: BlitzConfig = {
 	  return config
 	},
 	*/
-}
-module.exports = config
+};
+module.exports = config;

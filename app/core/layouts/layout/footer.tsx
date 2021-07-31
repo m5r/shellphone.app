@@ -1,19 +1,19 @@
-import type { ReactNode } from "react"
-import Link from "next/link"
-import { useRouter } from "next/router"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import type { ReactNode } from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
 	faPhoneAlt as fasPhone,
 	faTh as fasTh,
 	faComments as fasComments,
 	faCog as fasCog,
-} from "@fortawesome/pro-solid-svg-icons"
+} from "@fortawesome/pro-solid-svg-icons";
 import {
 	faPhoneAlt as farPhone,
 	faTh as farTh,
 	faComments as farComments,
 	faCog as farCog,
-} from "@fortawesome/pro-regular-svg-icons"
+} from "@fortawesome/pro-regular-svg-icons";
 
 export default function Footer() {
 	return (
@@ -51,22 +51,22 @@ export default function Footer() {
 				}}
 			/>
 		</footer>
-	)
+	);
 }
 
 type NavLinkProps = {
-	path: string
-	label: string
+	path: string;
+	label: string;
 	icons: {
-		active: ReactNode
-		inactive: ReactNode
-	}
-}
+		active: ReactNode;
+		inactive: ReactNode;
+	};
+};
 
 function NavLink({ path, label, icons }: NavLinkProps) {
-	const router = useRouter()
-	const isActiveRoute = router.pathname.startsWith(path)
-	const icon = isActiveRoute ? icons.active : icons.inactive
+	const router = useRouter();
+	const isActiveRoute = router.pathname.startsWith(path);
+	const icon = isActiveRoute ? icons.active : icons.inactive;
 
 	return (
 		<div className="flex flex-col items-center justify-around h-full">
@@ -77,5 +77,5 @@ function NavLink({ path, label, icons }: NavLinkProps) {
 				</a>
 			</Link>
 		</div>
-	)
+	);
 }

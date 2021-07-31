@@ -1,29 +1,29 @@
-import type { FunctionComponent } from "react"
-import { CheckIcon } from "@heroicons/react/solid"
-import clsx from "clsx"
-import { Link, Routes, useRouter } from "blitz"
+import type { FunctionComponent } from "react";
+import { CheckIcon } from "@heroicons/react/solid";
+import clsx from "clsx";
+import { Link, Routes, useRouter } from "blitz";
 
-import useCustomerPhoneNumber from "../../core/hooks/use-customer-phone-number"
+import useCustomerPhoneNumber from "../../core/hooks/use-customer-phone-number";
 
 type StepLink = {
-	href: string
-	label: string
-}
+	href: string;
+	label: string;
+};
 
 type Props = {
-	currentStep: 1 | 2 | 3
-	previous?: StepLink
-	next?: StepLink
-}
+	currentStep: 1 | 2 | 3;
+	previous?: StepLink;
+	next?: StepLink;
+};
 
-const steps = ["Welcome", "Twilio Credentials", "Pick a plan"] as const
+const steps = ["Welcome", "Twilio Credentials", "Pick a plan"] as const;
 
 const OnboardingLayout: FunctionComponent<Props> = ({ children, currentStep, previous, next }) => {
-	const router = useRouter()
-	const customerPhoneNumber = useCustomerPhoneNumber()
+	const router = useRouter();
+	const customerPhoneNumber = useCustomerPhoneNumber();
 
 	if (customerPhoneNumber) {
-		throw router.push(Routes.Messages())
+		throw router.push(Routes.Messages());
 	}
 
 	return (
@@ -57,8 +57,8 @@ const OnboardingLayout: FunctionComponent<Props> = ({ children, currentStep, pre
 
 						<ol className="flex items-center">
 							{steps.map((step, stepIdx) => {
-								const isComplete = currentStep > stepIdx + 1
-								const isCurrent = stepIdx + 1 === currentStep
+								const isComplete = currentStep > stepIdx + 1;
+								const isCurrent = stepIdx + 1 === currentStep;
 
 								return (
 									<li
@@ -100,14 +100,14 @@ const OnboardingLayout: FunctionComponent<Props> = ({ children, currentStep, pre
 											</>
 										)}
 									</li>
-								)
+								);
 							})}
 						</ol>
 					</nav>
 				</div>
 			</div>
 		</div>
-	)
-}
+	);
+};
 
-export default OnboardingLayout
+export default OnboardingLayout;

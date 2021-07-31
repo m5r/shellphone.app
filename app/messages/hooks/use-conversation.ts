@@ -1,6 +1,6 @@
-import { useQuery } from "blitz"
+import { useQuery } from "blitz";
 
-import getConversationsQuery from "../queries/get-conversations"
+import getConversationsQuery from "../queries/get-conversations";
 
 export default function useConversation(recipient: string) {
 	return useQuery(
@@ -9,11 +9,11 @@ export default function useConversation(recipient: string) {
 		{
 			select(conversations) {
 				if (!conversations[recipient]) {
-					throw new Error("Conversation not found")
+					throw new Error("Conversation not found");
 				}
 
-				return conversations[recipient]!
+				return conversations[recipient]!;
 			},
 		}
-	)
+	);
 }

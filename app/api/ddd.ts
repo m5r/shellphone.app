@@ -1,6 +1,6 @@
-import { BlitzApiRequest, BlitzApiResponse } from "blitz"
+import { BlitzApiRequest, BlitzApiResponse } from "blitz";
 
-import db from "db"
+import db from "db";
 
 export default async function ddd(req: BlitzApiRequest, res: BlitzApiResponse) {
 	await Promise.all([
@@ -8,9 +8,9 @@ export default async function ddd(req: BlitzApiRequest, res: BlitzApiResponse) {
 		db.phoneCall.deleteMany(),
 		db.phoneNumber.deleteMany(),
 		db.customer.deleteMany(),
-	])
+	]);
 
-	await db.user.deleteMany()
+	await db.user.deleteMany();
 
-	res.status(200).end()
+	res.status(200).end();
 }

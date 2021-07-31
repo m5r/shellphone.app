@@ -1,12 +1,12 @@
-import { Suspense } from "react"
-import type { BlitzPage } from "blitz"
+import { Suspense } from "react";
+import type { BlitzPage } from "blitz";
 
-import Layout from "../../core/layouts/layout"
-import ConversationsList from "../components/conversations-list"
-import useRequireOnboarding from "../../core/hooks/use-require-onboarding"
+import Layout from "../../core/layouts/layout";
+import ConversationsList from "../components/conversations-list";
+import useRequireOnboarding from "../../core/hooks/use-require-onboarding";
 
 const Messages: BlitzPage = () => {
-	useRequireOnboarding()
+	useRequireOnboarding();
 
 	return (
 		<Layout title="Messages">
@@ -17,9 +17,9 @@ const Messages: BlitzPage = () => {
 				<ConversationsList />
 			</Suspense>
 		</Layout>
-	)
-}
+	);
+};
 
-Messages.authenticate = true
+Messages.authenticate = true;
 
-export default Messages
+export default Messages;

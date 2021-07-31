@@ -1,16 +1,16 @@
-import { Queue } from "quirrel/blitz"
-import twilio from "twilio"
+import { Queue } from "quirrel/blitz";
+import twilio from "twilio";
 
-import db from "../../../db"
+import db from "../../../db";
 
 type Payload = {
-	customerId: string
-}
+	customerId: string;
+};
 
 const setTwilioWebhooks = Queue<Payload>(
 	"api/queue/set-twilio-webhooks",
 	async ({ customerId }) => {
-		const customer = await db.customer.findFirst({ where: { id: customerId } })
+		const customer = await db.customer.findFirst({ where: { id: customerId } });
 		const twimlApp = customer!.twimlAppSid
 			? await twilio(customer!.accountSid!, customer!.authToken!)
 					.applications.get(customer!.twimlAppSid)
@@ -21,9 +21,9 @@ const setTwilioWebhooks = Queue<Payload>(
 					smsMethod: "POST",
 					voiceUrl: "https://phone.mokhtar.dev/api/webhook/incoming-call",
 					voiceMethod: "POST",
-			  })
-		const twimlAppSid = twimlApp.sid
-		const phoneNumber = await db.phoneNumber.findFirst({ where: { customerId } })
+			  });
+		const twimlAppSid = twimlApp.sid;
+		const phoneNumber = await db.phoneNumber.findFirst({ where: { customerId } });
 
 		await Promise.all([
 			db.customer.update({
@@ -36,8 +36,8 @@ const setTwilioWebhooks = Queue<Payload>(
 					smsApplicationSid: twimlAppSid,
 					voiceApplicationSid: twimlAppSid,
 				}),
-		])
+		]);
 	}
-)
+);
 
-export default setTwilioWebhooks
+export default setTwilioWebhooks;

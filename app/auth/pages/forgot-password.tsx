@@ -1,13 +1,13 @@
-import { BlitzPage, useMutation } from "blitz"
+import { BlitzPage, useMutation } from "blitz";
 
-import BaseLayout from "../../core/layouts/base-layout"
-import { LabeledTextField } from "../../core/components/labeled-text-field"
-import { Form, FORM_ERROR } from "../../core/components/form"
-import { ForgotPassword } from "../validations"
-import forgotPassword from "../../auth/mutations/forgot-password"
+import BaseLayout from "../../core/layouts/base-layout";
+import { LabeledTextField } from "../../core/components/labeled-text-field";
+import { Form, FORM_ERROR } from "../../core/components/form";
+import { ForgotPassword } from "../validations";
+import forgotPassword from "../../auth/mutations/forgot-password";
 
 const ForgotPasswordPage: BlitzPage = () => {
-	const [forgotPasswordMutation, { isSuccess }] = useMutation(forgotPassword)
+	const [forgotPasswordMutation, { isSuccess }] = useMutation(forgotPassword);
 
 	return (
 		<div>
@@ -28,12 +28,12 @@ const ForgotPasswordPage: BlitzPage = () => {
 					initialValues={{ email: "" }}
 					onSubmit={async (values) => {
 						try {
-							await forgotPasswordMutation(values)
+							await forgotPasswordMutation(values);
 						} catch (error) {
 							return {
 								[FORM_ERROR]:
 									"Sorry, we had an unexpected error. Please try again.",
-							}
+							};
 						}
 					}}
 				>
@@ -41,12 +41,12 @@ const ForgotPasswordPage: BlitzPage = () => {
 				</Form>
 			)}
 		</div>
-	)
-}
+	);
+};
 
-ForgotPasswordPage.redirectAuthenticatedTo = "/"
+ForgotPasswordPage.redirectAuthenticatedTo = "/";
 ForgotPasswordPage.getLayout = (page) => (
 	<BaseLayout title="Forgot Your Password?">{page}</BaseLayout>
-)
+);
 
-export default ForgotPasswordPage
+export default ForgotPasswordPage;
