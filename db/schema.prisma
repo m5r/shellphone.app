@@ -1,0 +1,154 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// --------------------------------------
+
+model User {
+  id             String   @id @default(uuid())
+  createdAt      DateTime @default(now()) @db.Timestamptz
+  updatedAt      DateTime @updatedAt @db.Timestamptz
+  name           String?
+  email          String   @unique
+  hashedPassword String?
+  role           Role     @default(USER)
+
+  tokens   Token[]
+  sessions Session[]
+  customer Customer[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Session {
+  id                 String    @id @default(uuid())
+  createdAt          DateTime  @default(now()) @db.Timestamptz
+  updatedAt          DateTime  @updatedAt @db.Timestamptz
+  expiresAt          DateTime? @db.Timestamptz
+  handle             String    @unique
+  hashedSessionToken String?
+  antiCSRFToken      String?
+  publicData         String?
+  privateData        String?
+
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String?
+}
+
+model Token {
+  id          String    @id @default(uuid())
+  createdAt   DateTime  @default(now()) @db.Timestamptz
+  updatedAt   DateTime  @updatedAt @db.Timestamptz
+  hashedToken String
+  type        TokenType
+  expiresAt   DateTime  @db.Timestamptz
+  sentTo      String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  @@unique([hashedToken, type])
+}
+
+enum TokenType {
+  RESET_PASSWORD
+}
+
+model Customer {
+  id                   String   @id
+  createdAt            DateTime @default(now()) @db.Timestamptz
+  updatedAt            DateTime @updatedAt @db.Timestamptz
+  encryptionKey        String
+  accountSid           String?
+  authToken            String?
+  // TODO: encrypt it with encryptionKey
+  twimlAppSid          String?
+  paddleCustomerId     String?
+  paddleSubscriptionId String?
+
+  user         User          @relation(fields: [id], references: [id])
+  messages     Message[]
+  phoneCalls   PhoneCall[]
+  phoneNumbers PhoneNumber[]
+}
+
+model Message {
+  id        String        @id @default(uuid())
+  sentAt    DateTime      @db.Timestamptz
+  content   String
+  from      String
+  to        String
+  direction Direction
+  status    MessageStatus
+  twilioSid String?
+
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String
+}
+
+enum Direction {
+  Inbound
+  Outbound
+}
+
+enum MessageStatus {
+  Queued
+  Sending
+  Sent
+  Failed
+  Delivered
+  Undelivered
+  Receiving
+  Received
+  Accepted
+  Scheduled
+  Read
+  PartiallyDelivered
+  Canceled
+}
+
+model PhoneCall {
+  id        String     @id @default(uuid())
+  createdAt DateTime   @default(now()) @db.Timestamptz
+  twilioSid String
+  from      String
+  to        String
+  status    CallStatus
+  direction Direction
+  duration  String
+
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String
+}
+
+enum CallStatus {
+  Queued
+  Ringing
+  InProgress
+  Completed
+  Busy
+  Failed
+  NoAnswer
+  Canceled
+}
+
+model PhoneNumber {
+  id             String   @id @default(uuid())
+  createdAt      DateTime @default(now()) @db.Timestamptz
+  phoneNumberSid String
+  phoneNumber    String
+
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String
+}
