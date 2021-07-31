@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { BlitzApiRequest, BlitzApiResponse } from "blitz";
 import twilio from "twilio";
 
 import type { ApiError } from "../../../api/_types";
@@ -9,7 +9,7 @@ import { MessageInstance } from "twilio/lib/rest/api/v2010/account/message";
 
 const logger = appLogger.child({ route: "/api/webhook/incoming-message" });
 
-export default async function incomingMessageHandler(req: NextApiRequest, res: NextApiResponse) {
+export default async function incomingMessageHandler(req: BlitzApiRequest, res: BlitzApiResponse) {
 	if (req.method !== "POST") {
 		const statusCode = 405;
 		const apiError: ApiError = {

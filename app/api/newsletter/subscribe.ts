@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { BlitzApiRequest, BlitzApiResponse } from "blitz";
 import zod from "zod";
 
 import type { ApiError } from "../_types";
@@ -14,8 +14,8 @@ const bodySchema = zod.object({
 });
 
 export default async function subscribeToNewsletter(
-	req: NextApiRequest,
-	res: NextApiResponse<Response>
+	req: BlitzApiRequest,
+	res: BlitzApiResponse<Response>
 ) {
 	if (req.method !== "POST") {
 		const statusCode = 405;
