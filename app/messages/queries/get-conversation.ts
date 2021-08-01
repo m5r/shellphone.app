@@ -9,23 +9,19 @@ const GetConversations = z.object({
 	recipient: z.string(),
 });
 
-export default resolver.pipe(
-	resolver.zod(GetConversations),
-	resolver.authorize(),
-	async ({ recipient }, context) => {
-		const customer = await getCurrentCustomer(null, context);
-		const conversation = await db.message.findMany({
-			where: {
-				OR: [{ from: recipient }, { to: recipient }],
-			},
-			orderBy: { sentAt: Prisma.SortOrder.asc },
-		});
+export default resolver.pipe(resolver.zod(GetConversations), resolver.authorize(), async ({ recipient }, context) => {
+	const customer = await getCurrentCustomer(null, context);
+	const conversation = await db.message.findMany({
+		where: {
+			OR: [{ from: recipient }, { to: recipient }],
+		},
+		orderBy: { sentAt: Prisma.SortOrder.asc },
+	});
 
-		return conversation.map((message) => {
-			return {
-				...message,
-				content: decrypt(message.content, customer!.encryptionKey),
-			};
-		});
-	},
-);
+	return conversation.map((message) => {
+		return {
+			...message,
+			content: decrypt(message.content, customer!.encryptionKey),
+		};
+	});
+});

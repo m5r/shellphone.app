@@ -58,17 +58,11 @@ describe.skip("resetPassword mutation", () => {
 
 		// Expired token
 		await expect(
-			resetPassword(
-				{ token: expiredToken, password: newPassword, passwordConfirmation: newPassword },
-				mockCtx,
-			),
+			resetPassword({ token: expiredToken, password: newPassword, passwordConfirmation: newPassword }, mockCtx),
 		).rejects.toThrowError();
 
 		// Good token
-		await resetPassword(
-			{ token: goodToken, password: newPassword, passwordConfirmation: newPassword },
-			mockCtx,
-		);
+		await resetPassword({ token: goodToken, password: newPassword, passwordConfirmation: newPassword }, mockCtx);
 
 		// Delete's the token
 		const numberOfTokens = await db.token.count({ where: { userId: user.id } });
@@ -76,8 +70,6 @@ describe.skip("resetPassword mutation", () => {
 
 		// Updates user's password
 		const updatedUser = await db.user.findFirst({ where: { id: user.id } });
-		expect(await SecurePassword.verify(updatedUser!.hashedPassword, newPassword)).toBe(
-			SecurePassword.VALID,
-		);
+		expect(await SecurePassword.verify(updatedUser!.hashedPassword, newPassword)).toBe(SecurePassword.VALID);
 	});
 });

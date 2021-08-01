@@ -41,9 +41,7 @@ export default function NewMessageBottomSheet() {
 					<NewMessageArea
 						recipient={recipient}
 						onSend={() => {
-							router
-								.push(Routes.ConversationPage({ recipient }))
-								.then(() => setIsOpen(false));
+							router.push(Routes.ConversationPage({ recipient })).then(() => setIsOpen(false));
 						}}
 					/>
 				</Suspense>

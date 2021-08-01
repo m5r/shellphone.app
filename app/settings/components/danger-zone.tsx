@@ -28,38 +28,28 @@ export default function DangerZone() {
 		<SettingsSection title="Danger Zone" description="Highway to the Danger Zone 𝅘𝅥𝅮">
 			<div className="shadow border border-red-300 sm:rounded-md sm:overflow-hidden">
 				<div className="flex justify-between items-center flex-row px-4 py-5 bg-white sm:p-6">
-					<p>
-						Once you delete your account, all of its data will be permanently deleted.
-					</p>
+					<p>Once you delete your account, all of its data will be permanently deleted.</p>
 
 					<span className="text-base font-medium">
-						<Button
-							variant="error"
-							type="button"
-							onClick={() => setIsConfirmationModalOpen(true)}
-						>
+						<Button variant="error" type="button" onClick={() => setIsConfirmationModalOpen(true)}>
 							Delete my account
 						</Button>
 					</span>
 				</div>
 			</div>
 
-			<Modal
-				initialFocus={modalCancelButtonRef}
-				isOpen={isConfirmationModalOpen}
-				onClose={closeModal}
-			>
+			<Modal initialFocus={modalCancelButtonRef} isOpen={isConfirmationModalOpen} onClose={closeModal}>
 				<div className="md:flex md:items-start">
 					<div className="mt-3 text-center md:mt-0 md:ml-4 md:text-left">
 						<ModalTitle>Delete my account</ModalTitle>
 						<div className="mt-2 text-sm text-gray-500">
 							<p>
-								Are you sure you want to delete your account? Your subscription will
-								be cancelled and your data permanently deleted.
+								Are you sure you want to delete your account? Your subscription will be cancelled and
+								your data permanently deleted.
 							</p>
 							<p>
-								You are free to create a new account with the same email address if
-								you ever wish to come back.
+								You are free to create a new account with the same email address if you ever wish to
+								come back.
 							</p>
 						</div>
 					</div>

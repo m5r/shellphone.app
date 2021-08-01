@@ -23,9 +23,7 @@ export default function ConversationsList() {
 							<a className="flex flex-col">
 								<div className="flex flex-row justify-between">
 									<strong>{recipient}</strong>
-									<div>
-										{new Date(lastMessage.sentAt).toLocaleString("fr-FR")}
-									</div>
+									<div>{new Date(lastMessage.sentAt).toLocaleString("fr-FR")}</div>
 								</div>
 								<div>{lastMessage.content}</div>
 							</a>

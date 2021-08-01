@@ -7,9 +7,7 @@ const IV_LENGTH = 16;
 const ALGORITHM = "aes-256-cbc";
 
 export function encrypt(text: string, encryptionKey: Buffer | string) {
-	const encryptionKeyAsBuffer = Buffer.isBuffer(encryptionKey)
-		? encryptionKey
-		: Buffer.from(encryptionKey, "hex");
+	const encryptionKeyAsBuffer = Buffer.isBuffer(encryptionKey) ? encryptionKey : Buffer.from(encryptionKey, "hex");
 	const iv = crypto.randomBytes(IV_LENGTH);
 	const cipher = crypto.createCipheriv(ALGORITHM, encryptionKeyAsBuffer, iv);
 	const encrypted = cipher.update(text);
@@ -19,9 +17,7 @@ export function encrypt(text: string, encryptionKey: Buffer | string) {
 }
 
 export function decrypt(encryptedHexText: string, encryptionKey: Buffer | string) {
-	const encryptionKeyAsBuffer = Buffer.isBuffer(encryptionKey)
-		? encryptionKey
-		: Buffer.from(encryptionKey, "hex");
+	const encryptionKeyAsBuffer = Buffer.isBuffer(encryptionKey) ? encryptionKey : Buffer.from(encryptionKey, "hex");
 	const [hexIv, hexText] = encryptedHexText.split(":");
 	const iv = Buffer.from(hexIv!, "hex");
 	const encryptedText = Buffer.from(hexText!, "hex");

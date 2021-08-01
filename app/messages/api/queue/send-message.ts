@@ -17,10 +17,7 @@ const sendMessageQueue = Queue<Payload>(
 		const phoneNumber = await db.phoneNumber.findFirst({ where: { customerId } });
 
 		try {
-			const message = await twilio(
-				customer!.accountSid!,
-				customer!.authToken!,
-			).messages.create({
+			const message = await twilio(customer!.accountSid!, customer!.authToken!).messages.create({
 				body: content,
 				to,
 				from: phoneNumber!.phoneNumber,

@@ -28,8 +28,7 @@ export default function Conversation() {
 						const isSameNext = message.from === nextMessage?.from;
 						const isSamePrevious = message.from === previousMessage?.from;
 						const differenceInMinutes = previousMessage
-							? (new Date(message.sentAt).getTime() -
-									new Date(previousMessage.sentAt).getTime()) /
+							? (new Date(message.sentAt).getTime() - new Date(previousMessage.sentAt).getTime()) /
 							  1000 /
 							  60
 							: 0;
@@ -63,9 +62,7 @@ export default function Conversation() {
 									<span
 										className={clsx(
 											"inline-block text-left w-[fit-content] p-2 rounded-lg text-white",
-											isOutbound
-												? "bg-[#3194ff] rounded-br-none"
-												: "bg-black rounded-bl-none",
+											isOutbound ? "bg-[#3194ff] rounded-br-none" : "bg-black rounded-bl-none",
 										)}
 									>
 										{message.content}

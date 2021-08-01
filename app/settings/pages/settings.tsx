@@ -15,16 +15,12 @@ const navigation = [
 	{
 		name: "Account",
 		href: "/settings/account",
-		icon: ({ className = "w-8 h-8" }) => (
-			<FontAwesomeIcon size="lg" className={className} icon={faUserCircle} />
-		),
+		icon: ({ className = "w-8 h-8" }) => <FontAwesomeIcon size="lg" className={className} icon={faUserCircle} />,
 	},
 	{
 		name: "Billing",
 		href: "/settings/billing",
-		icon: ({ className = "w-8 h-8" }) => (
-			<FontAwesomeIcon size="lg" className={className} icon={faCreditCard} />
-		),
+		icon: ({ className = "w-8 h-8" }) => <FontAwesomeIcon size="lg" className={className} icon={faCreditCard} />,
 	},
 ];
 /* eslint-enable react/display-name */

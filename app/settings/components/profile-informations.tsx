@@ -61,31 +61,20 @@ const ProfileInformations: FunctionComponent = () => {
 			<form onSubmit={onSubmit}>
 				{errorMessage ? (
 					<div className="mb-8">
-						<Alert
-							title="Oops, there was an issue"
-							message={errorMessage}
-							variant="error"
-						/>
+						<Alert title="Oops, there was an issue" message={errorMessage} variant="error" />
 					</div>
 				) : null}
 
 				{isSubmitSuccessful ? (
 					<div className="mb-8">
-						<Alert
-							title="Saved successfully"
-							message="Your changes have been saved."
-							variant="success"
-						/>
+						<Alert title="Saved successfully" message="Your changes have been saved." variant="success" />
 					</div>
 				) : null}
 
 				<div className="shadow sm:rounded-md sm:overflow-hidden">
 					<div className="px-4 py-5 bg-white space-y-6 sm:p-6">
 						<div className="col-span-3 sm:col-span-2">
-							<label
-								htmlFor="name"
-								className="block text-sm font-medium leading-5 text-gray-700"
-							>
+							<label htmlFor="name" className="block text-sm font-medium leading-5 text-gray-700">
 								Name
 							</label>
 							<div className="mt-1 rounded-md shadow-sm">
@@ -101,10 +90,7 @@ const ProfileInformations: FunctionComponent = () => {
 						</div>
 
 						<div>
-							<label
-								htmlFor="email"
-								className="block text-sm font-medium leading-5 text-gray-700"
-							>
+							<label htmlFor="email" className="block text-sm font-medium leading-5 text-gray-700">
 								Email address
 							</label>
 							<div className="mt-1 rounded-md shadow-sm">

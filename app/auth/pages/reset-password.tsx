@@ -41,19 +41,14 @@ const ResetPasswordPage: BlitzPage = () => {
 								};
 							} else {
 								return {
-									[FORM_ERROR]:
-										"Sorry, we had an unexpected error. Please try again.",
+									[FORM_ERROR]: "Sorry, we had an unexpected error. Please try again.",
 								};
 							}
 						}
 					}}
 				>
 					<LabeledTextField name="password" label="New Password" type="password" />
-					<LabeledTextField
-						name="passwordConfirmation"
-						label="Confirm New Password"
-						type="password"
-					/>
+					<LabeledTextField name="passwordConfirmation" label="Confirm New Password" type="password" />
 				</Form>
 			)}
 		</div>

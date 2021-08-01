@@ -13,10 +13,7 @@ const bodySchema = zod.object({
 	email: zod.string().email(),
 });
 
-export default async function subscribeToNewsletter(
-	req: BlitzApiRequest,
-	res: BlitzApiResponse<Response>,
-) {
+export default async function subscribeToNewsletter(req: BlitzApiRequest, res: BlitzApiResponse<Response>) {
 	if (req.method !== "POST") {
 		const statusCode = 405;
 		const apiError: ApiError = {

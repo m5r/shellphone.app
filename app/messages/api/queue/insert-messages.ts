@@ -9,28 +9,25 @@ type Payload = {
 	messages: MessageInstance[];
 };
 
-const insertMessagesQueue = Queue<Payload>(
-	"api/queue/insert-messages",
-	async ({ messages, customerId }) => {
-		const customer = await db.customer.findFirst({ where: { id: customerId } });
-		const encryptionKey = customer!.encryptionKey;
+const insertMessagesQueue = Queue<Payload>("api/queue/insert-messages", async ({ messages, customerId }) => {
+	const customer = await db.customer.findFirst({ where: { id: customerId } });
+	const encryptionKey = customer!.encryptionKey;
 
-		const sms = messages
-			.map<Omit<Message, "id">>((message) => ({
-				customerId,
-				content: encrypt(message.body, encryptionKey),
-				from: message.from,
-				to: message.to,
-				status: translateStatus(message.status),
-				direction: translateDirection(message.direction),
-				twilioSid: message.sid,
-				sentAt: new Date(message.dateCreated),
-			}))
-			.sort((a, b) => a.sentAt.getTime() - b.sentAt.getTime());
+	const sms = messages
+		.map<Omit<Message, "id">>((message) => ({
+			customerId,
+			content: encrypt(message.body, encryptionKey),
+			from: message.from,
+			to: message.to,
+			status: translateStatus(message.status),
+			direction: translateDirection(message.direction),
+			twilioSid: message.sid,
+			sentAt: new Date(message.dateCreated),
+		}))
+		.sort((a, b) => a.sentAt.getTime() - b.sentAt.getTime());
 
-		await db.message.createMany({ data: sms });
-	},
-);
+	await db.message.createMany({ data: sms });
+});
 
 export default insertMessagesQueue;
 

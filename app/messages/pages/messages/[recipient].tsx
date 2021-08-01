@@ -2,11 +2,7 @@ import { Suspense } from "react";
 import type { BlitzPage } from "blitz";
 import { Routes, useRouter } from "blitz";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-	faLongArrowLeft,
-	faInfoCircle,
-	faPhoneAlt as faPhone,
-} from "@fortawesome/pro-regular-svg-icons";
+import { faLongArrowLeft, faInfoCircle, faPhoneAlt as faPhone } from "@fortawesome/pro-regular-svg-icons";
 
 import Layout from "../../../core/layouts/layout";
 import Conversation from "../../components/conversation";
