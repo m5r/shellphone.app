@@ -1,4 +1,5 @@
 import type { BlitzPage } from "blitz";
+import { Routes } from "blitz";
 
 import SettingsLayout from "../../components/settings-layout";
 import ProfileInformations from "../../components/profile-informations";
@@ -31,6 +32,8 @@ const Account: BlitzPage = () => {
 	);
 };
 
-Account.authenticate = true;
+Account.getLayout = (page) => <SettingsLayout>{page}</SettingsLayout>;
+
+Account.authenticate = { redirectTo: Routes.SignIn() };
 
 export default Account;

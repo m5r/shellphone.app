@@ -1,5 +1,6 @@
 import { Suspense } from "react";
-import { BlitzPage, useRouter } from "blitz";
+import type { BlitzPage } from "blitz";
+import { Routes, useRouter } from "blitz";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
 	faLongArrowLeft,
@@ -16,10 +17,9 @@ const ConversationPage: BlitzPage = () => {
 
 	const router = useRouter();
 	const recipient = router.params.recipient;
-	const pageTitle = `Messages with ${recipient}`;
 
 	return (
-		<Layout title={pageTitle} hideFooter>
+		<>
 			<header className="absolute top-0 w-screen h-12 backdrop-filter backdrop-blur-sm bg-white bg-opacity-75 border-b grid grid-cols-3 items-center">
 				<span className="col-start-1 col-span-1 pl-2 cursor-pointer" onClick={router.back}>
 					<FontAwesomeIcon size="lg" className="h-8 w-8" icon={faLongArrowLeft} />
@@ -33,10 +33,22 @@ const ConversationPage: BlitzPage = () => {
 			<Suspense fallback={<div className="pt-12">Loading messages with {recipient}</div>}>
 				<Conversation />
 			</Suspense>
+		</>
+	);
+};
+
+ConversationPage.getLayout = function ConversationLayout(page) {
+	const router = useRouter();
+	const recipient = router.params.recipient;
+	const pageTitle = `Messages with ${recipient}`;
+
+	return (
+		<Layout title={pageTitle} hideFooter>
+			{page}
 		</Layout>
 	);
 };
 
-ConversationPage.authenticate = true;
+ConversationPage.authenticate = { redirectTo: Routes.SignIn() };
 
 export default ConversationPage;

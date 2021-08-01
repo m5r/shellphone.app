@@ -1,19 +1,21 @@
-import { useRouter, BlitzPage, Routes } from "blitz";
+import type { BlitzPage } from "blitz";
+import { useRouter, Routes } from "blitz";
 
 import BaseLayout from "../../core/layouts/base-layout";
 import { SignupForm } from "../components/signup-form";
 
-const SignupPage: BlitzPage = () => {
+const SignUp: BlitzPage = () => {
 	const router = useRouter();
 
 	return (
 		<div>
-			<SignupForm onSuccess={() => router.push(Routes.Home())} />
+			<SignupForm onSuccess={() => router.push(Routes.StepOne())} />
 		</div>
 	);
 };
 
-SignupPage.redirectAuthenticatedTo = "/";
-SignupPage.getLayout = (page) => <BaseLayout title="Sign Up">{page}</BaseLayout>;
+SignUp.redirectAuthenticatedTo = Routes.StepOne();
 
-export default SignupPage;
+SignUp.getLayout = (page) => <BaseLayout title="Sign Up">{page}</BaseLayout>;
+
+export default SignUp;
