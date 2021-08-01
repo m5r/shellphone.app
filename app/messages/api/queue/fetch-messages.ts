@@ -12,14 +12,12 @@ const fetchMessagesQueue = Queue<Payload>("api/queue/fetch-messages", async ({ c
 	const customer = await db.customer.findFirst({ where: { id: customerId } });
 	const phoneNumber = await db.phoneNumber.findFirst({ where: { customerId } });
 
-	const [messagesSent, messagesReceived] = await Promise.all([
-		twilio(customer!.accountSid!, customer!.authToken!).messages.list({
-			from: phoneNumber!.phoneNumber,
-		}),
-		twilio(customer!.accountSid!, customer!.authToken!).messages.list({
-			to: phoneNumber!.phoneNumber,
-		}),
+	const [sent, received] = await Promise.all([
+		twilio(customer!.accountSid!, customer!.authToken!).messages.list({ from: phoneNumber!.phoneNumber }),
+		twilio(customer!.accountSid!, customer!.authToken!).messages.list({ to: phoneNumber!.phoneNumber }),
 	]);
+	const messagesSent = sent.filter((message) => message.direction.startsWith("outbound"));
+	const messagesReceived = received.filter((message) => message.direction === "inbound");
 	const messages = [...messagesSent, ...messagesReceived].sort(
 		(a, b) => a.dateCreated.getTime() - b.dateCreated.getTime(),
 	);

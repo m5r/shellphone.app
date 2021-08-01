@@ -1,4 +1,4 @@
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 import type { BlitzPage } from "blitz";
 import { Routes } from "blitz";
 import { useAtom } from "jotai";

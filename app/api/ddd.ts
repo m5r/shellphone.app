@@ -4,14 +4,14 @@ import db from "db";
 import twilio from "twilio";
 
 export default async function ddd(req: BlitzApiRequest, res: BlitzApiResponse) {
-	await Promise.all([
+	/*await Promise.all([
 		db.message.deleteMany(),
 		db.phoneCall.deleteMany(),
 		db.phoneNumber.deleteMany(),
-		db.customer.deleteMany(),
 	]);
+	await db.customer.deleteMany();
+	await db.user.deleteMany();*/
 
-	await db.user.deleteMany();
 	const accountSid = "ACa886d066be0832990d1cf43fb1d53362";
 	const authToken = "8696a59a64b94bb4eba3548ed815953b";
 	/*const ddd = await twilio(accountSid, authToken)
@@ -37,6 +37,17 @@ export default async function ddd(req: BlitzApiRequest, res: BlitzApiResponse) {
 		to: "+33757592025",
 		from: "+33757592722",
 	});*/
+	/*const [messagesSent, messagesReceived] = await Promise.all([
+		twilio(accountSid, authToken).messages.list({
+			from: "+33757592025",
+		}),
+		twilio(accountSid, authToken).messages.list({
+			to: "+33757592025",
+		}),
+	]);
+
+	console.log("messagesReceived", messagesReceived.sort((a, b) => a.dateCreated.getTime() - b.dateCreated.getTime()));
+	// console.log("messagesReceived", messagesReceived);*/
 
 	res.status(200).end();
 }

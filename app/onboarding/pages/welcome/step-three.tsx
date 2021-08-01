@@ -102,6 +102,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res }
 
 	const phoneNumber = await db.phoneNumber.findFirst({ where: { customerId: session.userId } });
 	if (phoneNumber) {
+		await session.$setPublicData({ hasCompletedOnboarding: true });
 		return {
 			redirect: {
 				destination: Routes.Messages().pathname,
@@ -129,10 +130,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res }
 		};
 	}
 
-	const incomingPhoneNumbers = await twilio(
-		customer.accountSid,
-		customer.authToken,
-	).incomingPhoneNumbers.list();
+	const incomingPhoneNumbers = await twilio(customer.accountSid, customer.authToken).incomingPhoneNumbers.list();
 	const phoneNumbers = incomingPhoneNumbers.map(({ phoneNumber, sid }) => ({ phoneNumber, sid }));
 
 	return {
