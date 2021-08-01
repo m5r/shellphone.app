@@ -60,12 +60,12 @@ type ErrorBoundaryState =
 			errorMessage: string;
 	  };
 
-const blitzErrorNames = [
-	RedirectError.name,
-	AuthenticationError.name,
-	AuthorizationError.name,
-	CSRFTokenMismatchError.name,
-	NotFoundError.name,
+const blitzErrors = [
+	RedirectError,
+	AuthenticationError,
+	AuthorizationError,
+	CSRFTokenMismatchError,
+	NotFoundError,
 ];
 
 const ErrorBoundary = withRouter(
@@ -83,7 +83,7 @@ const ErrorBoundary = withRouter(
 
 		public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
 			logger.error(error, errorInfo.componentStack);
-			if (blitzErrorNames.includes(error.name)) {
+			if (blitzErrors.some((blitzError) => error instanceof blitzError)) {
 				// let Blitz ErrorBoundary handle this one
 				throw error;
 			}
