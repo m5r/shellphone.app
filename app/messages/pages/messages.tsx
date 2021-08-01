@@ -1,12 +1,12 @@
 import { Suspense, useEffect } from "react";
+import dynamic from "next/dynamic";
 import type { BlitzPage } from "blitz";
 import { Routes } from "blitz";
-import { useAtom } from "jotai";
+import { atom, useAtom } from "jotai";
 
 import Layout from "../../core/layouts/layout";
 import ConversationsList from "../components/conversations-list";
 import NewMessageButton from "../components/new-message-button";
-import NewMessageBottomSheet, { bottomSheetOpenAtom } from "../components/new-message-bottom-sheet";
 import useRequireOnboarding from "../../core/hooks/use-require-onboarding";
 import useNotifications from "../../core/hooks/use-notifications";
 
@@ -34,6 +34,13 @@ const Messages: BlitzPage = () => {
 		</>
 	);
 };
+
+const NewMessageBottomSheet = dynamic(() => import("../components/new-message-bottom-sheet"), {
+	ssr: false,
+	loading: () => null,
+});
+
+export const bottomSheetOpenAtom = atom(false);
 
 Messages.getLayout = (page) => <Layout title="Messages">{page}</Layout>;
 
