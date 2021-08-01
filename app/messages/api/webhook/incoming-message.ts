@@ -1,13 +1,14 @@
 import type { BlitzApiRequest, BlitzApiResponse } from "blitz";
+import { getConfig } from "blitz";
 import twilio from "twilio";
 
 import type { ApiError } from "../../../api/_types";
 import appLogger from "../../../../integrations/logger";
-import { encrypt } from "../../../../db/_encryption";
-import db, { Direction, MessageStatus } from "../../../../db";
-import { MessageInstance } from "twilio/lib/rest/api/v2010/account/message";
+import db from "../../../../db";
+import insertIncomingMessageQueue from "../queue/insert-incoming-message";
 
 const logger = appLogger.child({ route: "/api/webhook/incoming-message" });
+const { serverRuntimeConfig } = getConfig();
 
 export default async function incomingMessageHandler(req: BlitzApiRequest, res: BlitzApiResponse) {
 	if (req.method !== "POST") {
@@ -36,16 +37,13 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 		return;
 	}
 
-	console.log("req.body", req.body);
-	// TODO: return 200 and process this in the background
+	const body: Body = req.body;
 	try {
-		const phoneNumber = req.body.To;
 		const customerPhoneNumber = await db.phoneNumber.findFirst({
-			where: { phoneNumber },
+			where: { phoneNumber: body.To },
 		});
-		console.log("customerPhoneNumber", customerPhoneNumber);
 		if (!customerPhoneNumber) {
-			// phone number is not registered by any customer
+			// phone number is not registered by any of our customer
 			res.status(200).end();
 			return;
 		}
@@ -53,20 +51,18 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 		const customer = await db.customer.findFirst({
 			where: { id: customerPhoneNumber.customerId },
 		});
-		console.log("customer", customer);
 		if (!customer || !customer.authToken) {
 			res.status(200).end();
 			return;
 		}
 
-		const url = "https://4cbc3f38c23a.ngrok.io/api/webhook/incoming-message";
+		const url = `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/incoming-message`;
 		const isRequestValid = twilio.validateRequest(
 			customer.authToken,
 			twilioSignature,
 			url,
 			req.body
 		);
-		console.log("isRequestValid", isRequestValid);
 		if (!isRequestValid) {
 			const statusCode = 400;
 			const apiError: ApiError = {
@@ -81,22 +77,16 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 
 		// TODO: send notification
 
-		const body: Body = req.body;
 		const messageSid = body.MessageSid;
-		const message = await twilio(customer.accountSid!, customer.authToken)
-			.messages.get(messageSid)
-			.fetch();
-		await db.message.create({
-			data: {
+		await insertIncomingMessageQueue.enqueue(
+			{
+				messageSid,
 				customerId: customer.id,
-				to: message.to,
-				from: message.from,
-				status: translateStatus(message.status),
-				direction: translateDirection(message.direction),
-				sentAt: message.dateCreated,
-				content: encrypt(message.body, customer.encryptionKey),
 			},
-		});
+			{ id: messageSid }
+		);
+
+		res.status(200).end();
 	} catch (error) {
 		const statusCode = error.statusCode ?? 500;
 		const apiError: ApiError = {
@@ -130,46 +120,3 @@ type Body = {
 	From: string;
 	ApiVersion: string;
 };
-
-function translateDirection(direction: MessageInstance["direction"]): Direction {
-	switch (direction) {
-		case "inbound":
-			return Direction.Inbound;
-		case "outbound-api":
-		case "outbound-call":
-		case "outbound-reply":
-		default:
-			return Direction.Outbound;
-	}
-}
-
-function translateStatus(status: MessageInstance["status"]): MessageStatus {
-	switch (status) {
-		case "accepted":
-			return MessageStatus.Accepted;
-		case "canceled":
-			return MessageStatus.Canceled;
-		case "delivered":
-			return MessageStatus.Delivered;
-		case "failed":
-			return MessageStatus.Failed;
-		case "partially_delivered":
-			return MessageStatus.PartiallyDelivered;
-		case "queued":
-			return MessageStatus.Queued;
-		case "read":
-			return MessageStatus.Read;
-		case "received":
-			return MessageStatus.Received;
-		case "receiving":
-			return MessageStatus.Receiving;
-		case "scheduled":
-			return MessageStatus.Scheduled;
-		case "sending":
-			return MessageStatus.Sending;
-		case "sent":
-			return MessageStatus.Sent;
-		case "undelivered":
-			return MessageStatus.Undelivered;
-	}
-}
