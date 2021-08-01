@@ -33,7 +33,7 @@ export default async function ddd(req: BlitzApiRequest, res: BlitzApiResponse) {
 		// console.log(JSON.stringify(Object.keys(error)));
 	}*/
 	/*const ddd = await twilio(accountSid, authToken).messages.create({
-		body: "content",
+		body: "cccccasdasd",
 		to: "+33757592025",
 		from: "+33757592722",
 	});*/
