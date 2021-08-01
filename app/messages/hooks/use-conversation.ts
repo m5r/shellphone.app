@@ -14,6 +14,7 @@ export default function useConversation(recipient: string) {
 
 				return conversations[recipient]!;
 			},
+			keepPreviousData: true,
 		}
 	);
 }

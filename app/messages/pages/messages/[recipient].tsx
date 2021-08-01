@@ -16,7 +16,7 @@ const ConversationPage: BlitzPage = () => {
 	useRequireOnboarding();
 
 	const router = useRouter();
-	const recipient = router.params.recipient;
+	const recipient = decodeURIComponent(router.params.recipient);
 
 	return (
 		<>
@@ -39,7 +39,7 @@ const ConversationPage: BlitzPage = () => {
 
 ConversationPage.getLayout = function ConversationLayout(page) {
 	const router = useRouter();
-	const recipient = router.params.recipient;
+	const recipient = decodeURIComponent(router.params.recipient);
 	const pageTitle = `Messages with ${recipient}`;
 
 	return (

@@ -8,7 +8,8 @@ import NewMessageArea from "./new-message-area";
 
 export default function Conversation() {
 	const router = useRouter();
-	const conversation = useConversation(router.params.recipient)[0];
+	const recipient = decodeURIComponent(router.params.recipient);
+	const conversation = useConversation(recipient)[0];
 	const messagesListRef = useRef<HTMLUListElement>(null);
 
 	useEffect(() => {
@@ -75,7 +76,7 @@ export default function Conversation() {
 				</ul>
 			</div>
 			<Suspense fallback={null}>
-				<NewMessageArea />
+				<NewMessageArea recipient={recipient} />
 			</Suspense>
 		</>
 	);

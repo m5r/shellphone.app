@@ -16,15 +16,24 @@ const sendMessageQueue = Queue<Payload>(
 		const customer = await db.customer.findFirst({ where: { id: customerId } });
 		const phoneNumber = await db.phoneNumber.findFirst({ where: { customerId } });
 
-		const message = await twilio(customer!.accountSid!, customer!.authToken!).messages.create({
-			body: content,
-			to,
-			from: phoneNumber!.phoneNumber,
-		});
-		await db.message.update({
-			where: { id },
-			data: { twilioSid: message.sid },
-		});
+		try {
+			const message = await twilio(
+				customer!.accountSid!,
+				customer!.authToken!
+			).messages.create({
+				body: content,
+				to,
+				from: phoneNumber!.phoneNumber,
+			});
+			await db.message.update({
+				where: { id },
+				data: { twilioSid: message.sid },
+			});
+		} catch (error) {
+			// TODO: handle twilio error
+			console.log(error.code); // 21211
+			console.log(error.moreInfo); // https://www.twilio.com/docs/errors/21211
+		}
 	},
 	{
 		retry: ["1min"],

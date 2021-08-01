@@ -1,11 +1,15 @@
 import { resolver } from "blitz";
 import { z } from "zod";
+import twilio from "twilio";
 
 import db, { Direction, MessageStatus } from "../../../db";
 import getCurrentCustomer from "../../customers/queries/get-current-customer";
 import getCustomerPhoneNumber from "../../phone-numbers/queries/get-customer-phone-number";
 import { encrypt } from "../../../db/_encryption";
 import sendMessageQueue from "../../api/queue/send-message";
+import appLogger from "../../../integrations/logger";
+
+const logger = appLogger.child({ mutation: "send-message" });
 
 const Body = z.object({
 	content: z.string(),
@@ -17,6 +21,15 @@ export default resolver.pipe(
 	resolver.authorize(),
 	async ({ content, to }, context) => {
 		const customer = await getCurrentCustomer(null, context);
+		try {
+			await twilio(customer!.accountSid!, customer!.authToken!)
+				.lookups.v1.phoneNumbers(to)
+				.fetch();
+		} catch (error) {
+			logger.error(error);
+			return;
+		}
+
 		const customerId = customer!.id;
 		const customerPhoneNumber = await getCustomerPhoneNumber({ customerId }, context);
 
