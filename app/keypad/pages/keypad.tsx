@@ -1,9 +1,11 @@
 import type { BlitzPage } from "blitz";
 import { Routes } from "blitz";
 import type { FunctionComponent } from "react";
+import { useRef } from "react";
 import { atom, useAtom } from "jotai";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBackspace, faPhoneAlt as faPhone } from "@fortawesome/pro-solid-svg-icons";
+import { usePress } from "@react-aria/interactions";
 
 import Layout from "../../core/layouts/layout";
 import useRequireOnboarding from "../../core/hooks/use-require-onboarding";
@@ -70,12 +72,25 @@ const Keypad: BlitzPage = () => {
 };
 
 const ZeroDigit: FunctionComponent = () => {
-	// TODO: long press, convert + to 0
+	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const pressDigit = useAtom(pressDigitAtom)[1];
-	const onClick = () => pressDigit("0");
+	const longPressDigit = useAtom(longPressDigitAtom)[1];
+	const { pressProps } = usePress({
+		onPressStart() {
+			pressDigit("0");
+			timeoutRef.current = setTimeout(() => {
+				longPressDigit("+");
+			}, 750);
+		},
+		onPressEnd() {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+		},
+	});
 
 	return (
-		<div onClick={onClick} className="text-3xl cursor-pointer select-none">
+		<div {...pressProps} className="text-3xl cursor-pointer select-none">
 			0 <DigitLetters>+</DigitLetters>
 		</div>
 	);
@@ -102,12 +117,19 @@ const DigitLetters: FunctionComponent = ({ children }) => (
 );
 
 const phoneNumberAtom = atom("");
-const pressDigitAtom = atom(null, (get, set, digit) => {
+const pressDigitAtom = atom(null, (get, set, digit: string) => {
 	if (get(phoneNumberAtom).length > 17) {
 		return;
 	}
 
 	set(phoneNumberAtom, (prevState) => prevState + digit);
+});
+const longPressDigitAtom = atom(null, (get, set, replaceWith: string) => {
+	if (get(phoneNumberAtom).length > 17) {
+		return;
+	}
+
+	set(phoneNumberAtom, (prevState) => prevState.slice(0, -1) + replaceWith);
 });
 const pressBackspaceAtom = atom(null, (get, set) => {
 	if (get(phoneNumberAtom).length === 0) {
