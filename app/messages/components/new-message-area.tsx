@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/pro-regular-svg-icons";
 import { useForm } from "react-hook-form";
-import { useMutation, useQuery, useRouter } from "blitz";
+import { useMutation, useQuery } from "blitz";
 
 import sendMessage from "../mutations/send-message";
 import { Direction, Message, MessageStatus } from "../../../db";

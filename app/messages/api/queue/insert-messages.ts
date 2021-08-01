@@ -1,8 +1,8 @@
 import { Queue } from "quirrel/blitz";
 import type { MessageInstance } from "twilio/lib/rest/api/v2010/account/message";
 
-import db, { MessageStatus, Direction, Message } from "../../../db";
-import { encrypt } from "../../../db/_encryption";
+import db, { MessageStatus, Direction, Message } from "../../../../db";
+import { encrypt } from "../../../../db/_encryption";
 
 type Payload = {
 	customerId: string;
