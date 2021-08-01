@@ -56,6 +56,7 @@
 		"concurrently": "6.2.0",
 		"got": "11.8.2",
 		"jotai": "1.2.2",
+		"next-pwa": "5.2.24",
 		"pino": "6.13.0",
 		"pino-pretty": "5.1.2",
 		"postcss": "8.3.6",
@@ -68,12 +69,14 @@
 		"react-use-gesture": "9.1.3",
 		"tailwindcss": "2.2.7",
 		"twilio": "3.66.1",
+		"web-push": "3.4.5",
 		"zod": "3.5.1"
 	},
 	"devDependencies": {
 		"@types/pino": "6.3.11",
 		"@types/preview-email": "2.0.1",
 		"@types/react": "17.0.15",
+		"@types/web-push": "3.3.2",
 		"eslint": "7.32.0",
 		"husky": "6.0.0",
 		"lint-staged": "10.5.4",

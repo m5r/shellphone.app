@@ -1,5 +1,7 @@
 import { BlitzConfig, sessionMiddleware, simpleRolesIsAuthorized } from "blitz";
 
+const withPWA = require("next-pwa");
+
 const config: BlitzConfig = {
 	middleware: [
 		sessionMiddleware({
@@ -24,7 +26,15 @@ const config: BlitzConfig = {
 		},
 		masterEncryptionKey: process.env.MASTER_ENCRYPTION_KEY,
 		app: {
-			baseUrl: process.env.QUIRREL_BASE_URL,
+			baseUrl: process.env.APP_BASE_URL,
+		},
+		webPush: {
+			privateKey: process.env.WEB_PUSH_VAPID_PRIVATE_KEY,
+		},
+	},
+	publicRuntimeConfig: {
+		webPush: {
+			publicKey: process.env.WEB_PUSH_VAPID_PUBLIC_KEY,
 		},
 	},
 	/* Uncomment this to customize the webpack config
@@ -36,4 +46,11 @@ const config: BlitzConfig = {
 	},
 	*/
 };
-module.exports = config;
+
+module.exports = withPWA({
+	...config,
+	pwa: {
+		dest: "public",
+		disable: process.env.NODE_ENV !== "production",
+	},
+});

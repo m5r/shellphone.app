@@ -48,7 +48,7 @@ export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ 
 			content,
 		},
 		{
-			id: message.id,
+			id: `insert-${message.id}`,
 		},
 	);
 });

@@ -77,10 +77,11 @@ model Customer {
   paddleCustomerId     String?
   paddleSubscriptionId String?
 
-  user         User          @relation(fields: [id], references: [id])
-  messages     Message[]
-  phoneCalls   PhoneCall[]
-  phoneNumbers PhoneNumber[]
+  user                      User                       @relation(fields: [id], references: [id])
+  messages                  Message[]
+  phoneCalls                PhoneCall[]
+  phoneNumbers              PhoneNumber[]
+  notificationSubscriptions NotificationSubscription[]
 }
 
 model Message {
@@ -148,6 +149,19 @@ model PhoneNumber {
   createdAt      DateTime @default(now()) @db.Timestamptz
   phoneNumberSid String
   phoneNumber    String
+
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String
+}
+
+model NotificationSubscription {
+  id             String   @id @default(uuid())
+  createdAt      DateTime @default(now()) @db.Timestamptz
+  updatedAt      DateTime @updatedAt @db.Timestamptz
+  endpoint       String   @unique
+  expirationTime Int?
+  keys_p256dh    String
+  keys_auth      String
 
   customer   Customer @relation(fields: [customerId], references: [id])
   customerId String

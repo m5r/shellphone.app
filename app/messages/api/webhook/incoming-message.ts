@@ -6,6 +6,7 @@ import type { ApiError } from "../../../api/_types";
 import appLogger from "../../../../integrations/logger";
 import db from "../../../../db";
 import insertIncomingMessageQueue from "../queue/insert-incoming-message";
+import notifyIncomingMessageQueue from "../queue/notify-incoming-message";
 
 const logger = appLogger.child({ route: "/api/webhook/incoming-message" });
 const { serverRuntimeConfig } = getConfig();
@@ -70,16 +71,24 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 			return;
 		}
 
-		// TODO: send notification
-
 		const messageSid = body.MessageSid;
-		await insertIncomingMessageQueue.enqueue(
-			{
-				messageSid,
-				customerId: customer.id,
-			},
-			{ id: messageSid },
-		);
+		const customerId = customer.id;
+		await Promise.all([
+			notifyIncomingMessageQueue.enqueue(
+				{
+					messageSid,
+					customerId,
+				},
+				{ id: `notify-${messageSid}` },
+			),
+			insertIncomingMessageQueue.enqueue(
+				{
+					messageSid,
+					customerId,
+				},
+				{ id: `insert-${messageSid}` },
+			),
+		]);
 
 		res.status(200).end();
 	} catch (error) {
