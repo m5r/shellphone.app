@@ -22,7 +22,8 @@ test.skip("renders blitz documentation link", () => {
 			paddleSubscriptionId: null,
 			user: {} as any,
 		},
-		hasCompletedOnboarding: false,
+		hasFilledTwilioCredentials: false,
+		hasCompletedOnboarding: undefined,
 	});
 
 	const { getByText } = render(<Home />);

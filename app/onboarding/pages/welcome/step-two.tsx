@@ -48,10 +48,7 @@ const StepTwo: BlitzPage = () => {
 		<div className="flex flex-col space-y-4 items-center">
 			<form onSubmit={onSubmit} className="flex flex-col gap-6">
 				<div className="w-full">
-					<label
-						htmlFor="twilioAccountSid"
-						className="block text-sm font-medium text-gray-700"
-					>
+					<label htmlFor="twilioAccountSid" className="block text-sm font-medium text-gray-700">
 						Twilio Account SID
 					</label>
 					<input
@@ -62,10 +59,7 @@ const StepTwo: BlitzPage = () => {
 					/>
 				</div>
 				<div className="w-full">
-					<label
-						htmlFor="twilioAuthToken"
-						className="block text-sm font-medium text-gray-700"
-					>
+					<label htmlFor="twilioAuthToken" className="block text-sm font-medium text-gray-700">
 						Twilio Auth Token
 					</label>
 					<input
@@ -108,11 +102,7 @@ const StepTwoLayout: FunctionComponent = ({ children }) => {
 	return (
 		<OnboardingLayout
 			currentStep={2}
-			next={
-				hasTwilioCredentials
-					? { href: Routes.StepThree().pathname, label: "Next" }
-					: undefined
-			}
+			next={hasTwilioCredentials ? { href: Routes.StepThree().pathname, label: "Next" } : undefined}
 			previous={{ href: Routes.StepOne().pathname, label: "Back" }}
 		>
 			{children}
@@ -135,16 +125,17 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	}
 
 	const phoneNumber = await db.phoneNumber.findFirst({ where: { customerId: session.userId } });
-	if (!phoneNumber) {
-		return { props: {} };
+	if (phoneNumber) {
+		await session.$setPublicData({ hasCompletedOnboarding: true });
+		return {
+			redirect: {
+				destination: Routes.Messages().pathname,
+				permanent: false,
+			},
+		};
 	}
 
-	return {
-		redirect: {
-			destination: Routes.Messages().pathname,
-			permanent: false,
-		},
-	};
+	return { props: {} };
 };
 
 export default StepTwo;

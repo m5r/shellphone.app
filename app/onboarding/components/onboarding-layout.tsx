@@ -1,9 +1,7 @@
 import type { FunctionComponent } from "react";
+import { Link } from "blitz";
 import { CheckIcon } from "@heroicons/react/solid";
 import clsx from "clsx";
-import { Link, Routes, useRouter } from "blitz";
-
-import useCustomerPhoneNumber from "../../core/hooks/use-customer-phone-number";
 
 type StepLink = {
 	href: string;
@@ -19,13 +17,6 @@ type Props = {
 const steps = ["Welcome", "Twilio Credentials", "Pick a plan"] as const;
 
 const OnboardingLayout: FunctionComponent<Props> = ({ children, currentStep, previous, next }) => {
-	const router = useRouter();
-	const customerPhoneNumber = useCustomerPhoneNumber();
-
-	if (customerPhoneNumber) {
-		throw router.push(Routes.Messages());
-	}
-
 	return (
 		<div className="bg-gray-800 fixed z-10 inset-0 overflow-y-auto">
 			<div className="min-h-screen text-center block p-0">

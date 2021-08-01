@@ -60,10 +60,10 @@ const Keypad: BlitzPage = () => {
 				</Row>
 				<Row>
 					<div className="cursor-pointer select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-green-800 rounded-full">
-						<FontAwesomeIcon icon={faPhone} color="white" size="lg" />
+						<FontAwesomeIcon className="w-6 h-6" icon={faPhone} color="white" size="lg" />
 					</div>
-					<div className="cursor-pointer select-none my-auto" onClick={pressBackspace}>
-						<FontAwesomeIcon icon={faBackspace} size="lg" />
+					<div className="cursor-pointer select-none m-auto" onClick={pressBackspace}>
+						<FontAwesomeIcon className="w-6 h-6" icon={faBackspace} size="lg" />
 					</div>
 				</Row>
 			</section>
@@ -112,9 +112,7 @@ const Digit: FunctionComponent<{ digit: string }> = ({ children, digit }) => {
 	);
 };
 
-const DigitLetters: FunctionComponent = ({ children }) => (
-	<div className="text-xs text-gray-600">{children}</div>
-);
+const DigitLetters: FunctionComponent = ({ children }) => <div className="text-xs text-gray-600">{children}</div>;
 
 const phoneNumberAtom = atom("");
 const pressDigitAtom = atom(null, (get, set, digit: string) => {

@@ -12,6 +12,7 @@ declare module "blitz" {
 		PublicData: {
 			userId: User["id"];
 			role: Role;
+			hasCompletedOnboarding?: true;
 		};
 	}
 }

@@ -5,10 +5,14 @@ import useCustomerPhoneNumber from "./use-customer-phone-number";
 
 export default function useRequireOnboarding() {
 	const router = useRouter();
-	const { customer, hasCompletedOnboarding } = useCurrentCustomer();
+	const { hasFilledTwilioCredentials, hasCompletedOnboarding } = useCurrentCustomer();
 	const customerPhoneNumber = useCustomerPhoneNumber();
 
-	if (!hasCompletedOnboarding) {
+	if (hasCompletedOnboarding) {
+		return;
+	}
+
+	if (!hasFilledTwilioCredentials) {
 		throw router.push(Routes.StepTwo());
 	}
 
@@ -17,7 +21,6 @@ export default function useRequireOnboarding() {
 		return;
 	}*/
 
-	console.log("customerPhoneNumber", customerPhoneNumber);
 	if (!customerPhoneNumber) {
 		throw router.push(Routes.StepThree());
 	}
