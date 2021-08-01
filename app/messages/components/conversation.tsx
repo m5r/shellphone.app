@@ -20,6 +20,7 @@ export default function Conversation() {
 		<>
 			<div className="flex flex-col space-y-6 p-6 pt-12 pb-16">
 				<ul ref={messagesListRef}>
+					{conversation.length === 0 ? "empty state" : null}
 					{conversation.map((message, index) => {
 						const isOutbound = message.direction === Direction.Outbound;
 						const nextMessage = conversation![index + 1];

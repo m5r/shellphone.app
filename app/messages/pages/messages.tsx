@@ -29,6 +29,6 @@ const Messages: BlitzPage = () => {
 
 Messages.getLayout = (page) => <Layout title="Messages">{page}</Layout>;
 
-Messages.authenticate = { redirectTo: Routes.SignIn() };
+Messages.authenticate = { redirectTo: Routes.SignIn().pathname };
 
 export default Messages;
