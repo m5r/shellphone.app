@@ -9,6 +9,6 @@ export default function useKnownRecipients() {
 			select(conversations) {
 				return Object.keys(conversations);
 			},
-		}
+		},
 	);
 }

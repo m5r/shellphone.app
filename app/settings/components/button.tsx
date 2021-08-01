@@ -18,7 +18,7 @@ const Button: FunctionComponent<Props> = ({ children, type, variant, onClick, is
 				{
 					[VARIANTS_STYLES[variant].base]: !isDisabled,
 					[VARIANTS_STYLES[variant].disabled]: isDisabled,
-				}
+				},
 			)}
 			disabled={isDisabled}
 		>

@@ -15,5 +15,5 @@ export default resolver.pipe(resolver.zod(GetCustomerPhoneNumber), async ({ cust
 			phoneNumber: true,
 			phoneNumberSid: true,
 		},
-	})
+	}),
 );

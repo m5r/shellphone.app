@@ -22,5 +22,5 @@ export default resolver.pipe(
 				authToken: twilioAuthToken,
 			},
 		});
-	}
+	},
 );

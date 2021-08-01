@@ -33,8 +33,8 @@ export default resolver.pipe(resolver.authorize(), async (_ = null, context) => 
 	}
 	conversations = Object.fromEntries(
 		Object.entries(conversations).sort(
-			([, a], [, b]) => b[b.length - 1]!.sentAt.getTime() - a[a.length - 1]!.sentAt.getTime()
-		)
+			([, a], [, b]) => b[b.length - 1]!.sentAt.getTime() - a[a.length - 1]!.sentAt.getTime(),
+		),
 	);
 
 	return conversations;

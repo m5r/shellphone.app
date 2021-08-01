@@ -20,7 +20,7 @@ export default resolver.pipe(
 		const customerId = customer!.id;
 		const phoneNumbers = await twilio(
 			customer!.accountSid!,
-			customer!.authToken!
+			customer!.authToken!,
 		).incomingPhoneNumbers.list();
 		const phoneNumber = phoneNumbers.find((phoneNumber) => phoneNumber.sid === phoneNumberSid)!;
 		await db.phoneNumber.create({
@@ -36,5 +36,5 @@ export default resolver.pipe(
 			fetchCallsQueue.enqueue({ customerId }, { id: `fetch-messages-${customerId}` }),
 			setTwilioWebhooks.enqueue({ customerId }, { id: `set-twilio-webhooks-${customerId}` }),
 		]);
-	}
+	},
 );

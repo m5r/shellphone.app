@@ -65,7 +65,7 @@ const OnboardingLayout: FunctionComponent<Props> = ({ children, currentStep, pre
 										key={step}
 										className={clsx(
 											stepIdx !== steps.length - 1 ? "pr-20 sm:pr-32" : "",
-											"relative"
+											"relative",
 										)}
 									>
 										{isComplete ? (

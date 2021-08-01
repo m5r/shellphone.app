@@ -54,7 +54,7 @@ export default resolver.pipe(
 			},
 			{
 				id: message.id,
-			}
+			},
 		);
-	}
+	},
 );

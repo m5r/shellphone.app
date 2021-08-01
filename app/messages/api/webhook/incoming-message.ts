@@ -61,7 +61,7 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 			customer.authToken,
 			twilioSignature,
 			url,
-			req.body
+			req.body,
 		);
 		if (!isRequestValid) {
 			const statusCode = 400;
@@ -83,7 +83,7 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 				messageSid,
 				customerId: customer.id,
 			},
-			{ id: messageSid }
+			{ id: messageSid },
 		);
 
 		res.status(200).end();

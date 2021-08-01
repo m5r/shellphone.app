@@ -70,7 +70,7 @@ const StepThree: BlitzPage<Props> = ({ availablePhoneNumbers }) => {
 					className={clsx(
 						"max-w-[240px] mt-6 mx-auto w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:text-sm",
 						!isSubmitting && "bg-primary-600 hover:bg-primary-700",
-						isSubmitting && "bg-primary-400 cursor-not-allowed"
+						isSubmitting && "bg-primary-400 cursor-not-allowed",
 					)}
 				>
 					Save
@@ -131,7 +131,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res }
 
 	const incomingPhoneNumbers = await twilio(
 		customer.accountSid,
-		customer.authToken
+		customer.authToken,
 	).incomingPhoneNumbers.list();
 	const phoneNumbers = incomingPhoneNumbers.map(({ phoneNumber, sid }) => ({ phoneNumber, sid }));
 

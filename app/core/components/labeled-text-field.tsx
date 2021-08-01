@@ -52,7 +52,7 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
 				`}</style>
 			</div>
 		);
-	}
+	},
 );
 
 export default LabeledTextField;

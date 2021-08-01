@@ -72,7 +72,7 @@ export default function DangerZone() {
 							{
 								"bg-red-400 cursor-not-allowed": isDeletingUser,
 								"bg-red-600 hover:bg-red-700": !isDeletingUser,
-							}
+							},
 						)}
 						onClick={onConfirm}
 						disabled={isDeletingUser}
@@ -87,7 +87,7 @@ export default function DangerZone() {
 							{
 								"bg-gray-50 cursor-not-allowed": isDeletingUser,
 								"hover:bg-gray-50": !isDeletingUser,
-							}
+							},
 						)}
 						onClick={closeModal}
 						disabled={isDeletingUser}
