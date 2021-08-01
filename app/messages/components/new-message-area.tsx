@@ -25,7 +25,7 @@ const NewMessageArea: FunctionComponent<Props> = ({ recipient, onSend }) => {
 	const sendMessageMutation = useMutation(sendMessage)[0];
 	const { setQueryData: setConversationsQueryData, refetch: refetchConversations } = useQuery(
 		getConversationsQuery,
-		{}
+		{},
 	)[1];
 	const {
 		register,
@@ -65,7 +65,7 @@ const NewMessageArea: FunctionComponent<Props> = ({ recipient, onSend }) => {
 				nextConversations[recipient] = [...nextConversations[recipient]!, message];
 				return nextConversations;
 			},
-			{ refetch: false }
+			{ refetch: false },
 		);
 		setValue("content", "");
 		onSend?.();

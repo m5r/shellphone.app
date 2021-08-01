@@ -46,7 +46,7 @@ const insertIncomingMessageQueue = Queue<Payload>(
 				sentAt: new Date(message.dateCreated),
 			},
 		});
-	}
+	},
 );
 
 export default insertIncomingMessageQueue;

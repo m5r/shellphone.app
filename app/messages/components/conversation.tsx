@@ -57,7 +57,7 @@ export default function Conversation() {
 								<div
 									className={clsx(
 										isSameNext ? "pb-1" : "pb-2",
-										isOutbound ? "text-right" : "text-left"
+										isOutbound ? "text-right" : "text-left",
 									)}
 								>
 									<span
@@ -65,7 +65,7 @@ export default function Conversation() {
 											"inline-block text-left w-[fit-content] p-2 rounded-lg text-white",
 											isOutbound
 												? "bg-[#3194ff] rounded-br-none"
-												: "bg-black rounded-bl-none"
+												: "bg-black rounded-bl-none",
 										)}
 									>
 										{message.content}

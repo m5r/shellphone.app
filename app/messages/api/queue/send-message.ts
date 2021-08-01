@@ -19,7 +19,7 @@ const sendMessageQueue = Queue<Payload>(
 		try {
 			const message = await twilio(
 				customer!.accountSid!,
-				customer!.authToken!
+				customer!.authToken!,
 			).messages.create({
 				body: content,
 				to,
@@ -37,7 +37,7 @@ const sendMessageQueue = Queue<Payload>(
 	},
 	{
 		retry: ["1min"],
-	}
+	},
 );
 
 export default sendMessageQueue;

@@ -1,7 +1,8 @@
+import type { FunctionComponent } from "react";
+import { Suspense, useEffect } from "react";
 import type { BlitzPage, GetServerSideProps } from "blitz";
 import { getSession, Routes, useMutation, useRouter } from "blitz";
 import clsx from "clsx";
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import db from "db";
@@ -80,7 +81,7 @@ const StepTwo: BlitzPage = () => {
 					className={clsx(
 						"max-w-[240px] mx-auto w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:text-sm",
 						!isSubmitting && "bg-primary-600 hover:bg-primary-700",
-						isSubmitting && "bg-primary-400 cursor-not-allowed"
+						isSubmitting && "bg-primary-400 cursor-not-allowed",
 					)}
 				>
 					Save
@@ -90,7 +91,15 @@ const StepTwo: BlitzPage = () => {
 	);
 };
 
-StepTwo.getLayout = function StepTwoLayout(page) {
+StepTwo.getLayout = (page) => {
+	return (
+		<Suspense fallback="Silence, ca pousse">
+			<StepTwoLayout>{page}</StepTwoLayout>
+		</Suspense>
+	);
+};
+
+const StepTwoLayout: FunctionComponent = ({ children }) => {
 	const { customer } = useCurrentCustomer();
 	const initialAuthToken = customer?.authToken ?? "";
 	const initialAccountSid = customer?.accountSid ?? "";
@@ -106,7 +115,7 @@ StepTwo.getLayout = function StepTwoLayout(page) {
 			}
 			previous={{ href: Routes.StepOne().pathname, label: "Back" }}
 		>
-			{page}
+			{children}
 		</OnboardingLayout>
 	);
 };

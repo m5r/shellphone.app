@@ -18,7 +18,7 @@ jest.mock("preview-email", () => jest.fn());
 describe.skip("forgotPassword mutation", () => {
 	it("does not throw error if user doesn't exist", async () => {
 		await expect(
-			forgotPassword({ email: "no-user@email.com" }, {} as Ctx)
+			forgotPassword({ email: "no-user@email.com" }, {} as Ctx),
 		).resolves.not.toThrow();
 	});
 

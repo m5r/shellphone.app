@@ -8,7 +8,7 @@ export default function useCustomerPhoneNumber() {
 	const [customerPhoneNumber] = useQuery(
 		getCurrentCustomerPhoneNumber,
 		{},
-		{ enabled: hasCompletedOnboarding }
+		{ enabled: hasCompletedOnboarding },
 	);
 
 	return customerPhoneNumber;

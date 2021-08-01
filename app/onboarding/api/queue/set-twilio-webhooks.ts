@@ -37,7 +37,7 @@ const setTwilioWebhooks = Queue<Payload>(
 					voiceApplicationSid: twimlAppSid,
 				}),
 		]);
-	}
+	},
 );
 
 export default setTwilioWebhooks;

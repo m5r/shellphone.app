@@ -20,5 +20,5 @@ export default resolver.pipe(
 		});
 
 		return true;
-	}
+	},
 );

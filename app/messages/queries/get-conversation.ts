@@ -27,5 +27,5 @@ export default resolver.pipe(
 				content: decrypt(message.content, customer!.encryptionKey),
 			};
 		});
-	}
+	},
 );
