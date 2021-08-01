@@ -1,7 +1,7 @@
 import { Queue } from "quirrel/blitz";
 import twilio from "twilio";
 
-import db from "../../../db";
+import db from "../../../../db";
 
 type Payload = {
 	customerId: string;

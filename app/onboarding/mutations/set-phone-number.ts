@@ -4,9 +4,9 @@ import twilio from "twilio";
 
 import db from "../../../db";
 import getCurrentCustomer from "../../customers/queries/get-current-customer";
-import fetchMessagesQueue from "../../api/queue/fetch-messages";
-import fetchCallsQueue from "../../api/queue/fetch-calls";
-import setTwilioWebhooks from "../../api/queue/set-twilio-webhooks";
+import fetchMessagesQueue from "../../messages/api/queue/fetch-messages";
+import fetchCallsQueue from "../../phone-calls/api/queue/fetch-calls";
+import setTwilioWebhooks from "../api/queue/set-twilio-webhooks";
 
 const Body = z.object({
 	phoneNumberSid: z.string(),

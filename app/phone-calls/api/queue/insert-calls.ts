@@ -1,7 +1,7 @@
 import { Queue } from "quirrel/blitz";
 import type { CallInstance } from "twilio/lib/rest/api/v2010/account/call";
 
-import db, { Direction, CallStatus } from "../../../db";
+import db, { Direction, CallStatus } from "../../../../db";
 
 type Payload = {
 	customerId: string;

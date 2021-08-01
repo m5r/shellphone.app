@@ -6,7 +6,7 @@ import db, { Direction, MessageStatus } from "../../../db";
 import getCurrentCustomer from "../../customers/queries/get-current-customer";
 import getCustomerPhoneNumber from "../../phone-numbers/queries/get-customer-phone-number";
 import { encrypt } from "../../../db/_encryption";
-import sendMessageQueue from "../../api/queue/send-message";
+import sendMessageQueue from "../../messages/api/queue/send-message";
 import appLogger from "../../../integrations/logger";
 
 const logger = appLogger.child({ mutation: "send-message" });
