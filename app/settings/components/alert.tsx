@@ -82,14 +82,8 @@ export default function Alert({ title, message, variant }: Props) {
 			<div className="flex">
 				<div className="flex-shrink-0">{variantProperties.icon}</div>
 				<div className="ml-3">
-					<h3
-						className={`text-sm leading-5 font-medium ${variantProperties.titleTextColor}`}
-					>
-						{title}
-					</h3>
-					<div className={`mt-2 text-sm leading-5 ${variantProperties.messageTextColor}`}>
-						{message}
-					</div>
+					<h3 className={`text-sm leading-5 font-medium ${variantProperties.titleTextColor}`}>{title}</h3>
+					<div className={`mt-2 text-sm leading-5 ${variantProperties.messageTextColor}`}>{message}</div>
 				</div>
 			</div>
 		</div>

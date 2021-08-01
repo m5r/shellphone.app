@@ -23,12 +23,7 @@ type Props = {
 
 const logger = appLogger.child({ module: "Layout" });
 
-const Layout: FunctionComponent<Props> = ({
-	children,
-	title,
-	pageTitle = title,
-	hideFooter = false,
-}) => {
+const Layout: FunctionComponent<Props> = ({ children, title, pageTitle = title, hideFooter = false }) => {
 	return (
 		<>
 			{pageTitle ? (
@@ -60,13 +55,7 @@ type ErrorBoundaryState =
 			errorMessage: string;
 	  };
 
-const blitzErrors = [
-	RedirectError,
-	AuthenticationError,
-	AuthorizationError,
-	CSRFTokenMismatchError,
-	NotFoundError,
-];
+const blitzErrors = [RedirectError, AuthenticationError, AuthorizationError, CSRFTokenMismatchError, NotFoundError];
 
 const ErrorBoundary = withRouter(
 	class ErrorBoundary extends Component<WithRouterProps, ErrorBoundaryState> {

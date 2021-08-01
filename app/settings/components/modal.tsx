@@ -32,9 +32,7 @@ const Modal: FunctionComponent<Props> = ({ children, initialFocus, isOpen, onClo
 					</Transition.Child>
 
 					{/* This element is to trick the browser into centering the modal contents. */}
-					<span className="hidden md:inline-block md:align-middle md:h-screen">
-						&#8203;
-					</span>
+					<span className="hidden md:inline-block md:align-middle md:h-screen">&#8203;</span>
 					<Transition.Child
 						as={Fragment}
 						enter="ease-out duration-300"

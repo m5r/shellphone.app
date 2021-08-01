@@ -138,9 +138,8 @@ const Home: BlitzPage = () => {
 				body {
 					padding: 0;
 					margin: 0;
-					font-family: "Libre Franklin", -apple-system, BlinkMacSystemFont, Segoe UI,
-						Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-						sans-serif;
+					font-family: "Libre Franklin", -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu,
+						Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 				}
 
 				* {

@@ -1,8 +1,7 @@
 import { paginate, resolver } from "blitz";
 import db, { Prisma, Customer } from "db";
 
-interface GetPhoneCallsInput
-	extends Pick<Prisma.PhoneCallFindManyArgs, "where" | "orderBy" | "skip" | "take"> {
+interface GetPhoneCallsInput extends Pick<Prisma.PhoneCallFindManyArgs, "where" | "orderBy" | "skip" | "take"> {
 	customerId: Customer["id"];
 }
 

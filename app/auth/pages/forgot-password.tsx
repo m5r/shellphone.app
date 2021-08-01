@@ -17,10 +17,7 @@ const ForgotPasswordPage: BlitzPage = () => {
 			{isSuccess ? (
 				<div>
 					<h2>Request Submitted</h2>
-					<p>
-						If your email is in our system, you will receive instructions to reset your
-						password shortly.
-					</p>
+					<p>If your email is in our system, you will receive instructions to reset your password shortly.</p>
 				</div>
 			) : (
 				<Form
@@ -32,8 +29,7 @@ const ForgotPasswordPage: BlitzPage = () => {
 							await forgotPasswordMutation(values);
 						} catch (error) {
 							return {
-								[FORM_ERROR]:
-									"Sorry, we had an unexpected error. Please try again.",
+								[FORM_ERROR]: "Sorry, we had an unexpected error. Please try again.",
 							};
 						}
 					}}
@@ -47,8 +43,6 @@ const ForgotPasswordPage: BlitzPage = () => {
 
 ForgotPasswordPage.redirectAuthenticatedTo = Routes.Messages();
 
-ForgotPasswordPage.getLayout = (page) => (
-	<BaseLayout title="Forgot Your Password?">{page}</BaseLayout>
-);
+ForgotPasswordPage.getLayout = (page) => <BaseLayout title="Forgot Your Password?">{page}</BaseLayout>;
 
 export default ForgotPasswordPage;

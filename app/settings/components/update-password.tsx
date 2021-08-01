@@ -60,21 +60,13 @@ const UpdatePassword: FunctionComponent = () => {
 			<form onSubmit={onSubmit}>
 				{errorMessage ? (
 					<div className="mb-8">
-						<Alert
-							title="Oops, there was an issue"
-							message={errorMessage}
-							variant="error"
-						/>
+						<Alert title="Oops, there was an issue" message={errorMessage} variant="error" />
 					</div>
 				) : null}
 
 				{isSubmitSuccessful ? (
 					<div className="mb-8">
-						<Alert
-							title="Saved successfully"
-							message="Your changes have been saved."
-							variant="success"
-						/>
+						<Alert title="Saved successfully" message="Your changes have been saved." variant="success" />
 					</div>
 				) : null}
 

@@ -20,9 +20,7 @@ const fetchCallsQueue = Queue<Payload>("api/queue/fetch-calls", async ({ custome
 			to: phoneNumber!.phoneNumber,
 		}),
 	]);
-	const calls = [...callsSent, ...callsReceived].sort(
-		(a, b) => a.dateCreated.getTime() - b.dateCreated.getTime(),
-	);
+	const calls = [...callsSent, ...callsReceived].sort((a, b) => a.dateCreated.getTime() - b.dateCreated.getTime());
 
 	await insertCallsQueue.enqueue(
 		{

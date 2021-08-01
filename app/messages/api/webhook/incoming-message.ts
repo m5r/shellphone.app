@@ -57,12 +57,7 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 		}
 
 		const url = `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/incoming-message`;
-		const isRequestValid = twilio.validateRequest(
-			customer.authToken,
-			twilioSignature,
-			url,
-			req.body,
-		);
+		const isRequestValid = twilio.validateRequest(customer.authToken, twilioSignature, url, req.body);
 		if (!isRequestValid) {
 			const statusCode = 400;
 			const apiError: ApiError = {

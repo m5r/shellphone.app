@@ -16,45 +16,39 @@ const Body = z.object({
 	to: z.string(),
 });
 
-export default resolver.pipe(
-	resolver.zod(Body),
-	resolver.authorize(),
-	async ({ content, to }, context) => {
-		const customer = await getCurrentCustomer(null, context);
-		try {
-			await twilio(customer!.accountSid!, customer!.authToken!)
-				.lookups.v1.phoneNumbers(to)
-				.fetch();
-		} catch (error) {
-			logger.error(error);
-			return;
-		}
+export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ content, to }, context) => {
+	const customer = await getCurrentCustomer(null, context);
+	try {
+		await twilio(customer!.accountSid!, customer!.authToken!).lookups.v1.phoneNumbers(to).fetch();
+	} catch (error) {
+		logger.error(error);
+		return;
+	}
 
-		const customerId = customer!.id;
-		const customerPhoneNumber = await getCustomerPhoneNumber({ customerId }, context);
+	const customerId = customer!.id;
+	const customerPhoneNumber = await getCustomerPhoneNumber({ customerId }, context);
 
-		const message = await db.message.create({
-			data: {
-				customerId,
-				to,
-				from: customerPhoneNumber!.phoneNumber,
-				direction: Direction.Outbound,
-				status: MessageStatus.Queued,
-				content: encrypt(content, customer!.encryptionKey),
-				sentAt: new Date(),
-			},
-		});
+	const message = await db.message.create({
+		data: {
+			customerId,
+			to,
+			from: customerPhoneNumber!.phoneNumber,
+			direction: Direction.Outbound,
+			status: MessageStatus.Queued,
+			content: encrypt(content, customer!.encryptionKey),
+			sentAt: new Date(),
+		},
+	});
 
-		await sendMessageQueue.enqueue(
-			{
-				id: message.id,
-				customerId,
-				to,
-				content,
-			},
-			{
-				id: message.id,
-			},
-		);
-	},
-);
+	await sendMessageQueue.enqueue(
+		{
+			id: message.id,
+			customerId,
+			to,
+			content,
+		},
+		{
+			id: message.id,
+		},
+	);
+});

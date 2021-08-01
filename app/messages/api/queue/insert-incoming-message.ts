@@ -19,9 +19,7 @@ const insertIncomingMessageQueue = Queue<Payload>(
 		}
 
 		const encryptionKey = customer.encryptionKey;
-		const message = await twilio(customer.accountSid, customer.authToken)
-			.messages.get(messageSid)
-			.fetch();
+		const message = await twilio(customer.accountSid, customer.authToken).messages.get(messageSid).fetch();
 		await db.message.create({
 			data: {
 				customerId,
