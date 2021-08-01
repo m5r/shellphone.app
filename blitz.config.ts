@@ -23,6 +23,9 @@ const config: BlitzConfig = {
 			audienceId: process.env.MAILCHIMP_AUDIENCE_ID,
 		},
 		masterEncryptionKey: process.env.MASTER_ENCRYPTION_KEY,
+		app: {
+			baseUrl: process.env.QUIRREL_BASE_URL,
+		},
 	},
 	/* Uncomment this to customize the webpack config
 	webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
