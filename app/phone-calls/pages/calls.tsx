@@ -12,7 +12,7 @@ const PhoneCalls: BlitzPage = () => {
 	return (
 		<>
 			<div className="flex flex-col space-y-6 p-6">
-				<p>Calls page</p>
+				<h2 className="text-3xl font-bold">Calls</h2>
 			</div>
 			<Suspense fallback="Loading...">
 				<PhoneCallsList />

@@ -8,14 +8,18 @@ import { Direction, Message, MessageStatus } from "../../../db";
 import getConversationsQuery from "../queries/get-conversations";
 import useCurrentCustomer from "../../core/hooks/use-current-customer";
 import useCustomerPhoneNumber from "../../core/hooks/use-customer-phone-number";
+import { FunctionComponent } from "react";
 
 type Form = {
 	content: string;
 };
 
-export default function NewMessageArea() {
-	const router = useRouter();
-	const recipient = router.params.recipient;
+type Props = {
+	recipient: string;
+	onSend?: () => void;
+};
+
+const NewMessageArea: FunctionComponent<Props> = ({ recipient, onSend }) => {
 	const { customer } = useCurrentCustomer();
 	const phoneNumber = useCustomerPhoneNumber();
 	const sendMessageMutation = useMutation(sendMessage)[0];
@@ -30,6 +34,10 @@ export default function NewMessageArea() {
 		formState: { isSubmitting },
 	} = useForm<Form>();
 	const onSubmit = handleSubmit(async ({ content }) => {
+		if (!recipient) {
+			return;
+		}
+
 		if (isSubmitting) {
 			return;
 		}
@@ -60,6 +68,7 @@ export default function NewMessageArea() {
 			{ refetch: false }
 		);
 		setValue("content", "");
+		onSend?.();
 		await sendMessageMutation({ to: recipient, content });
 		await refetchConversations({ cancelRefetch: true });
 	});
@@ -83,7 +92,9 @@ export default function NewMessageArea() {
 			</button>
 		</form>
 	);
-}
+};
+
+export default NewMessageArea;
 
 function uuidv4() {
 	return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
