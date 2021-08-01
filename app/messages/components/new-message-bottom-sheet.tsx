@@ -1,18 +1,22 @@
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { BottomSheet } from "react-spring-bottom-sheet";
-import { atom, useAtom } from "jotai";
+import { useAtom } from "jotai";
 import { useRouter, Routes } from "blitz";
 
 import "react-spring-bottom-sheet/dist/style.css";
 
 import NewMessageArea from "./new-message-area";
-
-export const bottomSheetOpenAtom = atom(false);
+import { bottomSheetOpenAtom } from "../pages/messages";
 
 export default function NewMessageBottomSheet() {
 	const router = useRouter();
 	const [isOpen, setIsOpen] = useAtom(bottomSheetOpenAtom);
 	const [recipient, setRecipient] = useState("");
+	const recipientRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		recipientRef.current?.focus();
+	});
 
 	return (
 		<BottomSheet
@@ -33,6 +37,7 @@ export default function NewMessageBottomSheet() {
 				<div className="flex items-center p-4 border-t border-b">
 					<span className="mr-4 text-[#333]">To:</span>
 					<input
+						ref={recipientRef}
 						onChange={(event) => setRecipient(event.target.value)}
 						className="bg-none border-none outline-none flex-1 text-black"
 					/>
