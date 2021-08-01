@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import type { BlitzPage } from "blitz";
+import { Routes } from "blitz";
 
 import Layout from "../../core/layouts/layout";
 import PhoneCallsList from "../components/phone-calls-list";
@@ -9,17 +10,19 @@ const PhoneCalls: BlitzPage = () => {
 	useRequireOnboarding();
 
 	return (
-		<Layout title="Calls">
+		<>
 			<div className="flex flex-col space-y-6 p-6">
 				<p>Calls page</p>
 			</div>
 			<Suspense fallback="Loading...">
 				<PhoneCallsList />
 			</Suspense>
-		</Layout>
+		</>
 	);
 };
 
-PhoneCalls.authenticate = true;
+PhoneCalls.getLayout = (page) => <Layout title="Calls">{page}</Layout>;
+
+PhoneCalls.authenticate = { redirectTo: Routes.SignIn() };
 
 export default PhoneCalls;

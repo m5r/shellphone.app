@@ -9,18 +9,22 @@ const StepOne: BlitzPage = () => {
 	useCurrentCustomer(); // preload for step two
 
 	return (
-		<OnboardingLayout
-			currentStep={1}
-			next={{ href: "/welcome/step-two", label: "Set up your phone number" }}
-		>
-			<div className="flex flex-col space-y-4 items-center">
-				<span>Welcome, let’s set up your virtual phone!</span>
-			</div>
-		</OnboardingLayout>
+		<div className="flex flex-col space-y-4 items-center">
+			<span>Welcome, let’s set up your virtual phone!</span>
+		</div>
 	);
 };
 
-StepOne.authenticate = true;
+StepOne.getLayout = (page) => (
+	<OnboardingLayout
+		currentStep={1}
+		next={{ href: Routes.StepTwo().pathname, label: "Set up your phone number" }}
+	>
+		{page}
+	</OnboardingLayout>
+);
+
+StepOne.authenticate = { redirectTo: Routes.SignIn() };
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	const session = await getSession(req, res);

@@ -25,13 +25,10 @@ const StepTwo: BlitzPage = () => {
 	const { customer } = useCurrentCustomer();
 	const [setTwilioApiFieldsMutation] = useMutation(setTwilioApiFields);
 
-	const initialAuthToken = customer?.authToken ?? "";
-	const initialAccountSid = customer?.accountSid ?? "";
-	const hasTwilioCredentials = initialAccountSid.length > 0 && initialAuthToken.length > 0;
 	useEffect(() => {
-		setValue("twilioAuthToken", initialAuthToken);
-		setValue("twilioAccountSid", initialAccountSid);
-	}, [initialAuthToken, initialAccountSid]);
+		setValue("twilioAuthToken", customer?.authToken ?? "");
+		setValue("twilioAccountSid", customer?.accountSid ?? "");
+	}, [setValue, customer?.authToken, customer?.accountSid]);
 
 	const onSubmit = handleSubmit(async ({ twilioAccountSid, twilioAuthToken }) => {
 		if (isSubmitting) {
@@ -47,59 +44,74 @@ const StepTwo: BlitzPage = () => {
 	});
 
 	return (
+		<div className="flex flex-col space-y-4 items-center">
+			<form onSubmit={onSubmit} className="flex flex-col gap-6">
+				<div className="w-full">
+					<label
+						htmlFor="twilioAccountSid"
+						className="block text-sm font-medium text-gray-700"
+					>
+						Twilio Account SID
+					</label>
+					<input
+						type="text"
+						id="twilioAccountSid"
+						className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+						{...register("twilioAccountSid", { required: true })}
+					/>
+				</div>
+				<div className="w-full">
+					<label
+						htmlFor="twilioAuthToken"
+						className="block text-sm font-medium text-gray-700"
+					>
+						Twilio Auth Token
+					</label>
+					<input
+						type="text"
+						id="twilioAuthToken"
+						className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+						{...register("twilioAuthToken", { required: true })}
+					/>
+				</div>
+
+				<button
+					type="submit"
+					className={clsx(
+						"max-w-[240px] mx-auto w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:text-sm",
+						!isSubmitting && "bg-primary-600 hover:bg-primary-700",
+						isSubmitting && "bg-primary-400 cursor-not-allowed"
+					)}
+				>
+					Save
+				</button>
+			</form>
+		</div>
+	);
+};
+
+StepTwo.getLayout = function StepTwoLayout(page) {
+	const { customer } = useCurrentCustomer();
+	const initialAuthToken = customer?.authToken ?? "";
+	const initialAccountSid = customer?.accountSid ?? "";
+	const hasTwilioCredentials = initialAccountSid.length > 0 && initialAuthToken.length > 0;
+
+	return (
 		<OnboardingLayout
 			currentStep={2}
-			next={hasTwilioCredentials ? { href: "/welcome/step-three", label: "Next" } : undefined}
-			previous={{ href: "/welcome/step-one", label: "Back" }}
+			next={
+				hasTwilioCredentials
+					? { href: Routes.StepThree().pathname, label: "Next" }
+					: undefined
+			}
+			previous={{ href: Routes.StepOne().pathname, label: "Back" }}
 		>
-			<div className="flex flex-col space-y-4 items-center">
-				<form onSubmit={onSubmit} className="flex flex-col gap-6">
-					<div className="w-full">
-						<label
-							htmlFor="twilioAccountSid"
-							className="block text-sm font-medium text-gray-700"
-						>
-							Twilio Account SID
-						</label>
-						<input
-							type="text"
-							id="twilioAccountSid"
-							className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-							{...register("twilioAccountSid", { required: true })}
-						/>
-					</div>
-					<div className="w-full">
-						<label
-							htmlFor="twilioAuthToken"
-							className="block text-sm font-medium text-gray-700"
-						>
-							Twilio Auth Token
-						</label>
-						<input
-							type="text"
-							id="twilioAuthToken"
-							className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-							{...register("twilioAuthToken", { required: true })}
-						/>
-					</div>
-
-					<button
-						type="submit"
-						className={clsx(
-							"max-w-[240px] mx-auto w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:text-sm",
-							!isSubmitting && "bg-primary-600 hover:bg-primary-700",
-							isSubmitting && "bg-primary-400 cursor-not-allowed"
-						)}
-					>
-						Save
-					</button>
-				</form>
-			</div>
+			{page}
 		</OnboardingLayout>
 	);
 };
 
-StepTwo.authenticate = true;
+StepTwo.authenticate = { redirectTo: Routes.SignIn() };
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	const session = await getSession(req, res);

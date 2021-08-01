@@ -111,10 +111,12 @@ export const getServerSideProps = withPageOnboardingRequired<Props>(
 */
 
 import type { BlitzPage } from "blitz";
+import { Routes } from "blitz";
 import { useRouter } from "blitz";
 import { useEffect } from "react";
 
 import useRequireOnboarding from "../../../core/hooks/use-require-onboarding";
+import SettingsLayout from "../../components/settings-layout";
 
 const Billing: BlitzPage = () => {
 	useRequireOnboarding();
@@ -127,6 +129,8 @@ const Billing: BlitzPage = () => {
 	return null;
 };
 
-Billing.authenticate = true;
+Billing.getLayout = (page) => <SettingsLayout>{page}</SettingsLayout>;
+
+Billing.authenticate = { redirectTo: Routes.SignIn() };
 
 export default Billing;

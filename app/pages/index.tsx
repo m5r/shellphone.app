@@ -1,5 +1,6 @@
 import { Suspense } from "react";
-import { Link, BlitzPage, useMutation, Routes } from "blitz";
+import type { BlitzPage } from "blitz";
+import { Link, useMutation, Routes } from "blitz";
 
 import BaseLayout from "../core/layouts/base-layout";
 import logout from "../auth/mutations/logout";
@@ -35,12 +36,12 @@ const UserInfo = () => {
 	} else {
 		return (
 			<>
-				<Link href={Routes.SignupPage()}>
+				<Link href={Routes.SignUp()}>
 					<a className="button small">
 						<strong>Sign Up</strong>
 					</a>
 				</Link>
-				<Link href={Routes.LoginPage()}>
+				<Link href={Routes.SignIn()}>
 					<a className="button small">
 						<strong>Login</strong>
 					</a>
@@ -268,6 +269,7 @@ const Home: BlitzPage = () => {
 };
 
 Home.suppressFirstRenderFlicker = true;
+
 Home.getLayout = (page) => <BaseLayout title="Home">{page}</BaseLayout>;
 
 export default Home;

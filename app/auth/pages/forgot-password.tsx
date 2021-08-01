@@ -1,4 +1,5 @@
-import { BlitzPage, useMutation } from "blitz";
+import type { BlitzPage } from "blitz";
+import { Routes, useMutation } from "blitz";
 
 import BaseLayout from "../../core/layouts/base-layout";
 import { LabeledTextField } from "../../core/components/labeled-text-field";
@@ -44,7 +45,8 @@ const ForgotPasswordPage: BlitzPage = () => {
 	);
 };
 
-ForgotPasswordPage.redirectAuthenticatedTo = "/";
+ForgotPasswordPage.redirectAuthenticatedTo = Routes.Messages();
+
 ForgotPasswordPage.getLayout = (page) => (
 	<BaseLayout title="Forgot Your Password?">{page}</BaseLayout>
 );

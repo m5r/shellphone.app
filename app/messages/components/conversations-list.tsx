@@ -1,4 +1,4 @@
-import { Link, useQuery } from "blitz";
+import { Link, useQuery, Routes } from "blitz";
 
 import getConversationsQuery from "../queries/get-conversations";
 
@@ -15,7 +15,11 @@ export default function ConversationsList() {
 				const lastMessage = messages[messages.length - 1]!;
 				return (
 					<li key={recipient} className="py-2">
-						<Link href={`/messages/${encodeURIComponent(recipient)}`}>
+						<Link
+							href={Routes.ConversationPage({
+								recipient: encodeURIComponent(recipient),
+							})}
+						>
 							<a className="flex flex-col">
 								<div className="flex flex-row justify-between">
 									<strong>{recipient}</strong>

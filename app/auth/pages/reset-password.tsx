@@ -1,4 +1,5 @@
-import { BlitzPage, useRouterQuery, Link, useMutation, Routes } from "blitz";
+import type { BlitzPage } from "blitz";
+import { useRouterQuery, Link, useMutation, Routes } from "blitz";
 
 import BaseLayout from "../../core/layouts/base-layout";
 import { LabeledTextField } from "../../core/components/labeled-text-field";
@@ -59,7 +60,8 @@ const ResetPasswordPage: BlitzPage = () => {
 	);
 };
 
-ResetPasswordPage.redirectAuthenticatedTo = "/";
+ResetPasswordPage.redirectAuthenticatedTo = Routes.Messages();
+
 ResetPasswordPage.getLayout = (page) => <BaseLayout title="Reset Your Password">{page}</BaseLayout>;
 
 export default ResetPasswordPage;
