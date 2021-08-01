@@ -21,7 +21,7 @@ const fetchMessagesQueue = Queue<Payload>("api/queue/fetch-messages", async ({ c
 		}),
 	]);
 	const messages = [...messagesSent, ...messagesReceived].sort(
-		(a, b) => a.dateSent.getTime() - b.dateSent.getTime()
+		(a, b) => a.dateCreated.getTime() - b.dateCreated.getTime()
 	);
 
 	await insertMessagesQueue.enqueue(

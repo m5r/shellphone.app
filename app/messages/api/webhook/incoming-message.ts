@@ -37,21 +37,36 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 	}
 
 	console.log("req.body", req.body);
+	// TODO: return 200 and process this in the background
 	try {
 		const phoneNumber = req.body.To;
 		const customerPhoneNumber = await db.phoneNumber.findFirst({
 			where: { phoneNumber },
 		});
+		console.log("customerPhoneNumber", customerPhoneNumber);
+		if (!customerPhoneNumber) {
+			// phone number is not registered by any customer
+			res.status(200).end();
+			return;
+		}
+
 		const customer = await db.customer.findFirst({
-			where: { id: customerPhoneNumber!.customerId },
+			where: { id: customerPhoneNumber.customerId },
 		});
-		const url = "https://phone.mokhtar.dev/api/webhook/incoming-message";
+		console.log("customer", customer);
+		if (!customer || !customer.authToken) {
+			res.status(200).end();
+			return;
+		}
+
+		const url = "https://4cbc3f38c23a.ngrok.io/api/webhook/incoming-message";
 		const isRequestValid = twilio.validateRequest(
-			customer!.authToken!,
+			customer.authToken,
 			twilioSignature,
 			url,
 			req.body
 		);
+		console.log("isRequestValid", isRequestValid);
 		if (!isRequestValid) {
 			const statusCode = 400;
 			const apiError: ApiError = {
@@ -64,15 +79,22 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 			return;
 		}
 
+		// TODO: send notification
+
+		const body: Body = req.body;
+		const messageSid = body.MessageSid;
+		const message = await twilio(customer.accountSid!, customer.authToken)
+			.messages.get(messageSid)
+			.fetch();
 		await db.message.create({
 			data: {
-				customerId: customer!.id,
-				to: req.body.To,
-				from: req.body.From,
-				status: MessageStatus.Received,
-				direction: Direction.Inbound,
-				sentAt: req.body.DateSent,
-				content: encrypt(req.body.Body, customer!.encryptionKey),
+				customerId: customer.id,
+				to: message.to,
+				from: message.from,
+				status: translateStatus(message.status),
+				direction: translateDirection(message.direction),
+				sentAt: message.dateCreated,
+				content: encrypt(message.body, customer.encryptionKey),
 			},
 		});
 	} catch (error) {
@@ -86,6 +108,28 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 		res.status(statusCode).send(apiError);
 	}
 }
+
+type Body = {
+	ToCountry: string;
+	ToState: string;
+	SmsMessageSid: string;
+	NumMedia: string;
+	ToCity: string;
+	FromZip: string;
+	SmsSid: string;
+	FromState: string;
+	SmsStatus: string;
+	FromCity: string;
+	Body: string;
+	FromCountry: string;
+	To: string;
+	ToZip: string;
+	NumSegments: string;
+	MessageSid: string;
+	AccountSid: string;
+	From: string;
+	ApiVersion: string;
+};
 
 function translateDirection(direction: MessageInstance["direction"]): Direction {
 	switch (direction) {

@@ -9,7 +9,7 @@ export default function useConversation(recipient: string) {
 		{
 			select(conversations) {
 				if (!conversations[recipient]) {
-					throw new Error("Conversation not found");
+					return [];
 				}
 
 				return conversations[recipient]!;

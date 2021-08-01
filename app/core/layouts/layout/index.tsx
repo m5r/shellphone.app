@@ -1,6 +1,14 @@
 import type { ErrorInfo, FunctionComponent } from "react";
 import { Component } from "react";
-import { Head, withRouter } from "blitz";
+import {
+	Head,
+	withRouter,
+	AuthenticationError,
+	AuthorizationError,
+	CSRFTokenMismatchError,
+	NotFoundError,
+	RedirectError,
+} from "blitz";
 import type { WithRouterProps } from "next/dist/client/with-router";
 
 import appLogger from "../../../../integrations/logger";
@@ -52,6 +60,14 @@ type ErrorBoundaryState =
 			errorMessage: string;
 	  };
 
+const blitzErrorNames = [
+	RedirectError.name,
+	AuthenticationError.name,
+	AuthorizationError.name,
+	CSRFTokenMismatchError.name,
+	NotFoundError.name,
+];
+
 const ErrorBoundary = withRouter(
 	class ErrorBoundary extends Component<WithRouterProps, ErrorBoundaryState> {
 		public readonly state = {
@@ -67,6 +83,10 @@ const ErrorBoundary = withRouter(
 
 		public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
 			logger.error(error, errorInfo.componentStack);
+			if (blitzErrorNames.includes(error.name)) {
+				// let Blitz ErrorBoundary handle this one
+				throw error;
+			}
 		}
 
 		public render() {

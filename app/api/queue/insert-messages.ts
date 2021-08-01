@@ -24,7 +24,7 @@ const insertMessagesQueue = Queue<Payload>(
 				status: translateStatus(message.status),
 				direction: translateDirection(message.direction),
 				twilioSid: message.sid,
-				sentAt: new Date(message.dateSent),
+				sentAt: new Date(message.dateCreated),
 			}))
 			.sort((a, b) => a.sentAt.getTime() - b.sentAt.getTime());
 
