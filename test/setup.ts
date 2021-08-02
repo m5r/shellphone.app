@@ -1,4 +1,17 @@
-// This is the jest 'setupFilesAfterEnv' setup file
-// It's a good place to set globals, add global before/after hooks, etc
+import { setConfig } from "blitz";
 
-export {}; // so TS doesn't complain
+import { config } from "../blitz.config";
+
+setConfig({
+	serverRuntimeConfig: config.serverRuntimeConfig,
+	publicRuntimeConfig: config.publicRuntimeConfig,
+});
+
+jest.mock("../integrations/logger", () => ({
+	child: jest.fn().mockReturnValue({
+		log: jest.fn(),
+		error: jest.fn(),
+		debug: jest.fn(),
+		warn: jest.fn(),
+	}),
+}));
