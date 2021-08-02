@@ -47,7 +47,7 @@ const notifyIncomingMessageQueue = Queue<Payload>(
 				} catch (error) {
 					logger.error(error);
 					if (error instanceof WebPushError) {
-						// subscription most likely expired
+						// subscription most likely expired or has been revoked
 						await db.notificationSubscription.delete({ where: { id: subscription.id } });
 					}
 				}

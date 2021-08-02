@@ -1,4 +1,4 @@
-import { resolver } from "blitz";
+import { NotFoundError, resolver } from "blitz";
 import { z } from "zod";
 
 import db, { Prisma } from "../../../db";
@@ -12,7 +12,7 @@ const GetConversations = z.object({
 export default resolver.pipe(resolver.zod(GetConversations), resolver.authorize(), async ({ recipient }, context) => {
 	const customer = await getCurrentCustomer(null, context);
 	if (!customer) {
-		return;
+		throw new NotFoundError();
 	}
 
 	const conversation = await db.message.findMany({

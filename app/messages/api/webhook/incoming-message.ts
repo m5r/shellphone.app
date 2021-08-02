@@ -45,7 +45,7 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 		});
 		if (!customerPhoneNumber) {
 			// phone number is not registered by any of our customer
-			res.status(200).end();
+			res.status(500).end();
 			return;
 		}
 
@@ -53,7 +53,7 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 			where: { id: customerPhoneNumber.customerId },
 		});
 		if (!customer || !customer.authToken) {
-			res.status(200).end();
+			res.status(500).end();
 			return;
 		}
 
@@ -90,7 +90,8 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 			),
 		]);
 
-		res.status(200).end();
+		res.setHeader("content-type", "text/html");
+		res.status(200).send("<Response></Response>");
 	} catch (error) {
 		const statusCode = error.statusCode ?? 500;
 		const apiError: ApiError = {

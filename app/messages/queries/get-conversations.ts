@@ -1,4 +1,4 @@
-import { resolver } from "blitz";
+import { resolver, NotFoundError } from "blitz";
 
 import db, { Direction, Message, Prisma } from "../../../db";
 import getCurrentCustomer from "../../customers/queries/get-current-customer";
@@ -7,7 +7,7 @@ import { decrypt } from "../../../db/_encryption";
 export default resolver.pipe(resolver.authorize(), async (_ = null, context) => {
 	const customer = await getCurrentCustomer(null, context);
 	if (!customer) {
-		return;
+		throw new NotFoundError();
 	}
 
 	const messages = await db.message.findMany({

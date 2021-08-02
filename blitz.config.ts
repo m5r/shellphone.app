@@ -2,7 +2,7 @@ import { BlitzConfig, sessionMiddleware, simpleRolesIsAuthorized } from "blitz";
 
 const withPWA = require("next-pwa");
 
-const config: BlitzConfig = {
+export const config: BlitzConfig = {
 	middleware: [
 		sessionMiddleware({
 			cookiePrefix: "virtual-phone-blitz",
@@ -47,10 +47,12 @@ const config: BlitzConfig = {
 	*/
 };
 
-module.exports = withPWA({
-	...config,
-	pwa: {
-		dest: "public",
-		disable: process.env.NODE_ENV !== "production",
-	},
-});
+export default process.env.NODE_ENV === "test"
+	? config
+	: withPWA({
+			...config,
+			pwa: {
+				dest: "public",
+				disable: process.env.NODE_ENV !== "production",
+			},
+	  });

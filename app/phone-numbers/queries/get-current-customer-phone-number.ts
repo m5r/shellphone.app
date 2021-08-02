@@ -1,4 +1,4 @@
-import { resolver } from "blitz";
+import { NotFoundError, resolver } from "blitz";
 
 import db from "db";
 import getCurrentCustomer from "../../customers/queries/get-current-customer";
@@ -6,7 +6,7 @@ import getCurrentCustomer from "../../customers/queries/get-current-customer";
 export default resolver.pipe(resolver.authorize(), async (_ = null, context) => {
 	const customer = await getCurrentCustomer(null, context);
 	if (!customer) {
-		return;
+		throw new NotFoundError();
 	}
 
 	return db.phoneNumber.findFirst({
