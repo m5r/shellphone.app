@@ -49,5 +49,7 @@ export default async function ddd(req: BlitzApiRequest, res: BlitzApiResponse) {
 	console.log("messagesReceived", messagesReceived.sort((a, b) => a.dateCreated.getTime() - b.dateCreated.getTime()));
 	// console.log("messagesReceived", messagesReceived);*/
 
-	res.status(200).end();
+	setTimeout(() => {
+		res.status(200).end();
+	}, 1000 * 60 * 5);
 }
