@@ -6,8 +6,12 @@ import { decrypt } from "../../../db/_encryption";
 
 export default resolver.pipe(resolver.authorize(), async (_ = null, context) => {
 	const customer = await getCurrentCustomer(null, context);
+	if (!customer) {
+		return;
+	}
+
 	const messages = await db.message.findMany({
-		where: { customerId: customer!.id },
+		where: { customerId: customer.id },
 		orderBy: { sentAt: Prisma.SortOrder.asc },
 	});
 
@@ -26,7 +30,7 @@ export default resolver.pipe(resolver.authorize(), async (_ = null, context) => 
 
 		conversations[recipient]!.push({
 			...message,
-			content: decrypt(message.content, customer!.encryptionKey),
+			content: decrypt(message.content, customer.encryptionKey),
 		});
 
 		conversations[recipient]!.sort((a, b) => a.sentAt.getTime() - b.sentAt.getTime());

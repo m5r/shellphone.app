@@ -5,8 +5,12 @@ import getCurrentCustomer from "../../customers/queries/get-current-customer";
 
 export default resolver.pipe(resolver.authorize(), async (_ = null, context) => {
 	const customer = await getCurrentCustomer(null, context);
+	if (!customer) {
+		return;
+	}
+
 	return db.phoneNumber.findFirst({
-		where: { customerId: customer!.id },
+		where: { customerId: customer.id },
 		select: {
 			id: true,
 			phoneNumber: true,

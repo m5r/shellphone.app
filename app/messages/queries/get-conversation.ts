@@ -11,17 +11,19 @@ const GetConversations = z.object({
 
 export default resolver.pipe(resolver.zod(GetConversations), resolver.authorize(), async ({ recipient }, context) => {
 	const customer = await getCurrentCustomer(null, context);
+	if (!customer) {
+		return;
+	}
+
 	const conversation = await db.message.findMany({
-		where: {
-			OR: [{ from: recipient }, { to: recipient }],
-		},
+		where: { OR: [{ from: recipient }, { to: recipient }] },
 		orderBy: { sentAt: Prisma.SortOrder.asc },
 	});
 
 	return conversation.map((message) => {
 		return {
 			...message,
-			content: decrypt(message.content, customer!.encryptionKey),
+			content: decrypt(message.content, customer.encryptionKey),
 		};
 	});
 });
