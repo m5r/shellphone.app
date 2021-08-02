@@ -14,8 +14,12 @@ const Body = z.object({
 
 export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ phoneNumberSid }, context) => {
 	const customer = await getCurrentCustomer(null, context);
-	const customerId = customer!.id;
-	const phoneNumbers = await twilio(customer!.accountSid!, customer!.authToken!).incomingPhoneNumbers.list();
+	if (!customer || !customer.accountSid || !customer.authToken) {
+		return;
+	}
+
+	const customerId = customer.id;
+	const phoneNumbers = await twilio(customer.accountSid, customer.authToken).incomingPhoneNumbers.list();
 	const phoneNumber = phoneNumbers.find((phoneNumber) => phoneNumber.sid === phoneNumberSid)!;
 	await db.phoneNumber.create({
 		data: {

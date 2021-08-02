@@ -18,24 +18,31 @@ const Body = z.object({
 
 export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ content, to }, context) => {
 	const customer = await getCurrentCustomer(null, context);
+	if (!customer || !customer.accountSid || !customer.authToken) {
+		return;
+	}
+
 	try {
-		await twilio(customer!.accountSid!, customer!.authToken!).lookups.v1.phoneNumbers(to).fetch();
+		await twilio(customer.accountSid, customer.authToken).lookups.v1.phoneNumbers(to).fetch();
 	} catch (error) {
 		logger.error(error);
 		return;
 	}
 
-	const customerId = customer!.id;
+	const customerId = customer.id;
 	const customerPhoneNumber = await getCustomerPhoneNumber({ customerId }, context);
+	if (!customerPhoneNumber) {
+		return;
+	}
 
 	const message = await db.message.create({
 		data: {
 			customerId,
 			to,
-			from: customerPhoneNumber!.phoneNumber,
+			from: customerPhoneNumber.phoneNumber,
 			direction: Direction.Outbound,
 			status: MessageStatus.Queued,
-			content: encrypt(content, customer!.encryptionKey),
+			content: encrypt(content, customer.encryptionKey),
 			sentAt: new Date(),
 		},
 	});

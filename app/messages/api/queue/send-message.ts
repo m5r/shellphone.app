@@ -13,14 +13,19 @@ type Payload = {
 const sendMessageQueue = Queue<Payload>(
 	"api/queue/send-message",
 	async ({ id, customerId, to, content }) => {
-		const customer = await db.customer.findFirst({ where: { id: customerId } });
-		const phoneNumber = await db.phoneNumber.findFirst({ where: { customerId } });
+		const [customer, phoneNumber] = await Promise.all([
+			db.customer.findFirst({ where: { id: customerId } }),
+			db.phoneNumber.findFirst({ where: { customerId } }),
+		]);
+		if (!customer || !customer.accountSid || !customer.authToken || !phoneNumber) {
+			return;
+		}
 
 		try {
-			const message = await twilio(customer!.accountSid!, customer!.authToken!).messages.create({
+			const message = await twilio(customer.accountSid, customer.authToken).messages.create({
 				body: content,
 				to,
-				from: phoneNumber!.phoneNumber,
+				from: phoneNumber.phoneNumber,
 			});
 			await db.message.update({
 				where: { id },

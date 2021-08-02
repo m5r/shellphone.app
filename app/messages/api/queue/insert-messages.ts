@@ -1,7 +1,7 @@
 import { Queue } from "quirrel/blitz";
 import type { MessageInstance } from "twilio/lib/rest/api/v2010/account/message";
 
-import db, { MessageStatus, Direction, Message } from "../../../../db";
+import db, { Direction, Message, MessageStatus } from "../../../../db";
 import { encrypt } from "../../../../db/_encryption";
 
 type Payload = {
@@ -11,12 +11,14 @@ type Payload = {
 
 const insertMessagesQueue = Queue<Payload>("api/queue/insert-messages", async ({ messages, customerId }) => {
 	const customer = await db.customer.findFirst({ where: { id: customerId } });
-	const encryptionKey = customer!.encryptionKey;
+	if (!customer) {
+		return;
+	}
 
 	const sms = messages
 		.map<Omit<Message, "id">>((message) => ({
 			customerId,
-			content: encrypt(message.body, encryptionKey),
+			content: encrypt(message.body, customer.encryptionKey),
 			from: message.from,
 			to: message.to,
 			status: translateStatus(message.status),

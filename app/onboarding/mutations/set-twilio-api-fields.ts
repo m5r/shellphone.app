@@ -14,9 +14,12 @@ export default resolver.pipe(
 	resolver.authorize(),
 	async ({ twilioAccountSid, twilioAuthToken }, context) => {
 		const customer = await getCurrentCustomer(null, context);
-		const customerId = customer!.id;
+		if (!customer) {
+			return;
+		}
+
 		await db.customer.update({
-			where: { id: customerId },
+			where: { id: customer.id },
 			data: {
 				accountSid: twilioAccountSid,
 				authToken: twilioAuthToken,

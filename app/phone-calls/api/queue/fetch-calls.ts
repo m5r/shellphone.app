@@ -9,15 +9,20 @@ type Payload = {
 };
 
 const fetchCallsQueue = Queue<Payload>("api/queue/fetch-calls", async ({ customerId }) => {
-	const customer = await db.customer.findFirst({ where: { id: customerId } });
-	const phoneNumber = await db.phoneNumber.findFirst({ where: { customerId } });
+	const [customer, phoneNumber] = await Promise.all([
+		db.customer.findFirst({ where: { id: customerId } }),
+		db.phoneNumber.findFirst({ where: { customerId } }),
+	]);
+	if (!customer || !customer.accountSid || !customer.authToken || !phoneNumber) {
+		return;
+	}
 
 	const [callsSent, callsReceived] = await Promise.all([
-		twilio(customer!.accountSid!, customer!.authToken!).calls.list({
-			from: phoneNumber!.phoneNumber,
+		twilio(customer.accountSid, customer.authToken).calls.list({
+			from: phoneNumber.phoneNumber,
 		}),
-		twilio(customer!.accountSid!, customer!.authToken!).calls.list({
-			to: phoneNumber!.phoneNumber,
+		twilio(customer.accountSid, customer.authToken).calls.list({
+			to: phoneNumber.phoneNumber,
 		}),
 	]);
 	const calls = [...callsSent, ...callsReceived].sort((a, b) => a.dateCreated.getTime() - b.dateCreated.getTime());
