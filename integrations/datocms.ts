@@ -1,8 +1,8 @@
 import { getConfig } from "blitz";
-import { remark } from "remark";
-import html from "remark-html";
 
 export async function markdownToHtml(markdown: string) {
+	const { remark } = await import("remark");
+	const { default: html } = await import("remark-html");
 	const result = await remark().use(html).process(markdown);
 	return result.toString();
 }
