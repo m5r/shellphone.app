@@ -1,6 +1,7 @@
 import { setConfig } from "blitz";
 
-import { config } from "../blitz.config";
+// see https://github.com/vercel/next.js/issues/4024
+const config = require("../blitz.config");
 
 setConfig({
 	serverRuntimeConfig: config.serverRuntimeConfig,
