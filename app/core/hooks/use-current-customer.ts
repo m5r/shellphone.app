@@ -1,10 +1,10 @@
-import { useAuthenticatedSession, useQuery } from "blitz";
+import { useSession, useQuery } from "blitz";
 
 import getCurrentCustomer from "../../customers/queries/get-current-customer";
 
 export default function useCurrentCustomer() {
-	const session = useAuthenticatedSession();
-	const [customer] = useQuery(getCurrentCustomer, null);
+	const session = useSession();
+	const [customer] = useQuery(getCurrentCustomer, null, { enabled: Boolean(session.userId) });
 	return {
 		customer,
 		hasFilledTwilioCredentials: Boolean(customer && customer.accountSid && customer.authToken),
