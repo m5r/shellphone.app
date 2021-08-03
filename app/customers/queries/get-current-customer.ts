@@ -1,8 +1,8 @@
-import { Ctx } from "blitz";
+import { resolver } from "blitz";
 
 import db from "../../../db";
 
-export default async function getCurrentCustomer(_ = null, { session }: Ctx) {
+export default resolver.pipe(resolver.authorize(), async (_ = null, { session }) => {
 	if (!session.userId) return null;
 
 	return db.customer.findFirst({
@@ -18,4 +18,4 @@ export default async function getCurrentCustomer(_ = null, { session }: Ctx) {
 			user: true,
 		},
 	});
-}
+});
