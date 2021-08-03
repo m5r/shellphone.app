@@ -1,0 +1,23 @@
+{
+	"name": "Shellphone: Your Personal Virtual Phone",
+	"short_name": "Shellphone",
+	"lang": "en-US",
+	"start_url": "/",
+	"scope": "/",
+	"shortcuts": [
+		{
+			"name": "Shellphone Messages",
+			"short_name": "Messages",
+			"url": "/messages"
+		},
+		{
+			"name": "Shellphone Calls",
+			"short_name": "Calls",
+			"url": "/calls"
+		}
+	],
+	"display": "standalone",
+	"orientation": "portrait",
+	"theme_color": "#663399",
+	"background_color": "#F9FAFB"
+}
