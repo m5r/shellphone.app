@@ -5,7 +5,7 @@ const withPWA = require("next-pwa");
 const config: BlitzConfig = {
 	middleware: [
 		sessionMiddleware({
-			cookiePrefix: "virtual-phone-blitz",
+			cookiePrefix: "shellphone",
 			isAuthorized: simpleRolesIsAuthorized,
 		}),
 	],
