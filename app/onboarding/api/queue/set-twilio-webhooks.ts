@@ -1,3 +1,4 @@
+import { getConfig } from "blitz";
 import { Queue } from "quirrel/blitz";
 import twilio from "twilio";
 
@@ -6,6 +7,8 @@ import db from "../../../../db";
 type Payload = {
 	customerId: string;
 };
+
+const { serverRuntimeConfig } = getConfig();
 
 const setTwilioWebhooks = Queue<Payload>("api/queue/set-twilio-webhooks", async ({ customerId }) => {
 	const [customer, phoneNumber] = await Promise.all([
@@ -19,10 +22,10 @@ const setTwilioWebhooks = Queue<Payload>("api/queue/set-twilio-webhooks", async 
 	const twimlApp = customer.twimlAppSid
 		? await twilio(customer.accountSid, customer.authToken).applications.get(customer.twimlAppSid).fetch()
 		: await twilio(customer.accountSid, customer.authToken).applications.create({
-				friendlyName: "Virtual Phone",
-				smsUrl: "https://phone.mokhtar.dev/api/webhook/incoming-message",
+				friendlyName: "Shellphone",
+				smsUrl: `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/incoming-message`,
 				smsMethod: "POST",
-				voiceUrl: "https://phone.mokhtar.dev/api/webhook/incoming-call",
+				voiceUrl: `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/incoming-call`,
 				voiceMethod: "POST",
 		  });
 	const twimlAppSid = twimlApp.sid;

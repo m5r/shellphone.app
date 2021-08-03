@@ -10,7 +10,7 @@ const BaseLayout = ({ title, children }: LayoutProps) => {
 	return (
 		<>
 			<Head>
-				<title>{title || "virtual-phone"}</title>
+				<title>{title || "shellphone.app"}</title>
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 

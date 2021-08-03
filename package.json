@@ -1,5 +1,5 @@
 {
-	"name": "virtual-phone",
+	"name": "shellphone.app",
 	"version": "1.0.0",
 	"scripts": {
 		"dev": "concurrently --raw \"blitz dev\" 'quirrel'",
