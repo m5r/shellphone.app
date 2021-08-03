@@ -31,6 +31,10 @@ const config: BlitzConfig = {
 		webPush: {
 			privateKey: process.env.WEB_PUSH_VAPID_PRIVATE_KEY,
 		},
+		datoCms: {
+			apiToken: process.env.DATOCMS_API_TOKEN,
+			previewSecret: process.env.DATOCMS_PREVIEW_SECRET,
+		},
 	},
 	publicRuntimeConfig: {
 		webPush: {
