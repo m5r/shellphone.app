@@ -71,6 +71,7 @@ const ErrorBoundary = withRouter(
 		}
 
 		public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+			console.trace("ddd");
 			logger.error(error, errorInfo.componentStack);
 			if (blitzErrors.some((blitzError) => error instanceof blitzError)) {
 				// let Blitz ErrorBoundary handle this one
