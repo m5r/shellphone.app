@@ -1,12 +1,12 @@
 import { Routes, useRouter } from "blitz";
 
-import useCurrentCustomer from "./use-current-customer";
-import useCustomerPhoneNumber from "./use-customer-phone-number";
+import useCurrentUser from "./use-current-user";
+import useCurrentPhoneNumber from "./use-current-phone-number";
 
 export default function useRequireOnboarding() {
 	const router = useRouter();
-	const { hasFilledTwilioCredentials, hasCompletedOnboarding } = useCurrentCustomer();
-	const customerPhoneNumber = useCustomerPhoneNumber();
+	const { hasFilledTwilioCredentials, hasCompletedOnboarding } = useCurrentUser();
+	const phoneNumber = useCurrentPhoneNumber();
 
 	if (hasCompletedOnboarding) {
 		return;
@@ -16,12 +16,12 @@ export default function useRequireOnboarding() {
 		throw router.push(Routes.StepTwo());
 	}
 
-	/*if (!customer.paddleCustomerId || !customer.paddleSubscriptionId) {
+	/*if (!user.paddleCustomerId || !user.paddleSubscriptionId) {
 		throw router.push(Routes.StepTwo());
 		return;
 	}*/
 
-	if (!customerPhoneNumber) {
+	if (!phoneNumber) {
 		throw router.push(Routes.StepThree());
 	}
 }

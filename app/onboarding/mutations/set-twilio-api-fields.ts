@@ -2,7 +2,7 @@ import { resolver } from "blitz";
 import { z } from "zod";
 
 import db from "../../../db";
-import getCurrentCustomer from "../../customers/queries/get-current-customer";
+import getCurrentUser from "../../users/queries/get-current-user";
 
 const Body = z.object({
 	twilioAccountSid: z.string(),
@@ -13,16 +13,17 @@ export default resolver.pipe(
 	resolver.zod(Body),
 	resolver.authorize(),
 	async ({ twilioAccountSid, twilioAuthToken }, context) => {
-		const customer = await getCurrentCustomer(null, context);
-		if (!customer) {
+		const user = await getCurrentUser(null, context);
+		if (!user) {
 			return;
 		}
 
-		await db.customer.update({
-			where: { id: customer.id },
+		const organizationId = user.memberships[0]!.id;
+		await db.organization.update({
+			where: { id: organizationId },
 			data: {
-				accountSid: twilioAccountSid,
-				authToken: twilioAuthToken,
+				twilioAccountSid: twilioAccountSid,
+				twilioAuthToken: twilioAuthToken,
 			},
 		});
 	},

@@ -4,15 +4,25 @@ import type { CallInstance } from "twilio/lib/rest/api/v2010/account/call";
 import db, { Direction, CallStatus } from "../../../../db";
 
 type Payload = {
-	customerId: string;
+	organizationId: string;
+	phoneNumberId: string;
 	calls: CallInstance[];
 };
 
-const insertCallsQueue = Queue<Payload>("api/queue/insert-calls", async ({ calls, customerId }) => {
+const insertCallsQueue = Queue<Payload>("api/queue/insert-calls", async ({ calls, organizationId, phoneNumberId }) => {
+	const phoneNumber = await db.phoneNumber.findFirst({
+		where: { id: phoneNumberId, organizationId },
+		include: { organization: true },
+	});
+	if (!phoneNumber) {
+		return;
+	}
+
 	const phoneCalls = calls
 		.map((call) => ({
-			customerId,
-			twilioSid: call.sid,
+			organizationId,
+			phoneNumberId,
+			id: call.sid,
 			from: call.from,
 			to: call.to,
 			direction: translateDirection(call.direction),

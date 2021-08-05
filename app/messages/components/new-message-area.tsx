@@ -1,14 +1,14 @@
+import type { FunctionComponent } from "react";
+import { useMutation, useQuery } from "blitz";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/pro-regular-svg-icons";
 import { useForm } from "react-hook-form";
-import { useMutation, useQuery } from "blitz";
 
 import sendMessage from "../mutations/send-message";
 import { Direction, Message, MessageStatus } from "../../../db";
 import getConversationsQuery from "../queries/get-conversations";
-import useCurrentCustomer from "../../core/hooks/use-current-customer";
-import useCustomerPhoneNumber from "../../core/hooks/use-customer-phone-number";
-import { FunctionComponent } from "react";
+import useCurrentUser from "../../core/hooks/use-current-user";
+import useCurrentPhoneNumber from "../../core/hooks/use-current-phone-number";
 
 type Form = {
 	content: string;
@@ -20,8 +20,8 @@ type Props = {
 };
 
 const NewMessageArea: FunctionComponent<Props> = ({ recipient, onSend }) => {
-	const { customer } = useCurrentCustomer();
-	const phoneNumber = useCustomerPhoneNumber();
+	const { organization } = useCurrentUser();
+	const phoneNumber = useCurrentPhoneNumber();
 	const sendMessageMutation = useMutation(sendMessage)[0];
 	const { setQueryData: setConversationsQueryData, refetch: refetchConversations } = useQuery(
 		getConversationsQuery,
@@ -45,9 +45,9 @@ const NewMessageArea: FunctionComponent<Props> = ({ recipient, onSend }) => {
 		const id = uuidv4();
 		const message: Message = {
 			id,
-			customerId: customer!.id,
-			twilioSid: id,
-			from: phoneNumber!.phoneNumber,
+			organizationId: organization!.id,
+			phoneNumberId: phoneNumber!.id,
+			from: phoneNumber!.number,
 			to: recipient,
 			content: content,
 			direction: Direction.Outbound,
@@ -63,7 +63,12 @@ const NewMessageArea: FunctionComponent<Props> = ({ recipient, onSend }) => {
 				}
 
 				nextConversations[recipient] = [...nextConversations[recipient]!, message];
-				return nextConversations;
+
+				return Object.fromEntries(
+					Object.entries(nextConversations).sort(
+						([, a], [, b]) => b[b.length - 1]!.sentAt.getTime() - a[a.length - 1]!.sentAt.getTime(),
+					),
+				);
 			},
 			{ refetch: false },
 		);

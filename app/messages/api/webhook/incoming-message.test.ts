@@ -3,31 +3,26 @@ import twilio from "twilio";
 
 import db from "db";
 import handler from "./incoming-message";
-import notifyIncomingMessageQueue from "../queue/notify-incoming-message";
 import insertIncomingMessageQueue from "../queue/insert-incoming-message";
 
 describe("/api/webhook/incoming-message", () => {
-	const mockedFindFirstPhoneNumber = db.phoneNumber.findFirst as jest.Mock<
-		ReturnType<typeof db.phoneNumber.findFirst>
-	>;
-	const mockedFindFirstCustomer = db.customer.findFirst as jest.Mock<ReturnType<typeof db.customer.findFirst>>;
-	const mockedEnqueueNotifyIncomingMessage = notifyIncomingMessageQueue.enqueue as jest.Mock<
-		ReturnType<typeof notifyIncomingMessageQueue.enqueue>
-	>;
+	const mockedFindManyPhoneNumbers = db.phoneNumber.findMany as jest.Mock<ReturnType<typeof db.phoneNumber.findMany>>;
 	const mockedEnqueueInsertIncomingMessage = insertIncomingMessageQueue.enqueue as jest.Mock<
 		ReturnType<typeof insertIncomingMessageQueue.enqueue>
 	>;
 	const mockedValidateRequest = twilio.validateRequest as jest.Mock<ReturnType<typeof twilio.validateRequest>>;
 
 	beforeEach(() => {
-		mockedFindFirstPhoneNumber.mockResolvedValue({ phoneNumber: "+33757592025" } as any);
-		mockedFindFirstCustomer.mockResolvedValue({ id: "9292", authToken: "twi" } as any);
+		mockedFindManyPhoneNumbers.mockResolvedValue([
+			{
+				id: "9292",
+				organization: { id: "2929", twilioAuthToken: "twi" },
+			} as any,
+		]);
 	});
 
 	afterEach(() => {
-		mockedFindFirstPhoneNumber.mockReset();
-		mockedFindFirstCustomer.mockReset();
-		mockedEnqueueNotifyIncomingMessage.mockReset();
+		mockedFindManyPhoneNumbers.mockReset();
 		mockedEnqueueInsertIncomingMessage.mockReset();
 		mockedValidateRequest.mockReset();
 	});
@@ -50,16 +45,15 @@ describe("/api/webhook/incoming-message", () => {
 
 				expect(res.status).toBe(200);
 				expect(res.headers.get("content-type")).toBe("text/html");
-				[mockedEnqueueNotifyIncomingMessage, mockedEnqueueNotifyIncomingMessage].forEach((enqueue) => {
-					expect(enqueue).toHaveBeenCalledTimes(1);
-					expect(enqueue).toHaveBeenCalledWith(
-						{
-							messageSid: "SM157246f02006b80953e8c753fb68fad6",
-							customerId: "9292",
-						},
-						{ id: "notify-SM157246f02006b80953e8c753fb68fad6" },
-					);
-				});
+				expect(mockedEnqueueInsertIncomingMessage).toHaveBeenCalledTimes(1);
+				expect(mockedEnqueueInsertIncomingMessage).toHaveBeenCalledWith(
+					{
+						messageSid: "SM157246f02006b80953e8c753fb68fad6",
+						phoneNumberId: "9292",
+						organizationId: "2929",
+					},
+					{ id: "insert-SM157246f02006b80953e8c753fb68fad6-2929-9292" },
+				);
 			},
 		});
 	});
@@ -107,11 +101,7 @@ describe("/api/webhook/incoming-message", () => {
 });
 
 jest.mock("db", () => ({
-	phoneNumber: { findFirst: jest.fn() },
-	customer: { findFirst: jest.fn() },
-}));
-jest.mock("../queue/notify-incoming-message", () => ({
-	enqueue: jest.fn(),
+	phoneNumber: { findMany: jest.fn() },
 }));
 jest.mock("../queue/insert-incoming-message", () => ({
 	enqueue: jest.fn(),

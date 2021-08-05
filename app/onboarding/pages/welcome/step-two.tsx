@@ -11,7 +11,7 @@ import db from "db";
 import setTwilioApiFields from "../../mutations/set-twilio-api-fields";
 import OnboardingLayout from "../../components/onboarding-layout";
 import HelpModal from "../../components/help-modal";
-import useCurrentCustomer from "../../../core/hooks/use-current-customer";
+import useCurrentUser from "../../../core/hooks/use-current-user";
 
 type Form = {
 	twilioAccountSid: string;
@@ -26,14 +26,14 @@ const StepTwo: BlitzPage = () => {
 		formState: { isSubmitting },
 	} = useForm<Form>();
 	const router = useRouter();
-	const { customer } = useCurrentCustomer();
+	const { organization } = useCurrentUser();
 	const [setTwilioApiFieldsMutation] = useMutation(setTwilioApiFields);
 	const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
 	useEffect(() => {
-		setValue("twilioAuthToken", customer?.authToken ?? "");
-		setValue("twilioAccountSid", customer?.accountSid ?? "");
-	}, [setValue, customer?.authToken, customer?.accountSid]);
+		setValue("twilioAuthToken", organization?.twilioAuthToken ?? "");
+		setValue("twilioAccountSid", organization?.twilioAccountSid ?? "");
+	}, [setValue, organization?.twilioAuthToken, organization?.twilioAccountSid]);
 
 	const onSubmit = handleSubmit(async ({ twilioAccountSid, twilioAuthToken }) => {
 		if (isSubmitting) {
@@ -105,9 +105,9 @@ StepTwo.getLayout = (page) => {
 };
 
 const StepTwoLayout: FunctionComponent = ({ children }) => {
-	const { customer } = useCurrentCustomer();
-	const initialAuthToken = customer?.authToken ?? "";
-	const initialAccountSid = customer?.accountSid ?? "";
+	const { organization } = useCurrentUser();
+	const initialAuthToken = organization?.twilioAuthToken ?? "";
+	const initialAccountSid = organization?.twilioAccountSid ?? "";
 	const hasTwilioCredentials = initialAccountSid.length > 0 && initialAuthToken.length > 0;
 
 	return (
@@ -135,7 +135,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 		};
 	}
 
-	const phoneNumber = await db.phoneNumber.findFirst({ where: { customerId: session.userId } });
+	const phoneNumber = await db.phoneNumber.findFirst({ where: { organizationId: session.orgId } });
 	if (phoneNumber) {
 		await session.$setPublicData({ hasCompletedOnboarding: true });
 		return {

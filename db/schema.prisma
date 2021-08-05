@@ -12,18 +12,68 @@ generator client {
 
 // --------------------------------------
 
-model User {
-  id             String   @id @default(uuid())
-  createdAt      DateTime @default(now()) @db.Timestamptz
-  updatedAt      DateTime @updatedAt @db.Timestamptz
-  name           String?
-  email          String   @unique
-  hashedPassword String?
-  role           Role     @default(USER)
+model Organization {
+  id                   String   @id @default(uuid())
+  createdAt            DateTime @default(now()) @db.Timestamptz
+  updatedAt            DateTime @updatedAt @db.Timestamptz
+  encryptionKey        String
+  paddleCustomerId     String?
+  paddleSubscriptionId String?
 
-  tokens   Token[]
-  sessions Session[]
-  customer Customer[]
+  twilioAccountSid String?
+  twilioAuthToken  String? // TODO: encrypt it with encryptionKey
+  twimlAppSid      String?
+
+  memberships               Membership[]
+  phoneNumbers              PhoneNumber[]
+  notificationSubscriptions NotificationSubscription[]
+  messages                  Message[]
+  phoneCalls                PhoneCall[]
+
+  @@unique([id, twilioAccountSid])
+}
+
+model Membership {
+  id   String         @id @default(uuid())
+  role MembershipRole
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  // When the user joins, we will clear out the name and email and set the user.
+  invitedName  String?
+  invitedEmail String?
+
+  @@unique([organizationId, invitedEmail])
+}
+
+enum MembershipRole {
+  OWNER
+  ADMIN
+  USER
+}
+
+// The owners of the SaaS (you) can have a SUPERADMIN role to access all data
+enum GlobalRole {
+  SUPERADMIN
+  CUSTOMER
+}
+
+model User {
+  id             String     @id @default(uuid())
+  createdAt      DateTime   @default(now()) @db.Timestamptz
+  updatedAt      DateTime   @updatedAt @db.Timestamptz
+  name           String?
+  email          String     @unique
+  hashedPassword String?
+  role           GlobalRole @default(CUSTOMER)
+
+  memberships Membership[]
+  tokens      Token[]
+  sessions    Session[]
 }
 
 enum Role {
@@ -65,25 +115,6 @@ enum TokenType {
   RESET_PASSWORD
 }
 
-model Customer {
-  id                   String   @id
-  createdAt            DateTime @default(now()) @db.Timestamptz
-  updatedAt            DateTime @updatedAt @db.Timestamptz
-  encryptionKey        String
-  accountSid           String?
-  authToken            String?
-  // TODO: encrypt it with encryptionKey
-  twimlAppSid          String?
-  paddleCustomerId     String?
-  paddleSubscriptionId String?
-
-  user                      User                       @relation(fields: [id], references: [id])
-  messages                  Message[]
-  phoneCalls                PhoneCall[]
-  phoneNumbers              PhoneNumber[]
-  notificationSubscriptions NotificationSubscription[]
-}
-
 model Message {
   id        String        @id @default(uuid())
   sentAt    DateTime      @db.Timestamptz
@@ -92,10 +123,13 @@ model Message {
   to        String
   direction Direction
   status    MessageStatus
-  twilioSid String?
 
-  customer   Customer @relation(fields: [customerId], references: [id])
-  customerId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  phoneNumber    PhoneNumber  @relation(fields: [phoneNumberId], references: [id])
+  phoneNumberId  String
+
+  @@unique([organizationId, phoneNumberId, id])
 }
 
 enum Direction {
@@ -117,20 +151,25 @@ enum MessageStatus {
   Read
   PartiallyDelivered
   Canceled
+
+  Error
 }
 
 model PhoneCall {
-  id        String     @id @default(uuid())
+  id        String     @id
   createdAt DateTime   @default(now()) @db.Timestamptz
-  twilioSid String
   from      String
   to        String
   status    CallStatus
   direction Direction
   duration  String
 
-  customer   Customer @relation(fields: [customerId], references: [id])
-  customerId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  phoneNumber    PhoneNumber  @relation(fields: [phoneNumberId], references: [id])
+  phoneNumberId  String
+
+  @@unique([organizationId, phoneNumberId, id])
 }
 
 enum CallStatus {
@@ -145,13 +184,18 @@ enum CallStatus {
 }
 
 model PhoneNumber {
-  id             String   @id @default(uuid())
-  createdAt      DateTime @default(now()) @db.Timestamptz
-  phoneNumberSid String
-  phoneNumber    String
+  id        String   @id
+  createdAt DateTime @default(now()) @db.Timestamptz
+  number    String
 
-  customer   Customer @relation(fields: [customerId], references: [id])
-  customerId String
+  messages                  Message[]
+  phoneCalls                PhoneCall[]
+  notificationSubscriptions NotificationSubscription[]
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+
+  @@unique([organizationId, id])
 }
 
 model NotificationSubscription {
@@ -163,6 +207,8 @@ model NotificationSubscription {
   keys_p256dh    String
   keys_auth      String
 
-  customer   Customer @relation(fields: [customerId], references: [id])
-  customerId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  phoneNumber    PhoneNumber  @relation(fields: [phoneNumberId], references: [id])
+  phoneNumberId  String
 }

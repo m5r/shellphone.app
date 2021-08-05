@@ -2,6 +2,7 @@ import { getConfig, useMutation } from "blitz";
 import { useEffect, useState } from "react";
 
 import setNotificationSubscription from "../mutations/set-notification-subscription";
+import useCurrentPhoneNumber from "./use-current-phone-number";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -9,6 +10,7 @@ export default function useNotifications() {
 	const isServiceWorkerSupported = "serviceWorker" in navigator;
 	const [subscription, setSubscription] = useState<PushSubscription | null>(null);
 	const [setNotificationSubscriptionMutation] = useMutation(setNotificationSubscription);
+	const phoneNumber = useCurrentPhoneNumber();
 
 	useEffect(() => {
 		(async () => {
@@ -23,7 +25,7 @@ export default function useNotifications() {
 	}, [isServiceWorkerSupported]);
 
 	async function subscribe() {
-		if (!isServiceWorkerSupported) {
+		if (!isServiceWorkerSupported || !phoneNumber) {
 			return;
 		}
 
@@ -33,7 +35,10 @@ export default function useNotifications() {
 			applicationServerKey: urlBase64ToUint8Array(publicRuntimeConfig.webPush.publicKey),
 		});
 		setSubscription(subscription);
-		await setNotificationSubscriptionMutation({ subscription: subscription.toJSON() as any }); // TODO remove as any
+		await setNotificationSubscriptionMutation({
+			phoneNumberId: phoneNumber.id,
+			subscription: subscription.toJSON() as any,
+		}); // TODO remove as any
 	}
 
 	async function unsubscribe() {

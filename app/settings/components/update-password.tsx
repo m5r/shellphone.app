@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import Alert from "./alert";
 import Button from "./button";
 import SettingsSection from "./settings-section";
-import useCurrentCustomer from "../../core/hooks/use-current-customer";
 
 import appLogger from "../../../integrations/logger";
 
@@ -18,7 +17,6 @@ type Form = {
 };
 
 const UpdatePassword: FunctionComponent = () => {
-	const customer = useCurrentCustomer();
 	const router = useRouter();
 	const {
 		register,

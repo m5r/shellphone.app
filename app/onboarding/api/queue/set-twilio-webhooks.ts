@@ -5,23 +5,31 @@ import twilio from "twilio";
 import db from "../../../../db";
 
 type Payload = {
-	customerId: string;
+	organizationId: string;
+	phoneNumberId: string;
 };
 
 const { serverRuntimeConfig } = getConfig();
 
-const setTwilioWebhooks = Queue<Payload>("api/queue/set-twilio-webhooks", async ({ customerId }) => {
-	const [customer, phoneNumber] = await Promise.all([
-		db.customer.findFirst({ where: { id: customerId } }),
-		db.phoneNumber.findFirst({ where: { customerId } }),
-	]);
-	if (!customer || !customer.accountSid || !customer.authToken || !phoneNumber) {
+const setTwilioWebhooks = Queue<Payload>("api/queue/set-twilio-webhooks", async ({ organizationId, phoneNumberId }) => {
+	const phoneNumber = await db.phoneNumber.findFirst({
+		where: { id: phoneNumberId, organizationId },
+		include: { organization: true },
+	});
+	if (!phoneNumber) {
 		return;
 	}
 
-	const twimlApp = customer.twimlAppSid
-		? await twilio(customer.accountSid, customer.authToken).applications.get(customer.twimlAppSid).fetch()
-		: await twilio(customer.accountSid, customer.authToken).applications.create({
+	const organization = phoneNumber.organization;
+	if (!organization.twilioAccountSid || !organization.twilioAuthToken) {
+		return;
+	}
+
+	const twimlApp = organization.twimlAppSid
+		? await twilio(organization.twilioAccountSid, organization.twilioAuthToken)
+				.applications.get(organization.twimlAppSid)
+				.fetch()
+		: await twilio(organization.twilioAccountSid, organization.twilioAuthToken).applications.create({
 				friendlyName: "Shellphone",
 				smsUrl: `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/incoming-message`,
 				smsMethod: "POST",
@@ -31,14 +39,16 @@ const setTwilioWebhooks = Queue<Payload>("api/queue/set-twilio-webhooks", async 
 	const twimlAppSid = twimlApp.sid;
 
 	await Promise.all([
-		db.customer.update({
-			where: { id: customerId },
+		db.organization.update({
+			where: { id: organizationId },
 			data: { twimlAppSid },
 		}),
-		twilio(customer.accountSid, customer.authToken).incomingPhoneNumbers.get(phoneNumber.phoneNumberSid).update({
-			smsApplicationSid: twimlAppSid,
-			voiceApplicationSid: twimlAppSid,
-		}),
+		twilio(organization.twilioAccountSid, organization.twilioAuthToken)
+			.incomingPhoneNumbers.get(phoneNumber.id)
+			.update({
+				smsApplicationSid: twimlAppSid,
+				voiceApplicationSid: twimlAppSid,
+			}),
 	]);
 });
 

@@ -40,26 +40,25 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 
 	const body: Body = req.body;
 	try {
-		const customerPhoneNumber = await db.phoneNumber.findFirst({
-			where: { phoneNumber: body.To },
+		const phoneNumbers = await db.phoneNumber.findMany({
+			where: { number: body.To },
+			include: { organization: true },
 		});
-		if (!customerPhoneNumber) {
-			// phone number is not registered by any of our customer
-			res.status(500).end();
-			return;
-		}
-
-		const customer = await db.customer.findFirst({
-			where: { id: customerPhoneNumber.customerId },
-		});
-		if (!customer || !customer.authToken) {
+		if (phoneNumbers.length === 0) {
+			// phone number is not registered by any organization
 			res.status(500).end();
 			return;
 		}
 
 		const url = `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/incoming-message`;
-		const isRequestValid = twilio.validateRequest(customer.authToken, twilioSignature, url, req.body);
-		if (!isRequestValid) {
+		const phoneNumber = phoneNumbers.find((phoneNumber) => {
+			// if multiple organizations have the same number
+			// find the organization currently using that phone number
+			// maybe we shouldn't let multiple organizations use the same phone number
+			const authToken = phoneNumber.organization.twilioAuthToken ?? "";
+			return twilio.validateRequest(authToken, twilioSignature, url, req.body);
+		});
+		if (!phoneNumber) {
 			const statusCode = 400;
 			const apiError: ApiError = {
 				statusCode,
@@ -72,23 +71,16 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 		}
 
 		const messageSid = body.MessageSid;
-		const customerId = customer.id;
-		await Promise.all([
-			notifyIncomingMessageQueue.enqueue(
-				{
-					messageSid,
-					customerId,
-				},
-				{ id: `notify-${messageSid}` },
-			),
-			insertIncomingMessageQueue.enqueue(
-				{
-					messageSid,
-					customerId,
-				},
-				{ id: `insert-${messageSid}` },
-			),
-		]);
+		const organizationId = phoneNumber.organization.id;
+		const phoneNumberId = phoneNumber.id;
+		await insertIncomingMessageQueue.enqueue(
+			{
+				messageSid,
+				organizationId,
+				phoneNumberId,
+			},
+			{ id: `insert-${messageSid}-${organizationId}-${phoneNumberId}` },
+		);
 
 		res.setHeader("content-type", "text/html");
 		res.status(200).send("<Response></Response>");
