@@ -4,46 +4,49 @@ import twilio from "twilio";
 
 import db, { Direction, MessageStatus } from "../../../../db";
 import { encrypt } from "../../../../db/_encryption";
+import notifyIncomingMessageQueue from "./notify-incoming-message";
 
 type Payload = {
-	customerId: string;
+	organizationId: string;
+	phoneNumberId: string;
 	messageSid: MessageInstance["sid"];
 };
 
 const insertIncomingMessageQueue = Queue<Payload>(
 	"api/queue/insert-incoming-message",
-	async ({ messageSid, customerId }) => {
-		const customer = await db.customer.findFirst({ where: { id: customerId } });
-		if (!customer || !customer.accountSid || !customer.authToken) {
+	async ({ messageSid, organizationId, phoneNumberId }) => {
+		const organization = await db.organization.findFirst({
+			where: { id: organizationId },
+		});
+		if (!organization || !organization.twilioAccountSid || !organization.twilioAuthToken) {
 			return;
 		}
 
-		const encryptionKey = customer.encryptionKey;
-		const message = await twilio(customer.accountSid, customer.authToken).messages.get(messageSid).fetch();
+		const message = await twilio(organization.twilioAccountSid, organization.twilioAuthToken)
+			.messages.get(messageSid)
+			.fetch();
 		await db.message.create({
 			data: {
-				customerId,
+				organizationId,
+				phoneNumberId,
+				id: messageSid,
 				to: message.to,
 				from: message.from,
 				status: translateStatus(message.status),
 				direction: translateDirection(message.direction),
 				sentAt: message.dateCreated,
-				content: encrypt(message.body, customer.encryptionKey),
+				content: encrypt(message.body, organization.encryptionKey),
 			},
 		});
 
-		await db.message.createMany({
-			data: {
-				customerId,
-				content: encrypt(message.body, encryptionKey),
-				from: message.from,
-				to: message.to,
-				status: translateStatus(message.status),
-				direction: translateDirection(message.direction),
-				twilioSid: message.sid,
-				sentAt: new Date(message.dateCreated),
+		await notifyIncomingMessageQueue.enqueue(
+			{
+				messageSid,
+				organizationId,
+				phoneNumberId,
 			},
-		});
+			{ id: `notify-${messageSid}-${organizationId}-${phoneNumberId}` },
+		);
 	},
 );
 

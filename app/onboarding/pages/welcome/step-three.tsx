@@ -100,7 +100,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res }
 		};
 	}
 
-	const phoneNumber = await db.phoneNumber.findFirst({ where: { customerId: session.userId } });
+	const phoneNumber = await db.phoneNumber.findFirst({ where: { organizationId: session.orgId } });
 	if (phoneNumber) {
 		await session.$setPublicData({ hasCompletedOnboarding: true });
 		return {
@@ -111,8 +111,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res }
 		};
 	}
 
-	const customer = await db.customer.findFirst({ where: { id: session.userId } });
-	if (!customer) {
+	const organization = await db.organization.findFirst({ where: { id: session.orgId } });
+	if (!organization) {
 		return {
 			redirect: {
 				destination: Routes.StepOne().pathname,
@@ -121,7 +121,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res }
 		};
 	}
 
-	if (!customer.accountSid || !customer.authToken) {
+	if (!organization.twilioAccountSid || !organization.twilioAuthToken) {
 		return {
 			redirect: {
 				destination: Routes.StepTwo().pathname,
@@ -130,7 +130,10 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res }
 		};
 	}
 
-	const incomingPhoneNumbers = await twilio(customer.accountSid, customer.authToken).incomingPhoneNumbers.list();
+	const incomingPhoneNumbers = await twilio(
+		organization.twilioAccountSid,
+		organization.twilioAuthToken,
+	).incomingPhoneNumbers.list();
 	const phoneNumbers = incomingPhoneNumbers.map(({ phoneNumber, sid }) => ({ phoneNumber, sid }));
 
 	return {

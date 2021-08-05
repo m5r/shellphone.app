@@ -5,21 +5,27 @@ import db from "../../../../db";
 import insertMessagesQueue from "./insert-messages";
 
 type Payload = {
-	customerId: string;
+	organizationId: string;
+	phoneNumberId: string;
 };
 
-const fetchMessagesQueue = Queue<Payload>("api/queue/fetch-messages", async ({ customerId }) => {
-	const [customer, phoneNumber] = await Promise.all([
-		db.customer.findFirst({ where: { id: customerId } }),
-		db.phoneNumber.findFirst({ where: { customerId } }),
-	]);
-	if (!customer || !customer.accountSid || !customer.authToken || !phoneNumber) {
+const fetchMessagesQueue = Queue<Payload>("api/queue/fetch-messages", async ({ organizationId, phoneNumberId }) => {
+	const phoneNumber = await db.phoneNumber.findFirst({
+		where: { id: phoneNumberId, organizationId },
+		include: { organization: true },
+	});
+	if (!phoneNumber) {
+		return;
+	}
+
+	const organization = phoneNumber.organization;
+	if (!organization.twilioAccountSid || !organization.twilioAuthToken) {
 		return;
 	}
 
 	const [sent, received] = await Promise.all([
-		twilio(customer.accountSid, customer.authToken).messages.list({ from: phoneNumber.phoneNumber }),
-		twilio(customer.accountSid, customer.authToken).messages.list({ to: phoneNumber.phoneNumber }),
+		twilio(organization.twilioAccountSid, organization.twilioAuthToken).messages.list({ from: phoneNumber.number }),
+		twilio(organization.twilioAccountSid, organization.twilioAuthToken).messages.list({ to: phoneNumber.number }),
 	]);
 	const messagesSent = sent.filter((message) => message.direction.startsWith("outbound"));
 	const messagesReceived = received.filter((message) => message.direction === "inbound");
@@ -29,11 +35,12 @@ const fetchMessagesQueue = Queue<Payload>("api/queue/fetch-messages", async ({ c
 
 	await insertMessagesQueue.enqueue(
 		{
-			customerId,
+			organizationId,
+			phoneNumberId,
 			messages,
 		},
 		{
-			id: `insert-messages-${customerId}`,
+			id: `insert-messages-${organizationId}-${phoneNumberId}`,
 		},
 	);
 });

@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import Alert from "./alert";
 import Button from "./button";
 import SettingsSection from "./settings-section";
-import useCurrentCustomer from "../../core/hooks/use-current-customer";
+import useCurrentUser from "../../core/hooks/use-current-user";
 
 import appLogger from "../../../integrations/logger";
 
@@ -18,7 +18,7 @@ type Form = {
 const logger = appLogger.child({ module: "profile-settings" });
 
 const ProfileInformations: FunctionComponent = () => {
-	const { customer } = useCurrentCustomer();
+	const { user } = useCurrentUser();
 	const router = useRouter();
 	const {
 		register,
@@ -29,9 +29,9 @@ const ProfileInformations: FunctionComponent = () => {
 	const [errorMessage, setErrorMessage] = useState("");
 
 	useEffect(() => {
-		setValue("name", customer?.user.name ?? "");
-		setValue("email", customer?.user.email ?? "");
-	}, [setValue, customer]);
+		setValue("name", user?.name ?? "");
+		setValue("email", user?.email ?? "");
+	}, [setValue, user]);
 
 	const onSubmit = handleSubmit(async ({ name, email }) => {
 		if (isSubmitting) {
@@ -40,7 +40,7 @@ const ProfileInformations: FunctionComponent = () => {
 
 		try {
 			// TODO
-			// await customer.updateUser({ email, data: { name } });
+			// await updateUser({ email, data: { name } });
 		} catch (error) {
 			logger.error(error.response, "error updating user infos");
 

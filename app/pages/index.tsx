@@ -4,7 +4,7 @@ import { Link, useMutation, Routes } from "blitz";
 
 import BaseLayout from "../core/layouts/base-layout";
 import logout from "../auth/mutations/logout";
-import useCurrentCustomer from "../core/hooks/use-current-customer";
+import useCurrentUser from "../core/hooks/use-current-user";
 
 /*
  * This file is just for a pleasant getting started page for your new app.
@@ -12,10 +12,10 @@ import useCurrentCustomer from "../core/hooks/use-current-customer";
  */
 
 const UserInfo = () => {
-	const { customer } = useCurrentCustomer();
+	const { user } = useCurrentUser();
 	const [logoutMutation] = useMutation(logout);
 
-	if (customer) {
+	if (user) {
 		return (
 			<>
 				<button
@@ -27,9 +27,9 @@ const UserInfo = () => {
 					Logout
 				</button>
 				<div>
-					User id: <code>{customer.id}</code>
+					User id: <code>{user.id}</code>
 					<br />
-					User role: <code>{customer.encryptionKey}</code>
+					User role: <code>{user.role}</code>
 				</div>
 			</>
 		);

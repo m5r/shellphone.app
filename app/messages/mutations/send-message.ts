@@ -1,10 +1,8 @@
-import { resolver } from "blitz";
+import { NotFoundError, resolver } from "blitz";
 import { z } from "zod";
 import twilio from "twilio";
 
 import db, { Direction, MessageStatus } from "../../../db";
-import getCurrentCustomer from "../../customers/queries/get-current-customer";
-import getCustomerPhoneNumber from "../../phone-numbers/queries/get-customer-phone-number";
 import { encrypt } from "../../../db/_encryption";
 import sendMessageQueue from "../../messages/api/queue/send-message";
 import appLogger from "../../../integrations/logger";
@@ -17,32 +15,40 @@ const Body = z.object({
 });
 
 export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ content, to }, context) => {
-	const customer = await getCurrentCustomer(null, context);
-	if (!customer || !customer.accountSid || !customer.authToken) {
+	const organizationId = context.session.orgId;
+	const organization = await db.organization.findFirst({
+		where: { id: organizationId },
+		include: { phoneNumbers: true },
+	});
+	if (!organization) {
+		throw new NotFoundError();
+	}
+	if (!organization.twilioAccountSid || !organization.twilioAuthToken) {
 		return;
 	}
 
 	try {
-		await twilio(customer.accountSid, customer.authToken).lookups.v1.phoneNumbers(to).fetch();
+		await twilio(organization.twilioAccountSid, organization.twilioAuthToken).lookups.v1.phoneNumbers(to).fetch();
 	} catch (error) {
 		logger.error(error);
 		return;
 	}
 
-	const customerId = customer.id;
-	const customerPhoneNumber = await getCustomerPhoneNumber({ customerId }, context);
-	if (!customerPhoneNumber) {
+	const phoneNumber = organization.phoneNumbers[0];
+	if (!phoneNumber) {
 		return;
 	}
 
+	const phoneNumberId = phoneNumber.id;
 	const message = await db.message.create({
 		data: {
-			customerId,
+			organizationId,
+			phoneNumberId,
 			to,
-			from: customerPhoneNumber.phoneNumber,
+			from: phoneNumber.number,
 			direction: Direction.Outbound,
 			status: MessageStatus.Queued,
-			content: encrypt(content, customer.encryptionKey),
+			content: encrypt(content, organization.encryptionKey),
 			sentAt: new Date(),
 		},
 	});
@@ -50,12 +56,13 @@ export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ 
 	await sendMessageQueue.enqueue(
 		{
 			id: message.id,
-			customerId,
+			organizationId,
+			phoneNumberId,
 			to,
 			content,
 		},
 		{
-			id: `insert-${message.id}`,
+			id: `insert-${message.id}-${organizationId}-${phoneNumberId}`,
 		},
 	);
 });

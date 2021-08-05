@@ -4,10 +4,8 @@ import clsx from "clsx";
 import Button from "./button";
 import SettingsSection from "./settings-section";
 import Modal, { ModalTitle } from "./modal";
-import useCurrentCustomer from "../../core/hooks/use-current-customer";
 
 export default function DangerZone() {
-	const customer = useCurrentCustomer();
 	const [isDeletingUser, setIsDeletingUser] = useState(false);
 	const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
 	const modalCancelButtonRef = useRef<HTMLButtonElement>(null);

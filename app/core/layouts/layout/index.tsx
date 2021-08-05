@@ -77,6 +77,8 @@ const ErrorBoundary = withRouter(
 				// let Blitz ErrorBoundary handle this one
 				throw error;
 			}
+
+			// if network error and connection lost, display the auto-reload page with countdown
 		}
 
 		public render() {

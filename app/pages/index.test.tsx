@@ -1,9 +1,10 @@
+import { GlobalRole } from "db";
 import { render } from "../../test/utils";
 import Home from "./index";
-import useCurrentCustomer from "../core/hooks/use-current-customer";
+import useCurrentUser from "../core/hooks/use-current-user";
 
-jest.mock("../core/hooks/use-current-customer");
-const mockUseCurrentCustomer = useCurrentCustomer as jest.MockedFunction<typeof useCurrentCustomer>;
+jest.mock("../core/hooks/use-current-user");
+const mockUseCurrentUser = useCurrentUser as jest.MockedFunction<typeof useCurrentUser>;
 
 test.skip("renders blitz documentation link", () => {
 	// This is an example of how to ensure a specific item is in the document
@@ -11,16 +12,14 @@ test.skip("renders blitz documentation link", () => {
 	// when you remove the the default content from the page
 
 	// This is an example on how to mock api hooks when testing
-	mockUseCurrentCustomer.mockReturnValue({
-		customer: {
+	mockUseCurrentUser.mockReturnValue({
+		organization: undefined,
+		user: {
 			id: uuidv4(),
-			encryptionKey: "",
-			accountSid: null,
-			authToken: null,
-			twimlAppSid: null,
-			paddleCustomerId: null,
-			paddleSubscriptionId: null,
-			user: {} as any,
+			name: "name",
+			email: "email@test.com",
+			role: GlobalRole.CUSTOMER,
+			memberships: [],
 		},
 		hasFilledTwilioCredentials: false,
 		hasCompletedOnboarding: undefined,

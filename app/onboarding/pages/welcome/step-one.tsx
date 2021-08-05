@@ -2,11 +2,11 @@ import type { BlitzPage, GetServerSideProps } from "blitz";
 import { getSession, Routes } from "blitz";
 
 import OnboardingLayout from "../../components/onboarding-layout";
-import useCurrentCustomer from "../../../core/hooks/use-current-customer";
+import useCurrentUser from "../../../core/hooks/use-current-user";
 import db from "../../../../db";
 
 const StepOne: BlitzPage = () => {
-	useCurrentCustomer(); // preload for step two
+	useCurrentUser(); // preload for step two
 
 	return (
 		<div className="flex flex-col space-y-4 items-center">
@@ -35,7 +35,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 		};
 	}
 
-	const phoneNumber = await db.phoneNumber.findFirst({ where: { customerId: session.userId } });
+	const phoneNumber = await db.phoneNumber.findFirst({ where: { organizationId: session.orgId } });
 	if (phoneNumber) {
 		await session.$setPublicData({ hasCompletedOnboarding: true });
 		return {

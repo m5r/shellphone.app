@@ -11,27 +11,32 @@ const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 const logger = appLogger.child({ queue: "notify-incoming-message" });
 
 type Payload = {
-	customerId: string;
+	organizationId: string;
+	phoneNumberId: string;
 	messageSid: MessageInstance["sid"];
 };
 
 const notifyIncomingMessageQueue = Queue<Payload>(
 	"api/queue/notify-incoming-message",
-	async ({ messageSid, customerId }) => {
+	async ({ messageSid, organizationId, phoneNumberId }) => {
 		webpush.setVapidDetails(
 			"mailto:mokht@rmi.al",
 			publicRuntimeConfig.webPush.publicKey,
 			serverRuntimeConfig.webPush.privateKey,
 		);
 
-		const customer = await db.customer.findFirst({ where: { id: customerId } });
-		if (!customer || !customer.accountSid || !customer.authToken) {
+		const organization = await db.organization.findFirst({
+			where: { id: organizationId },
+		});
+		if (!organization || !organization.twilioAccountSid || !organization.twilioAuthToken) {
 			return;
 		}
 
-		const message = await twilio(customer.accountSid, customer.authToken).messages.get(messageSid).fetch();
+		const message = await twilio(organization.twilioAccountSid, organization.twilioAuthToken)
+			.messages.get(messageSid)
+			.fetch();
 		const notification = { message: `${message.from} - ${message.body}` };
-		const subscriptions = await db.notificationSubscription.findMany({ where: { customerId: customer.id } });
+		const subscriptions = await db.notificationSubscription.findMany({ where: { organizationId, phoneNumberId } });
 		await Promise.all(
 			subscriptions.map(async (subscription) => {
 				const webPushSubscription: PushSubscription = {
