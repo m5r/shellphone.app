@@ -6,7 +6,7 @@ services:
         restart: unless-stopped
         volumes:
             - data:/var/lib/postgresql/data
-        env_file: ./.env.local #Here we are using the already existing .env.local file
+        env_file: ./.env #Here we are using the already existing .env file
         ports:
             - "5432:5432"
     admin:

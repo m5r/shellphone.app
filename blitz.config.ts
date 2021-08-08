@@ -1,11 +1,14 @@
-import { BlitzConfig, sessionMiddleware, simpleRolesIsAuthorized } from "blitz";
+/// <reference path='./next-pwa.d.ts' />
+import type { BlitzConfig } from "blitz";
+import { sessionMiddleware, simpleRolesIsAuthorized } from "blitz";
+// import withPWA from "next-pwa";
 
-const withPWA = require("next-pwa");
+type Module = Omit<NodeModule, "exports"> & { exports: BlitzConfig };
 
-const config: BlitzConfig = {
+(module as Module).exports = {
 	middleware: [
 		sessionMiddleware({
-			cookiePrefix: "shellphone",
+			cookiePrefix: "virtual-phone",
 			isAuthorized: simpleRolesIsAuthorized,
 		}),
 	],
@@ -49,15 +52,8 @@ const config: BlitzConfig = {
 	  return config
 	},
 	*/
+	/*pwa: {
+		dest: "public",
+		disable: process.env.NODE_ENV !== "production",
+	},*/
 };
-
-module.exports =
-	process.env.NODE_ENV === "test"
-		? config
-		: withPWA({
-				...config,
-				pwa: {
-					dest: "public",
-					disable: process.env.NODE_ENV !== "production",
-				},
-		  });
