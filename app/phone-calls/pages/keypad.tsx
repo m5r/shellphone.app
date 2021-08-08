@@ -11,7 +11,7 @@ import useRequireOnboarding from "../../core/hooks/use-require-onboarding";
 
 const KeypadPage: BlitzPage = () => {
 	useRequireOnboarding();
-	const phoneNumber = useAtom(phoneNumberAtom)[0];
+	const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
 	const pressBackspace = useAtom(pressBackspaceAtom)[1];
 	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const pressDigit = useAtom(pressDigitAtom)[1];
@@ -43,7 +43,10 @@ const KeypadPage: BlitzPage = () => {
 
 			<Keypad onDigitPressProps={onDigitPressProps} onZeroPressProps={onZeroPressProps}>
 				<Link href={Routes.OutgoingCall({ recipient: encodeURI(phoneNumber) })}>
-					<a className="cursor-pointer select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-green-800 rounded-full">
+					<a
+						onClick={() => setPhoneNumber("")}
+						className="cursor-pointer select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-green-800 rounded-full"
+					>
 						<FontAwesomeIcon className="w-6 h-6" icon={faPhone} color="white" size="lg" />
 					</a>
 				</Link>
