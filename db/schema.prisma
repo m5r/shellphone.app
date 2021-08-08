@@ -22,6 +22,8 @@ model Organization {
 
   twilioAccountSid String?
   twilioAuthToken  String? // TODO: encrypt it with encryptionKey
+  twilioApiKey     String?
+  twilioApiSecret  String? // TODO: encrypt it with encryptionKey
   twimlAppSid      String?
 
   memberships               Membership[]
