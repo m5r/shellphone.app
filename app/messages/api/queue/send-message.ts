@@ -1,7 +1,7 @@
 import { Queue } from "quirrel/blitz";
-import twilio from "twilio";
 
 import db, { MessageStatus } from "../../../../db";
+import getTwilioClient from "../../../../integrations/twilio";
 
 type Payload = {
 	id: string;
@@ -19,12 +19,13 @@ const sendMessageQueue = Queue<Payload>(
 			include: { phoneNumbers: true },
 		});
 		const phoneNumber = organization?.phoneNumbers.find((phoneNumber) => phoneNumber.id === phoneNumberId);
-		if (!organization || !organization.twilioAccountSid || !organization.twilioAuthToken || !phoneNumber) {
+		if (!organization || !phoneNumber) {
 			return;
 		}
 
+		const twilioClient = getTwilioClient(organization);
 		try {
-			const message = await twilio(organization.twilioAccountSid, organization.twilioAuthToken).messages.create({
+			const message = await twilioClient.messages.create({
 				body: content,
 				to,
 				from: phoneNumber.number,

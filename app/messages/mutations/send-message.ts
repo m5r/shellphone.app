@@ -1,11 +1,11 @@
 import { NotFoundError, resolver } from "blitz";
 import { z } from "zod";
-import twilio from "twilio";
 
 import db, { Direction, MessageStatus } from "../../../db";
 import { encrypt } from "../../../db/_encryption";
 import sendMessageQueue from "../../messages/api/queue/send-message";
 import appLogger from "../../../integrations/logger";
+import getTwilioClient from "../../../integrations/twilio";
 
 const logger = appLogger.child({ mutation: "send-message" });
 
@@ -23,12 +23,10 @@ export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ 
 	if (!organization) {
 		throw new NotFoundError();
 	}
-	if (!organization.twilioAccountSid || !organization.twilioAuthToken) {
-		return;
-	}
 
+	const twilioClient = getTwilioClient(organization);
 	try {
-		await twilio(organization.twilioAccountSid, organization.twilioAuthToken).lookups.v1.phoneNumbers(to).fetch();
+		await twilioClient.lookups.v1.phoneNumbers(to).fetch();
 	} catch (error) {
 		logger.error(error);
 		return;
