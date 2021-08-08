@@ -1,3 +1,5 @@
+jest.mock("next-pwa", () => ({ __esModule: true, default: jest.fn().mockImplementation((config) => config) }));
+
 import { setConfig } from "blitz";
 
 // see https://github.com/vercel/next.js/issues/4024
