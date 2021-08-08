@@ -1,22 +1,24 @@
 import type { BlitzPage } from "blitz";
 import { Routes, useMutation, useRouter } from "blitz";
-import type { FunctionComponent } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { atom, useAtom } from "jotai";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPhoneAlt as faPhone } from "@fortawesome/pro-solid-svg-icons";
-import { usePress } from "@react-aria/interactions";
 import type { TwilioError } from "@twilio/voice-sdk";
 import { Device, Call } from "@twilio/voice-sdk";
 
 import getToken from "../../mutations/get-token";
 import useRequireOnboarding from "../../../core/hooks/use-require-onboarding";
+import Keypad from "../../components/keypad";
 
 const OutgoingCall: BlitzPage = () => {
 	const router = useRouter();
 	const recipient = decodeURIComponent(router.params.recipient);
+	const [outgoingConnection, setOutgoingConnection] = useState<Call | null>(null);
 	const [device, setDevice] = useState<Device | null>(null);
 	const [getTokenMutation] = useMutation(getToken);
+	const [deviceState, setDeviceState] = useState<DeviceState>("initial");
+
 	async function makeCall() {
 		const token = await getTokenMutation();
 		console.log("token", token);
@@ -37,6 +39,10 @@ const OutgoingCall: BlitzPage = () => {
 			console.log("Ringing...");
 		});
 	}
+
+	useEffect(() => {
+		// make call
+	});
 
 	useEffect(() => {
 		if (!device) {
@@ -61,109 +67,60 @@ const OutgoingCall: BlitzPage = () => {
 
 	useRequireOnboarding();
 	const phoneNumber = useAtom(phoneNumberAtom)[0];
+	const pressDigit = useAtom(pressDigitAtom)[1];
+	const onDigitPressProps = useMemo(
+		() => (digit: string) => ({
+			onPress() {
+				pressDigit(digit);
+
+				if (outgoingConnection) {
+					outgoingConnection.sendDigits(digit);
+				}
+			},
+		}),
+		[outgoingConnection, pressDigit],
+	);
+	const hangUp = useMemo(
+		() => () => {
+			if (outgoingConnection) {
+				outgoingConnection.reject();
+			}
+
+			if (device) {
+				device.disconnectAll();
+				device.destroy();
+				device.unregister();
+			}
+
+			// return router.replace(Routes.KeypadPage());
+			return router.push(Routes.KeypadPage());
+		},
+		[device, outgoingConnection, router],
+	);
 
 	return (
 		<div className="w-96 h-full flex flex-col justify-around py-5 mx-auto text-center text-black bg-white">
 			<div className="h-16 text-3xl text-gray-700">
+				<span>{recipient}</span>
+			</div>
+
+			<div className="h-16 text-2xl text-gray-600">
 				<span>{phoneNumber}</span>
 			</div>
 
-			<section>
-				<Row>
-					<Digit digit="1" />
-					<Digit digit="2">
-						<DigitLetters>ABC</DigitLetters>
-					</Digit>
-					<Digit digit="3">
-						<DigitLetters>DEF</DigitLetters>
-					</Digit>
-				</Row>
-				<Row>
-					<Digit digit="4">
-						<DigitLetters>GHI</DigitLetters>
-					</Digit>
-					<Digit digit="5">
-						<DigitLetters>JKL</DigitLetters>
-					</Digit>
-					<Digit digit="6">
-						<DigitLetters>MNO</DigitLetters>
-					</Digit>
-				</Row>
-				<Row>
-					<Digit digit="7">
-						<DigitLetters>PQRS</DigitLetters>
-					</Digit>
-					<Digit digit="8">
-						<DigitLetters>TUV</DigitLetters>
-					</Digit>
-					<Digit digit="9">
-						<DigitLetters>WXYZ</DigitLetters>
-					</Digit>
-				</Row>
-				<Row>
-					<Digit digit="*" />
-					<ZeroDigit />
-					<Digit digit="#" />
-				</Row>
-				<Row>
-					<div
-						onClick={makeCall}
-						className="cursor-pointer select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-red-800 rounded-full"
-					>
-						<FontAwesomeIcon className="w-6 h-6" icon={faPhone} color="white" size="lg" />
-					</div>
-				</Row>
-			</section>
+			<Keypad onDigitPressProps={onDigitPressProps} onZeroPressProps={onDigitPressProps("0")}>
+				<div
+					onClick={hangUp}
+					className="cursor-pointer select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-red-800 rounded-full"
+				>
+					<FontAwesomeIcon className="w-6 h-6" icon={faPhone} color="white" size="lg" />
+				</div>
+			</Keypad>
 		</div>
 	);
 };
 
-const ZeroDigit: FunctionComponent = () => {
-	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-	const pressDigit = useAtom(pressDigitAtom)[1];
-	const longPressDigit = useAtom(longPressDigitAtom)[1];
-	const { pressProps } = usePress({
-		onPressStart() {
-			pressDigit("0");
-			timeoutRef.current = setTimeout(() => {
-				longPressDigit("+");
-			}, 750);
-		},
-		onPressEnd() {
-			if (timeoutRef.current) {
-				clearTimeout(timeoutRef.current);
-			}
-		},
-	});
-
-	return (
-		<div {...pressProps} className="text-3xl cursor-pointer select-none">
-			0 <DigitLetters>+</DigitLetters>
-		</div>
-	);
-};
-
-const Row: FunctionComponent = ({ children }) => (
-	<div className="grid grid-cols-3 p-4 my-0 mx-auto text-black">{children}</div>
-);
-
-const Digit: FunctionComponent<{ digit: string }> = ({ children, digit }) => {
-	const pressDigit = useAtom(pressDigitAtom)[1];
-	const { pressProps } = usePress({
-		onPress() {
-			pressDigit(digit);
-		},
-	});
-
-	return (
-		<div {...pressProps} className="text-3xl cursor-pointer select-none">
-			{digit}
-			{children}
-		</div>
-	);
-};
-
-const DigitLetters: FunctionComponent = ({ children }) => <div className="text-xs text-gray-600">{children}</div>;
+type DeviceState = "initial" | "";
 
 const phoneNumberAtom = atom("");
 const pressDigitAtom = atom(null, (get, set, digit: string) => {
@@ -172,13 +129,6 @@ const pressDigitAtom = atom(null, (get, set, digit: string) => {
 	}
 
 	set(phoneNumberAtom, (prevState) => prevState + digit);
-});
-const longPressDigitAtom = atom(null, (get, set, replaceWith: string) => {
-	if (get(phoneNumberAtom).length > 17) {
-		return;
-	}
-
-	set(phoneNumberAtom, (prevState) => prevState.slice(0, -1) + replaceWith);
 });
 
 OutgoingCall.authenticate = { redirectTo: Routes.SignIn() };
