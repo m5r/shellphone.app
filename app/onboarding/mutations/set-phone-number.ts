@@ -34,6 +34,16 @@ export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ 
 	});
 	context.session.$setPrivateData({ hasCompletedOnboarding: true });
 
+	const mainTwilioClient = twilio(organization.twilioAccountSid, organization.twilioAuthToken);
+	const apiKey = await mainTwilioClient.newKeys.create({ friendlyName: "Shellphone API key" });
+	await db.organization.update({
+		where: { id: organizationId },
+		data: {
+			twilioApiKey: apiKey.sid,
+			twilioApiSecret: apiKey.secret,
+		},
+	});
+
 	const phoneNumberId = phoneNumberSid;
 	await Promise.all([
 		fetchMessagesQueue.enqueue(

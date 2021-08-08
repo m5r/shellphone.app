@@ -22,15 +22,15 @@ const insertMessagesQueue = Queue<Payload>(
 		}
 
 		const sms = messages
-			.map<Omit<Message, "id">>((message) => ({
+			.map<Message>((message) => ({
 				organizationId,
+				id: message.sid,
 				phoneNumberId: phoneNumber.id,
 				content: encrypt(message.body, phoneNumber.organization.encryptionKey),
 				from: message.from,
 				to: message.to,
 				status: translateStatus(message.status),
 				direction: translateDirection(message.direction),
-				twilioSid: message.sid,
 				sentAt: new Date(message.dateCreated),
 			}))
 			.sort((a, b) => a.sentAt.getTime() - b.sentAt.getTime());
