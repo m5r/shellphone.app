@@ -1,5 +1,5 @@
 import type { BlitzPage } from "blitz";
-import { Routes } from "blitz";
+import { Link, Routes } from "blitz";
 import type { FunctionComponent } from "react";
 import { useRef } from "react";
 import { atom, useAtom } from "jotai";
@@ -59,9 +59,11 @@ const Keypad: BlitzPage = () => {
 					<Digit digit="#" />
 				</Row>
 				<Row>
-					<div className="cursor-pointer select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-green-800 rounded-full">
-						<FontAwesomeIcon className="w-6 h-6" icon={faPhone} color="white" size="lg" />
-					</div>
+					<Link href={Routes.OutgoingCall({ recipient: encodeURI(phoneNumber) })}>
+						<a className="cursor-pointer select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-green-800 rounded-full">
+							<FontAwesomeIcon className="w-6 h-6" icon={faPhone} color="white" size="lg" />
+						</a>
+					</Link>
 					<div className="cursor-pointer select-none m-auto" onClick={pressBackspace}>
 						<FontAwesomeIcon className="w-6 h-6" icon={faBackspace} size="lg" />
 					</div>

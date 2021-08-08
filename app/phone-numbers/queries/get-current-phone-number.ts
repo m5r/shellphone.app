@@ -14,6 +14,7 @@ export default resolver.pipe(
 			where: { organizationId },
 			select: {
 				id: true,
+				organizationId: true,
 				number: true,
 			},
 		});
