@@ -1,8 +1,8 @@
 import { Queue } from "quirrel/blitz";
-import twilio from "twilio";
 
 import db from "../../../../db";
 import insertCallsQueue from "./insert-calls";
+import getTwilioClient from "../../../../integrations/twilio";
 
 type Payload = {
 	organizationId: string;
@@ -19,17 +19,10 @@ const fetchCallsQueue = Queue<Payload>("api/queue/fetch-calls", async ({ organiz
 	}
 
 	const organization = phoneNumber.organization;
-	if (!organization.twilioAccountSid || !organization.twilioAuthToken) {
-		return;
-	}
-
+	const twilioClient = getTwilioClient(organization);
 	const [callsSent, callsReceived] = await Promise.all([
-		twilio(organization.twilioAccountSid, organization.twilioAuthToken).calls.list({
-			from: phoneNumber.number,
-		}),
-		twilio(organization.twilioAccountSid, organization.twilioAuthToken).calls.list({
-			to: phoneNumber.number,
-		}),
+		twilioClient.calls.list({ from: phoneNumber.number }),
+		twilioClient.calls.list({ to: phoneNumber.number }),
 	]);
 	const calls = [...callsSent, ...callsReceived].sort((a, b) => a.dateCreated.getTime() - b.dateCreated.getTime());
 

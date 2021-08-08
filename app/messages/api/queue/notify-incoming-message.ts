@@ -1,11 +1,11 @@
 import { getConfig } from "blitz";
 import { Queue } from "quirrel/blitz";
 import type { MessageInstance } from "twilio/lib/rest/api/v2010/account/message";
-import twilio from "twilio";
 import webpush, { PushSubscription, WebPushError } from "web-push";
 
 import db from "../../../../db";
 import appLogger from "../../../../integrations/logger";
+import getTwilioClient from "../../../../integrations/twilio";
 
 const { serverRuntimeConfig, publicRuntimeConfig } = getConfig();
 const logger = appLogger.child({ queue: "notify-incoming-message" });
@@ -28,15 +28,12 @@ const notifyIncomingMessageQueue = Queue<Payload>(
 		const organization = await db.organization.findFirst({
 			where: { id: organizationId },
 		});
-		if (!organization || !organization.twilioAccountSid || !organization.twilioAuthToken) {
-			return;
-		}
-
-		const message = await twilio(organization.twilioAccountSid, organization.twilioAuthToken)
-			.messages.get(messageSid)
-			.fetch();
+		const twilioClient = getTwilioClient(organization);
+		const message = await twilioClient.messages.get(messageSid).fetch();
 		const notification = { message: `${message.from} - ${message.body}` };
-		const subscriptions = await db.notificationSubscription.findMany({ where: { organizationId, phoneNumberId } });
+		const subscriptions = await db.notificationSubscription.findMany({
+			where: { organizationId, phoneNumberId },
+		});
 		await Promise.all(
 			subscriptions.map(async (subscription) => {
 				const webPushSubscription: PushSubscription = {

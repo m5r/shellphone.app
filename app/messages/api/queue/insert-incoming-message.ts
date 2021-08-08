@@ -1,10 +1,10 @@
 import { Queue } from "quirrel/blitz";
 import type { MessageInstance } from "twilio/lib/rest/api/v2010/account/message";
-import twilio from "twilio";
 
 import db, { Direction, MessageStatus } from "../../../../db";
 import { encrypt } from "../../../../db/_encryption";
 import notifyIncomingMessageQueue from "./notify-incoming-message";
+import getTwilioClient from "../../../../integrations/twilio";
 
 type Payload = {
 	organizationId: string;
@@ -18,13 +18,12 @@ const insertIncomingMessageQueue = Queue<Payload>(
 		const organization = await db.organization.findFirst({
 			where: { id: organizationId },
 		});
-		if (!organization || !organization.twilioAccountSid || !organization.twilioAuthToken) {
+		if (!organization) {
 			return;
 		}
 
-		const message = await twilio(organization.twilioAccountSid, organization.twilioAuthToken)
-			.messages.get(messageSid)
-			.fetch();
+		const twilioClient = getTwilioClient(organization);
+		const message = await twilioClient.messages.get(messageSid).fetch();
 		await db.message.create({
 			data: {
 				organizationId,

@@ -1,13 +1,13 @@
 import type { BlitzPage, GetServerSideProps } from "blitz";
 import { Routes, getSession, useRouter, useMutation } from "blitz";
 import { useEffect } from "react";
-import twilio from "twilio";
 import { useForm } from "react-hook-form";
 import clsx from "clsx";
 
 import db from "../../../../db";
 import OnboardingLayout from "../../components/onboarding-layout";
 import setPhoneNumber from "../../mutations/set-phone-number";
+import getTwilioClient from "../../../../integrations/twilio";
 
 type PhoneNumber = {
 	phoneNumber: string;
@@ -130,10 +130,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res }
 		};
 	}
 
-	const incomingPhoneNumbers = await twilio(
-		organization.twilioAccountSid,
-		organization.twilioAuthToken,
-	).incomingPhoneNumbers.list();
+	const twilioClient = getTwilioClient(organization);
+	const incomingPhoneNumbers = await twilioClient.incomingPhoneNumbers.list();
 	const phoneNumbers = incomingPhoneNumbers.map(({ phoneNumber, sid }) => ({ phoneNumber, sid }));
 
 	return {
