@@ -21,6 +21,7 @@ export default async function getCurrentUser(_ = null, { session }: Ctx) {
 							paddleCustomerId: true,
 							paddleSubscriptionId: true,
 							twilioAccountSid: true,
+							twilioAuthToken: true,
 							twilioApiKey: true,
 							twilioApiSecret: true,
 							twimlAppSid: true,
