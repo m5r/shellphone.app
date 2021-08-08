@@ -1,83 +1,22 @@
 import type { BlitzPage } from "blitz";
 import { Link, Routes } from "blitz";
-import type { FunctionComponent } from "react";
 import { useRef } from "react";
 import { atom, useAtom } from "jotai";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBackspace, faPhoneAlt as faPhone } from "@fortawesome/pro-solid-svg-icons";
-import { usePress } from "@react-aria/interactions";
 
 import Layout from "../../core/layouts/layout";
+import Keypad from "../components/keypad";
 import useRequireOnboarding from "../../core/hooks/use-require-onboarding";
 
-const Keypad: BlitzPage = () => {
+const KeypadPage: BlitzPage = () => {
 	useRequireOnboarding();
 	const phoneNumber = useAtom(phoneNumberAtom)[0];
 	const pressBackspace = useAtom(pressBackspaceAtom)[1];
-
-	return (
-		<div className="w-96 h-full flex flex-col justify-around py-5 mx-auto text-center text-black bg-white">
-			<div className="h-16 text-3xl text-gray-700">
-				<span>{phoneNumber}</span>
-			</div>
-
-			<section>
-				<Row>
-					<Digit digit="1" />
-					<Digit digit="2">
-						<DigitLetters>ABC</DigitLetters>
-					</Digit>
-					<Digit digit="3">
-						<DigitLetters>DEF</DigitLetters>
-					</Digit>
-				</Row>
-				<Row>
-					<Digit digit="4">
-						<DigitLetters>GHI</DigitLetters>
-					</Digit>
-					<Digit digit="5">
-						<DigitLetters>JKL</DigitLetters>
-					</Digit>
-					<Digit digit="6">
-						<DigitLetters>MNO</DigitLetters>
-					</Digit>
-				</Row>
-				<Row>
-					<Digit digit="7">
-						<DigitLetters>PQRS</DigitLetters>
-					</Digit>
-					<Digit digit="8">
-						<DigitLetters>TUV</DigitLetters>
-					</Digit>
-					<Digit digit="9">
-						<DigitLetters>WXYZ</DigitLetters>
-					</Digit>
-				</Row>
-				<Row>
-					<Digit digit="*" />
-					<ZeroDigit />
-					<Digit digit="#" />
-				</Row>
-				<Row>
-					<Link href={Routes.OutgoingCall({ recipient: encodeURI(phoneNumber) })}>
-						<a className="cursor-pointer select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-green-800 rounded-full">
-							<FontAwesomeIcon className="w-6 h-6" icon={faPhone} color="white" size="lg" />
-						</a>
-					</Link>
-					<div className="cursor-pointer select-none m-auto" onClick={pressBackspace}>
-						<FontAwesomeIcon className="w-6 h-6" icon={faBackspace} size="lg" />
-					</div>
-				</Row>
-			</section>
-		</div>
-	);
-};
-
-const ZeroDigit: FunctionComponent = () => {
 	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const pressDigit = useAtom(pressDigitAtom)[1];
 	const longPressDigit = useAtom(longPressDigitAtom)[1];
-	const { pressProps } = usePress({
+	const onZeroPressProps = {
 		onPressStart() {
 			pressDigit("0");
 			timeoutRef.current = setTimeout(() => {
@@ -89,32 +28,32 @@ const ZeroDigit: FunctionComponent = () => {
 				clearTimeout(timeoutRef.current);
 			}
 		},
+	};
+	const onDigitPressProps = (digit: string) => ({
+		onPress() {
+			pressDigit(digit);
+		},
 	});
 
 	return (
-		<div {...pressProps} className="text-3xl cursor-pointer select-none">
-			0 <DigitLetters>+</DigitLetters>
+		<div className="w-96 h-full flex flex-col justify-around py-5 mx-auto text-center text-black bg-white">
+			<div className="h-16 text-3xl text-gray-700">
+				<span>{phoneNumber}</span>
+			</div>
+
+			<Keypad onDigitPressProps={onDigitPressProps} onZeroPressProps={onZeroPressProps}>
+				<Link href={Routes.OutgoingCall({ recipient: encodeURI(phoneNumber) })}>
+					<a className="cursor-pointer select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-green-800 rounded-full">
+						<FontAwesomeIcon className="w-6 h-6" icon={faPhone} color="white" size="lg" />
+					</a>
+				</Link>
+				<div className="cursor-pointer select-none m-auto" onClick={pressBackspace}>
+					<FontAwesomeIcon className="w-6 h-6" icon={faBackspace} size="lg" />
+				</div>
+			</Keypad>
 		</div>
 	);
 };
-
-const Row: FunctionComponent = ({ children }) => (
-	<div className="grid grid-cols-3 p-4 my-0 mx-auto text-black">{children}</div>
-);
-
-const Digit: FunctionComponent<{ digit: string }> = ({ children, digit }) => {
-	const pressDigit = useAtom(pressDigitAtom)[1];
-	const onClick = () => pressDigit(digit);
-
-	return (
-		<div onClick={onClick} className="text-3xl cursor-pointer select-none">
-			{digit}
-			{children}
-		</div>
-	);
-};
-
-const DigitLetters: FunctionComponent = ({ children }) => <div className="text-xs text-gray-600">{children}</div>;
 
 const phoneNumberAtom = atom("");
 const pressDigitAtom = atom(null, (get, set, digit: string) => {
@@ -139,8 +78,8 @@ const pressBackspaceAtom = atom(null, (get, set) => {
 	set(phoneNumberAtom, (prevState) => prevState.slice(0, -1));
 });
 
-Keypad.getLayout = (page) => <Layout title="Keypad">{page}</Layout>;
+KeypadPage.getLayout = (page) => <Layout title="Keypad">{page}</Layout>;
 
-Keypad.authenticate = { redirectTo: Routes.SignIn() };
+KeypadPage.authenticate = { redirectTo: Routes.SignIn() };
 
-export default Keypad;
+export default KeypadPage;
