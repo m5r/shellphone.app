@@ -1,9 +1,10 @@
 import { getConfig } from "blitz";
 import { Queue } from "quirrel/blitz";
-import twilio from "twilio";
+import type twilio from "twilio";
 import type { ApplicationInstance } from "twilio/lib/rest/api/v2010/account/application";
 
 import db from "../../../../db";
+import getTwilioClient from "../../../../integrations/twilio";
 
 type Payload = {
 	organizationId: string;
@@ -22,27 +23,16 @@ const setTwilioWebhooks = Queue<Payload>("api/queue/set-twilio-webhooks", async 
 	}
 
 	const organization = phoneNumber.organization;
-	if (!organization.twilioAccountSid || !organization.twilioAuthToken) {
-		return;
-	}
-
-	const mainTwilioClient = twilio(organization.twilioAccountSid, organization.twilioAuthToken);
-	const [twimlApp, apiKey] = await Promise.all([
-		getTwimlApplication(mainTwilioClient, organization.twimlAppSid),
-		mainTwilioClient.newKeys.create({ friendlyName: "Shellphone API key" }),
-	]);
+	const twilioClient = getTwilioClient(organization);
+	const twimlApp = await getTwimlApplication(twilioClient, organization.twimlAppSid);
 	const twimlAppSid = twimlApp.sid;
 
 	await Promise.all([
 		db.organization.update({
 			where: { id: organizationId },
-			data: {
-				twimlAppSid,
-				twilioApiKey: apiKey.sid,
-				twilioApiSecret: apiKey.secret,
-			},
+			data: { twimlAppSid },
 		}),
-		mainTwilioClient.incomingPhoneNumbers.get(phoneNumber.id).update({
+		twilioClient.incomingPhoneNumbers.get(phoneNumber.id).update({
 			smsApplicationSid: twimlAppSid,
 			voiceApplicationSid: twimlAppSid,
 		}),
