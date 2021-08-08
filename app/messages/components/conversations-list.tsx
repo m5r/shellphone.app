@@ -17,7 +17,7 @@ export default function ConversationsList() {
 					<li key={recipient} className="py-2">
 						<Link
 							href={Routes.ConversationPage({
-								recipient: encodeURIComponent(recipient),
+								recipient: encodeURI(recipient),
 							})}
 						>
 							<a className="flex flex-col">
