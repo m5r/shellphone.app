@@ -1,9 +1,9 @@
 import type { BlitzApiRequest, BlitzApiResponse } from "blitz";
 import zod from "zod";
 
-import type { ApiError } from "../_types";
-import appLogger from "../../../integrations/logger";
-import { addSubscriber } from "./_mailchimp";
+import type { ApiError } from "../../_types";
+import appLogger from "integrations/logger";
+import { addSubscriber } from "integrations/mailchimp";
 
 type Response = {} | ApiError;
 
