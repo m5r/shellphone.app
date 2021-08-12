@@ -2,7 +2,7 @@ import type { BlitzApiRequest, BlitzApiResponse } from "blitz";
 import { getConfig } from "blitz";
 import twilio from "twilio";
 
-import type { ApiError } from "../../../api/_types";
+import type { ApiError } from "../../../_types";
 import appLogger from "../../../../integrations/logger";
 import db from "../../../../db";
 import insertIncomingMessageQueue from "../queue/insert-incoming-message";
