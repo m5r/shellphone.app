@@ -1,69 +1,25 @@
 import type { BlitzPage } from "blitz";
-import { Routes, useMutation, useRouter } from "blitz";
-import { useEffect, useMemo, useState } from "react";
+import { Routes, useRouter } from "blitz";
+import { useEffect, useMemo } from "react";
 import { atom, useAtom } from "jotai";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPhoneAlt as faPhone } from "@fortawesome/pro-solid-svg-icons";
-import type { TwilioError } from "@twilio/voice-sdk";
-import { Device, Call } from "@twilio/voice-sdk";
 
-import getToken from "../../mutations/get-token";
 import useRequireOnboarding from "../../../core/hooks/use-require-onboarding";
 import Keypad from "../../components/keypad";
+import useMakeCall from "../../hooks/use-make-call";
 
 const OutgoingCall: BlitzPage = () => {
 	const router = useRouter();
 	const recipient = decodeURIComponent(router.params.recipient);
-	const [outgoingConnection, setOutgoingConnection] = useState<Call | null>(null);
-	const [device, setDevice] = useState<Device | null>(null);
-	const [getTokenMutation] = useMutation(getToken);
-	const [deviceState, setDeviceState] = useState<DeviceState>("initial");
-
-	async function makeCall() {
-		const token = await getTokenMutation();
-		console.log("token", token);
-		const device = new Device(token, { codecPreferences: [Call.Codec.Opus, Call.Codec.PCMU] });
-		setDevice(device);
-
-		const params = { To: recipient };
-		const outgoingConnection = await device.connect({ params });
-		// @ts-ignore
-		window.ddd = outgoingConnection;
-
-		/*$("[id^=dial-]").click(function (event) {
-			console.log("send digit", event.target.innerText);
-			outgoingConnection.sendDigits(event.target.innerText);
-		})*/
-
-		outgoingConnection.on("ringing", () => {
-			console.log("Ringing...");
-		});
-	}
+	const call = useMakeCall(recipient);
 
 	useEffect(() => {
-		// make call
-	});
-
-	useEffect(() => {
-		if (!device) {
-			return;
+		console.log("call.state", call.state);
+		if (call.state === "ready") {
+			call.makeCall();
 		}
-
-		device.on("ready", onDeviceReady);
-		device.on("error", onDeviceError);
-		device.on("register", onDeviceRegistered);
-		device.on("unregister", onDeviceUnregistered);
-		device.on("incoming", onDeviceIncoming);
-		// device.audio?.on('deviceChange', updateAllDevices.bind(device));
-
-		return () => {
-			device.off("ready", onDeviceReady);
-			device.off("error", onDeviceError);
-			device.off("register", onDeviceRegistered);
-			device.off("unregister", onDeviceUnregistered);
-			device.off("incoming", onDeviceIncoming);
-		};
-	}, [device]);
+	}, [call.state]);
 
 	useRequireOnboarding();
 	const phoneNumber = useAtom(phoneNumberAtom)[0];
@@ -73,29 +29,19 @@ const OutgoingCall: BlitzPage = () => {
 			onPress() {
 				pressDigit(digit);
 
-				if (outgoingConnection) {
-					outgoingConnection.sendDigits(digit);
-				}
+				call.sendDigits(digit);
 			},
 		}),
-		[outgoingConnection, pressDigit],
+		[call, pressDigit],
 	);
 	const hangUp = useMemo(
 		() => () => {
-			if (outgoingConnection) {
-				outgoingConnection.reject();
-			}
-
-			if (device) {
-				device.disconnectAll();
-				device.destroy();
-				device.unregister();
-			}
+			call.hangUp();
 
 			// return router.replace(Routes.KeypadPage());
 			return router.push(Routes.KeypadPage());
 		},
-		[device, outgoingConnection, router],
+		[call, router],
 	);
 
 	return (
@@ -104,8 +50,9 @@ const OutgoingCall: BlitzPage = () => {
 				<span>{recipient}</span>
 			</div>
 
-			<div className="h-16 text-2xl text-gray-600">
-				<span>{phoneNumber}</span>
+			<div className="mb-4 text-gray-600">
+				<div className="h-8 text-2xl">{phoneNumber}</div>
+				<div className="h-8 text-lg">{translateState(call.state)}</div>
 			</div>
 
 			<Keypad onDigitPressProps={onDigitPressProps} onZeroPressProps={onDigitPressProps("0")}>
@@ -118,9 +65,23 @@ const OutgoingCall: BlitzPage = () => {
 			</Keypad>
 		</div>
 	);
-};
 
-type DeviceState = "initial" | "";
+	function translateState(state: typeof call.state): string {
+		switch (state) {
+			case "initial":
+			case "ready":
+				return "Connecting...";
+			case "calling":
+				return "Calling...";
+			case "call_in_progress":
+				return ""; // TODO display time elapsed
+			case "call_ending":
+				return "Call ending...";
+			case "call_ended":
+				return "Call ended";
+		}
+	}
+};
 
 const phoneNumberAtom = atom("");
 const pressDigitAtom = atom(null, (get, set, digit: string) => {
@@ -132,34 +93,5 @@ const pressDigitAtom = atom(null, (get, set, digit: string) => {
 });
 
 OutgoingCall.authenticate = { redirectTo: Routes.SignIn() };
-
-function onDeviceReady(device: Device) {
-	console.log("device", device);
-}
-
-function onDeviceError(error: TwilioError.TwilioError, call?: Call) {
-	console.log("error", error);
-}
-
-function onDeviceRegistered(device: Device) {
-	console.log("ready to make calls");
-	console.log("device", device);
-}
-
-function onDeviceUnregistered() {}
-
-function onDeviceIncoming(call: Call) {
-	console.log("call", call);
-	console.log("Incoming connection from " + call.parameters.From);
-	let archEnemyPhoneNumber = "+12093373517";
-
-	if (call.parameters.From === archEnemyPhoneNumber) {
-		call.reject();
-		console.log("It's your nemesis. Rejected call.");
-	} else {
-		// accept the incoming connection and start two-way audio
-		call.accept();
-	}
-}
 
 export default OutgoingCall;
