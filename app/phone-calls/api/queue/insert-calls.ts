@@ -32,7 +32,7 @@ const insertCallsQueue = Queue<Payload>("api/queue/insert-calls", async ({ calls
 		}))
 		.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
-	await db.phoneCall.createMany({ data: phoneCalls });
+	await db.phoneCall.createMany({ data: phoneCalls, skipDuplicates: true });
 });
 
 export default insertCallsQueue;

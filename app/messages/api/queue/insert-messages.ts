@@ -35,7 +35,7 @@ const insertMessagesQueue = Queue<Payload>(
 			}))
 			.sort((a, b) => a.sentAt.getTime() - b.sentAt.getTime());
 
-		await db.message.createMany({ data: sms });
+		await db.message.createMany({ data: sms, skipDuplicates: true });
 	},
 );
 
