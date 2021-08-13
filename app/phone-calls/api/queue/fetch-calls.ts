@@ -15,6 +15,7 @@ const fetchCallsQueue = Queue<Payload>("api/queue/fetch-calls", async ({ organiz
 		include: { organization: true },
 	});
 	if (!phoneNumber) {
+		console.log("no phone number found");
 		return;
 	}
 
