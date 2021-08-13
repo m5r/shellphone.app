@@ -10,19 +10,20 @@ import Keypad from "../../components/keypad";
 import useMakeCall from "../../hooks/use-make-call";
 
 const OutgoingCall: BlitzPage = () => {
-	const router = useRouter();
-	const recipient = decodeURIComponent(router.params.recipient);
-	const call = useMakeCall(recipient);
-
-	useEffect(() => {
-		console.log("call.state", call.state);
-		if (call.state === "ready") {
-			call.makeCall();
-		}
-	}, [call.state]);
-
 	useRequireOnboarding();
 	const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
+	const router = useRouter();
+	const recipient = decodeURIComponent(router.params.recipient);
+	const onHangUp = useMemo(
+		() => () => {
+			setPhoneNumber("");
+
+			// return router.replace(Routes.KeypadPage());
+			return router.push(Routes.KeypadPage());
+		},
+		[router, setPhoneNumber],
+	);
+	const call = useMakeCall({ recipient, onHangUp });
 	const pressDigit = useAtom(pressDigitAtom)[1];
 	const onDigitPressProps = useMemo(
 		() => (digit: string) => ({
@@ -34,16 +35,13 @@ const OutgoingCall: BlitzPage = () => {
 		}),
 		[call, pressDigit],
 	);
-	const hangUp = useMemo(
-		() => () => {
-			call.hangUp();
-			setPhoneNumber("");
 
-			// return router.replace(Routes.KeypadPage());
-			return router.push(Routes.KeypadPage());
-		},
-		[call, router, setPhoneNumber],
-	);
+	useEffect(() => {
+		console.log("call.state", call.state);
+		if (call.state === "ready") {
+			call.makeCall();
+		}
+	}, [call.state]);
 
 	return (
 		<div className="w-96 h-full flex flex-col justify-around py-5 mx-auto text-center text-black bg-white">
@@ -58,7 +56,7 @@ const OutgoingCall: BlitzPage = () => {
 
 			<Keypad onDigitPressProps={onDigitPressProps} onZeroPressProps={onDigitPressProps("0")}>
 				<button
-					onClick={hangUp}
+					onClick={call.hangUp}
 					className="cursor-pointer select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-red-800 rounded-full"
 				>
 					<FontAwesomeIcon className="w-6 h-6" icon={faPhone} color="white" size="lg" />

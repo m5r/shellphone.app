@@ -4,7 +4,12 @@ import { Call, Device, TwilioError } from "@twilio/voice-sdk";
 
 import getToken from "../mutations/get-token";
 
-export default function useMakeCall(recipient: string) {
+type Params = {
+	recipient: string;
+	onHangUp?: () => void;
+};
+
+export default function useMakeCall({ recipient, onHangUp }: Params) {
 	const [outgoingConnection, setOutgoingConnection] = useState<Call | null>(null);
 	const [device, setDevice] = useState<Device | null>(null);
 	const [getTokenMutation] = useMutation(getToken);
@@ -80,15 +85,10 @@ export default function useMakeCall(recipient: string) {
 
 	function hangUp() {
 		setState("call_ending");
-
-		if (outgoingConnection) {
-			outgoingConnection.reject();
-		}
-
-		if (device) {
-			device.disconnectAll();
-			device.destroy();
-		}
+		outgoingConnection?.reject();
+		device?.disconnectAll();
+		device?.destroy();
+		onHangUp?.();
 	}
 
 	function onDeviceError(error: TwilioError.TwilioError, call?: Call) {
