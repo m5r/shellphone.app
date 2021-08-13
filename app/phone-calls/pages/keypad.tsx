@@ -1,5 +1,5 @@
 import type { BlitzPage } from "blitz";
-import { Link, Routes } from "blitz";
+import { Link, Routes, useRouter } from "blitz";
 import { useRef } from "react";
 import { atom, useAtom } from "jotai";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,6 +11,7 @@ import useRequireOnboarding from "../../core/hooks/use-require-onboarding";
 
 const KeypadPage: BlitzPage = () => {
 	useRequireOnboarding();
+	const router = useRouter();
 	const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
 	const pressBackspace = useAtom(pressBackspaceAtom)[1];
 	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -31,6 +32,7 @@ const KeypadPage: BlitzPage = () => {
 	};
 	const onDigitPressProps = (digit: string) => ({
 		onPress() {
+			// navigator.vibrate(1); // removed in webkit
 			pressDigit(digit);
 		},
 	});
@@ -43,12 +45,19 @@ const KeypadPage: BlitzPage = () => {
 
 			<Keypad onDigitPressProps={onDigitPressProps} onZeroPressProps={onZeroPressProps}>
 				<Link href={Routes.OutgoingCall({ recipient: encodeURI(phoneNumber) })}>
-					<a
-						onClick={() => setPhoneNumber("")}
+					<button
+						onClick={async () => {
+							if (phoneNumber === "") {
+								// TODO setPhoneNumber(lastCallRecipient);
+							}
+
+							await router.push(Routes.OutgoingCall({ recipient: encodeURI(phoneNumber) }));
+							setPhoneNumber("");
+						}}
 						className="cursor-pointer select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-green-800 rounded-full"
 					>
 						<FontAwesomeIcon className="w-6 h-6" icon={faPhone} color="white" size="lg" />
-					</a>
+					</button>
 				</Link>
 				<div className="cursor-pointer select-none m-auto" onClick={pressBackspace}>
 					<FontAwesomeIcon className="w-6 h-6" icon={faBackspace} size="lg" />

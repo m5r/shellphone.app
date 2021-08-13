@@ -87,7 +87,7 @@ export default function useMakeCall(recipient: string) {
 
 		if (device) {
 			device.disconnectAll();
-			// device.destroy();
+			device.destroy();
 		}
 	}
 
