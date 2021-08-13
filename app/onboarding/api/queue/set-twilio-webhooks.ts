@@ -61,7 +61,7 @@ async function getTwimlApplication(
 		friendlyName: "Shellphone",
 		smsUrl: `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/incoming-message`,
 		smsMethod: "POST",
-		voiceUrl: `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/incoming-call`,
+		voiceUrl: `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/call`,
 		voiceMethod: "POST",
 	});
 }
@@ -70,7 +70,7 @@ async function updateTwimlApplication(twilioClient: twilio.Twilio, twimlAppSid: 
 	await twilioClient.applications.get(twimlAppSid).update({
 		smsUrl: `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/incoming-message`,
 		smsMethod: "POST",
-		voiceUrl: `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/incoming-call`,
+		voiceUrl: `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/call`,
 		voiceMethod: "POST",
 	});
 
