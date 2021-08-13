@@ -22,7 +22,7 @@ const OutgoingCall: BlitzPage = () => {
 	}, [call.state]);
 
 	useRequireOnboarding();
-	const phoneNumber = useAtom(phoneNumberAtom)[0];
+	const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
 	const pressDigit = useAtom(pressDigitAtom)[1];
 	const onDigitPressProps = useMemo(
 		() => (digit: string) => ({
@@ -37,11 +37,12 @@ const OutgoingCall: BlitzPage = () => {
 	const hangUp = useMemo(
 		() => () => {
 			call.hangUp();
+			setPhoneNumber("");
 
 			// return router.replace(Routes.KeypadPage());
 			return router.push(Routes.KeypadPage());
 		},
-		[call, router],
+		[call, router, setPhoneNumber],
 	);
 
 	return (
@@ -56,12 +57,12 @@ const OutgoingCall: BlitzPage = () => {
 			</div>
 
 			<Keypad onDigitPressProps={onDigitPressProps} onZeroPressProps={onDigitPressProps("0")}>
-				<div
+				<button
 					onClick={hangUp}
 					className="cursor-pointer select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-red-800 rounded-full"
 				>
 					<FontAwesomeIcon className="w-6 h-6" icon={faPhone} color="white" size="lg" />
-				</div>
+				</button>
 			</Keypad>
 		</div>
 	);
