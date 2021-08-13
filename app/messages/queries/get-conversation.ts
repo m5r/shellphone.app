@@ -16,7 +16,7 @@ export default resolver.pipe(resolver.zod(GetConversations), resolver.authorize(
 
 	const conversation = await db.message.findMany({
 		where: { OR: [{ from: recipient }, { to: recipient }] },
-		orderBy: { sentAt: Prisma.SortOrder.asc },
+		orderBy: { sentAt: Prisma.SortOrder.desc },
 	});
 
 	return conversation.map((message) => {

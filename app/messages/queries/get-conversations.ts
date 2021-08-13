@@ -22,7 +22,7 @@ export default resolver.pipe(
 		const phoneNumberId = organization.phoneNumbers[0]!.id;
 		const messages = await db.message.findMany({
 			where: { organizationId, phoneNumberId },
-			orderBy: { sentAt: Prisma.SortOrder.asc },
+			orderBy: { sentAt: Prisma.SortOrder.desc },
 		});
 
 		let conversations: Record<string, Message[]> = {};

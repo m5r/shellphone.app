@@ -11,6 +11,6 @@ export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ 
 
 	return db.phoneCall.findMany({
 		where: { organizationId, phoneNumberId },
-		orderBy: { createdAt: Prisma.SortOrder.asc },
+		orderBy: { createdAt: Prisma.SortOrder.desc },
 	});
 });
