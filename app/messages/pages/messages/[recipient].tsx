@@ -20,7 +20,7 @@ const ConversationPage: BlitzPage = () => {
 				<span className="col-start-1 col-span-1 pl-2 cursor-pointer" onClick={router.back}>
 					<FontAwesomeIcon size="lg" className="h-8 w-8" icon={faLongArrowLeft} />
 				</span>
-				<strong className="col-span-1">{recipient}</strong>
+				<strong className="col-span-1 text-center">{recipient}</strong>
 				<span className="col-span-1 flex justify-end space-x-4 pr-2">
 					<FontAwesomeIcon size="lg" className="h-8 w-8" icon={faPhone} />
 					<FontAwesomeIcon size="lg" className="h-8 w-8" icon={faInfoCircle} />
