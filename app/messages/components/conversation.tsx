@@ -25,17 +25,20 @@ export default function Conversation() {
 						const isOutbound = message.direction === Direction.Outbound;
 						const nextMessage = conversation![index + 1];
 						const previousMessage = conversation![index - 1];
-						const isSameNext = message.from === nextMessage?.from;
-						const isSamePrevious = message.from === previousMessage?.from;
-						const differenceInMinutes = previousMessage
-							? (new Date(message.sentAt).getTime() - new Date(previousMessage.sentAt).getTime()) /
-							  1000 /
-							  60
-							: 0;
-						const isTooLate = differenceInMinutes > 15;
+						const isNextMessageFromSameSender = message.from === nextMessage?.from;
+						const isPreviousMessageFromSameSender = message.from === previousMessage?.from;
+
+						const messageSentAt = new Date(message.sentAt);
+						const previousMessageSentAt = previousMessage ? new Date(previousMessage.sentAt) : null;
+						const quarter = Math.floor(messageSentAt.getMinutes() / 15);
+						const sameQuarter =
+							previousMessage &&
+							messageSentAt.getTime() - previousMessageSentAt!.getTime() < 15 * 60 * 1000 &&
+							quarter === Math.floor(previousMessageSentAt!.getMinutes() / 15);
+						const shouldGroupMessages = previousMessageSentAt && sameQuarter;
 						return (
 							<li key={message.id}>
-								{(!isSamePrevious || isTooLate) && (
+								{(!isPreviousMessageFromSameSender || !shouldGroupMessages) && (
 									<div className="flex py-2 space-x-1 text-xs justify-center">
 										<strong>
 											{new Date(message.sentAt).toLocaleDateString("fr-FR", {
@@ -55,7 +58,7 @@ export default function Conversation() {
 
 								<div
 									className={clsx(
-										isSameNext ? "pb-1" : "pb-2",
+										isNextMessageFromSameSender ? "pb-1" : "pb-2",
 										isOutbound ? "text-right" : "text-left",
 									)}
 								>
