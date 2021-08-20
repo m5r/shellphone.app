@@ -18,7 +18,7 @@ export default resolver.pipe(
 			return;
 		}
 
-		const organizationId = user.memberships[0]!.id;
+		const organizationId = user.memberships[0]!.organizationId;
 		await db.organization.update({
 			where: { id: organizationId },
 			data: {
