@@ -1,9 +1,10 @@
 import type { BlitzApiRequest, BlitzApiResponse } from "blitz";
 import { getConfig } from "blitz";
 import twilio from "twilio";
+import type { CallInstance } from "twilio/lib/rest/api/v2010/account/call";
 
 import type { ApiError } from "../../../_types";
-import db, { Direction } from "../../../../db";
+import db, { CallStatus, Direction } from "../../../../db";
 import appLogger from "../../../../integrations/logger";
 
 const { serverRuntimeConfig } = getConfig();
@@ -12,7 +13,7 @@ const logger = appLogger.child({ route: "/api/webhook/call" });
 export default async function incomingCallHandler(req: BlitzApiRequest, res: BlitzApiResponse) {
 	console.log("req.body", req.body);
 
-	const url = `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/incoming-message`;
+	const url = `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/call`;
 	const twilioSignature = req.headers["X-Twilio-Signature"] || req.headers["x-twilio-signature"];
 	if (!twilioSignature || Array.isArray(twilioSignature)) {
 		const statusCode = 400;
@@ -55,7 +56,7 @@ export default async function incomingCallHandler(req: BlitzApiRequest, res: Bli
 				id: req.body.CallSid,
 				from: phoneNumber.number,
 				to: req.body.To,
-				status: req.body.CallStatus,
+				status: translateStatus(req.body.CallStatus),
 				direction: Direction.Outbound,
 				duration: "", // TODO
 				organizationId: phoneNumber.organization.id,
@@ -102,6 +103,7 @@ export default async function incomingCallHandler(req: BlitzApiRequest, res: Bli
 			return;
 		}
 
+		// TODO dial.client("unique id of device user is picking up with");
 		// TODO send notification
 		// TODO db.phoneCall.create(...);
 	}
@@ -123,3 +125,24 @@ const outgoingBody = {
 	From: "client:95267d60-3d35-4c36-9905-8543ecb4f174__673b461a-11ba-43a4-89d7-9e29403053d4",
 	To: "+33613370787",
 };
+
+function translateStatus(status: CallInstance["status"]): CallStatus {
+	switch (status) {
+		case "busy":
+			return CallStatus.Busy;
+		case "canceled":
+			return CallStatus.Canceled;
+		case "completed":
+			return CallStatus.Completed;
+		case "failed":
+			return CallStatus.Failed;
+		case "in-progress":
+			return CallStatus.InProgress;
+		case "no-answer":
+			return CallStatus.NoAnswer;
+		case "queued":
+			return CallStatus.Queued;
+		case "ringing":
+			return CallStatus.Ringing;
+	}
+}
