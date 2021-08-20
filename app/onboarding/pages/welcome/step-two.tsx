@@ -55,6 +55,10 @@ const StepTwo: BlitzPage = () => {
 					<FontAwesomeIcon size="lg" className="w-6 h-6 text-primary-700" icon={faQuestionCircle} />
 				</button>
 				<form onSubmit={onSubmit} className="flex flex-col gap-6">
+					<article>
+						Shellphone needs some informations about your Twilio account to securely use your phone numbers.
+					</article>
+
 					<div className="w-full">
 						<label htmlFor="twilioAccountSid" className="block text-sm font-medium text-gray-700">
 							Twilio Account SID

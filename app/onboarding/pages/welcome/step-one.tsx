@@ -10,13 +10,16 @@ const StepOne: BlitzPage = () => {
 
 	return (
 		<div className="flex flex-col space-y-4 items-center">
-			<span>Welcome, let’s set up your virtual phone!</span>
+			<h2>Welcome to Shellphone</h2>
+			<span>
+				We&#39;ll help you connect your Twilio phone number to our service and set up your virtual phone!
+			</span>
 		</div>
 	);
 };
 
 StepOne.getLayout = (page) => (
-	<OnboardingLayout currentStep={1} next={{ href: Routes.StepTwo().pathname, label: "Set up your phone number" }}>
+	<OnboardingLayout currentStep={1} next={{ href: Routes.StepTwo().pathname, label: "Connect Twilio to Shellphone" }}>
 		{page}
 	</OnboardingLayout>
 );
