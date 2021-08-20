@@ -1,11 +1,48 @@
 name: Deployment pipeline
 
-on: push
+on: [push, pull_request]
 
 jobs:
-    deploy:
-        if: contains('refs/heads/master refs/heads/production', github.ref)
-        name: Deploy
+    lint:
+        name: Lint
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: 16
+            - run: npm install
+            - run: npm run lint
+
+    test:
+        name: Test
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: 16
+            - run: npm install
+            - run: npm test
+
+    build:
+        name: Compile
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: 16
+            - run: npm install
+            - run: npm run build
+              env:
+                  DATOCMS_API_TOKEN: ${{ secrets.DATOCMS_API_TOKEN }}
+                  QUIRREL_BASE_URL: doesntmatter.shellphone.app
+
+    deploy_dev:
+        if: github.ref == 'refs/heads/master'
+        needs: [lint, test, build]
+        name: Deploy dev.shellphone.app
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
@@ -15,4 +52,19 @@ jobs:
             - run: npm i -g @railway/cli
             - run: railway up
               env:
-                  RAILWAY_TOKEN: "${{ github.ref }} === 'refs/heads/master' ? ${{ secrets.RAILWAY_TOKEN_DEV }} : ${{ secrets.RAILWAY_TOKEN_PROD }}"
+                  RAILWAY_TOKEN: secrets.RAILWAY_TOKEN_DEV
+
+    deploy_prod:
+        if: github.ref == 'refs/heads/production'
+        needs: [lint, test, build]
+        name: Deploy www.shellphone.app
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: 16
+            - run: npm i -g @railway/cli
+            - run: railway up
+              env:
+                  RAILWAY_TOKEN: secrets.RAILWAY_TOKEN_PROD
