@@ -52,4 +52,4 @@ jobs:
             - run: npm i -g @railway/cli
             - run: railway up
               env:
-                  RAILWAY_TOKEN: "${{ github.ref }} === 'refs/heads/master' ? '${{ secrets.RAILWAY_TOKEN_PROD }}' : '${{ secrets.RAILWAY_TOKEN_DEV }}'"
+                  RAILWAY_TOKEN: "${{ github.ref }} === 'refs/heads/master' ? ${{ secrets.RAILWAY_TOKEN_DEV }} : ${{ secrets.RAILWAY_TOKEN_PROD }}"
