@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useRef, useState } from "react";
 import { BottomSheet } from "react-spring-bottom-sheet";
 import { useAtom } from "jotai";
 import { useRouter, Routes } from "blitz";
@@ -14,13 +14,16 @@ export default function NewMessageBottomSheet() {
 	const [recipient, setRecipient] = useState("");
 	const recipientRef = useRef<HTMLInputElement>(null);
 
-	useEffect(() => {
-		recipientRef.current?.focus();
-	});
-
 	return (
 		<BottomSheet
 			open={isOpen}
+			initialFocusRef={recipientRef}
+			onSpringEnd={(event) => {
+				if (event.type === "OPEN") {
+					// doesn't work with iOS safari *sigh*
+					recipientRef.current?.focus();
+				}
+			}}
 			onDismiss={() => setIsOpen(false)}
 			snapPoints={({ maxHeight }) => maxHeight / 2}
 			header={
@@ -40,6 +43,7 @@ export default function NewMessageBottomSheet() {
 						ref={recipientRef}
 						onChange={(event) => setRecipient(event.target.value)}
 						className="bg-none border-none outline-none flex-1 text-black"
+						type="tel"
 					/>
 				</div>
 				<Suspense fallback={null}>
