@@ -52,7 +52,7 @@ jobs:
             - run: npm i -g @railway/cli
             - run: railway up
               env:
-                  RAILWAY_TOKEN: secrets.RAILWAY_TOKEN_DEV
+                  RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_DEV }}
 
     deploy_prod:
         if: github.ref == 'refs/heads/production'
@@ -67,4 +67,5 @@ jobs:
             - run: npm i -g @railway/cli
             - run: railway up
               env:
-                  RAILWAY_TOKEN: secrets.RAILWAY_TOKEN_PROD
+                  RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_PROD }}
+# TODO: on pull_request, deploy 24hour-long deployment at {commit_short_hash}.shellphone.app, provision db and seed data
