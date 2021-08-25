@@ -6,6 +6,19 @@ import { sessionMiddleware, simpleRolesIsAuthorized } from "blitz";
 type Module = Omit<NodeModule, "exports"> & { exports: BlitzConfig };
 
 (module as Module).exports = {
+	async header() {
+		return [
+			{
+				source: "/fonts/*.woff2",
+				headers: [
+					{
+						key: "Cache-Control",
+						value: "public, max-age=31536000, immutable",
+					},
+				],
+			},
+		];
+	},
 	middleware: [
 		sessionMiddleware({
 			cookiePrefix: "shellphone",
