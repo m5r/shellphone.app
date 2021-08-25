@@ -23,6 +23,21 @@ class MyDocument extends Document {
 					<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 					<meta name="msapplication-starturl" content="/" />
 					<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+					<link
+						rel="preload"
+						href="/fonts/inter-roman.var.woff2"
+						as="font"
+						type="font/woff2"
+						crossOrigin="anonymous"
+					/>
+					<link
+						rel="preload"
+						href="/fonts/inter-italic.var.woff2"
+						as="font"
+						type="font/woff2"
+						crossOrigin="anonymous"
+					/>
 				</Head>
 				<body>
 					<Main />
