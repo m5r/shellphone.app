@@ -35,7 +35,7 @@ const LandingPage: BlitzPage = () => {
 										{/* Content */}
 										<div className="md:col-span-7 lg:col-span-7 mb-8 md:mb-0 text-center md:text-left">
 											<h1 className="h1 lg:text-5xl mb-4 font-extrabold font-mackinac">
-												<strong className="bg-gradient-to-br from-primary-500 to-indigo-600 bg-clip-text text-transparent">
+												<strong className="bg-gradient-to-br from-primary-500 to-indigo-600 bg-clip-text decoration-clone text-transparent">
 													Take your phone number
 												</strong>
 												<br />
