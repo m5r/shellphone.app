@@ -7,7 +7,8 @@ import logout from "../../auth/mutations/logout";
 import useCurrentUser from "../../core/hooks/use-current-user";
 import Header from "../components/header";
 
-import "../styles/index.css";
+import iphoneMockup from "../images/iphone-mockup.png";
+import mockupImage from "../images/mockup-image-01.jpg";
 
 const LandingPage: BlitzPage = () => {
 	return (
@@ -15,7 +16,7 @@ const LandingPage: BlitzPage = () => {
 			<Head>
 				<title>Shellphone: Your Personal Cloud Phone</title>
 
-				<link
+				{/*<link
 					rel="preload"
 					href="/fonts/P22MackinacPro-Book.woff2"
 					as="font"
@@ -42,10 +43,157 @@ const LandingPage: BlitzPage = () => {
 					as="font"
 					type="font/woff2"
 					crossOrigin="anonymous"
-				/>
+				/>*/}
 			</Head>
-			<section className="font-inter antialiased bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100 tracking-tight">
-				<Header />
+			<section className="font-inter antialiased bg-white text-gray-900 tracking-tight">
+				<section className="flex flex-col min-h-screen overflow-hidden">
+					<Header />
+
+					<main className="flex-grow">
+						<section>
+							<div className="max-w-6xl mx-auto px-4 sm:px-6">
+								<div className="pt-32 pb-10 md:pt-40 md:pb-16">
+									{/* Hero content */}
+									<div className="md:grid md:grid-cols-12 md:gap-12 lg:gap-20 items-center">
+										{/* Content */}
+										<div className="md:col-span-7 lg:col-span-7 mb-8 md:mb-0 text-center md:text-left">
+											<h1 className="h1 lg:text-5xl mb-4 font-red-hat-display font-extrabold font-mackinac">
+												Take your phone number anywhere you go
+											</h1>
+											<p className="text-xl text-gray-600">
+												Keep your phone number and pay less for your communications, even
+												abroad. No download required.
+											</p>
+											{/* CTA form */}
+											<form className="mt-8">
+												<div className="flex flex-col sm:flex-row justify-center max-w-sm mx-auto sm:max-w-md md:mx-0">
+													<input
+														type="tel"
+														className="form-input w-full mb-2 sm:mb-0 sm:mr-2"
+														placeholder="Phone number"
+														aria-label="Phone number"
+													/>
+													<a
+														className="btn text-white bg-primary-500 hover:bg-primary-400 flex-shrink-0"
+														href="#0"
+													>
+														Request code
+													</a>
+												</div>
+												{/* Success message */}
+												{/* <p className="text-center md:text-left mt-2 opacity-75 text-sm">Thanks for subscribing!</p> */}
+											</form>
+											<ul className="max-w-sm sm:max-w-md mx-auto md:max-w-none text-gray-600 mt-8 -mb-2">
+												<li className="flex items-center mb-2">
+													<svg
+														className="w-3 h-3 fill-current text-primary-400 mr-2 flex-shrink-0"
+														viewBox="0 0 12 12"
+														xmlns="http://www.w3.org/2000/svg"
+													>
+														<path d="M10.28 2.28L3.989 8.575 1.695 6.28A1 1 0 00.28 7.695l3 3a1 1 0 001.414 0l7-7A1 1 0 0010.28 2.28z" />
+													</svg>
+													<span>Lorem ipsum is placeholder text commonly.</span>
+												</li>
+												<li className="flex items-center mb-2">
+													<svg
+														className="w-3 h-3 fill-current text-primary-400 mr-2 flex-shrink-0"
+														viewBox="0 0 12 12"
+														xmlns="http://www.w3.org/2000/svg"
+													>
+														<path d="M10.28 2.28L3.989 8.575 1.695 6.28A1 1 0 00.28 7.695l3 3a1 1 0 001.414 0l7-7A1 1 0 0010.28 2.28z" />
+													</svg>
+													<span>Excepteur sint occaecat cupidatat.</span>
+												</li>
+												<li className="flex items-center mb-2">
+													<svg
+														className="w-3 h-3 fill-current text-primary-400 mr-2 flex-shrink-0"
+														viewBox="0 0 12 12"
+														xmlns="http://www.w3.org/2000/svg"
+													>
+														<path d="M10.28 2.28L3.989 8.575 1.695 6.28A1 1 0 00.28 7.695l3 3a1 1 0 001.414 0l7-7A1 1 0 0010.28 2.28z" />
+													</svg>
+													<span>Lorem ipsum is placeholder text commonly.</span>
+												</li>
+											</ul>
+										</div>
+
+										{/* Mobile mockup */}
+										<div className="md:col-span-5 lg:col-span-5 text-center md:text-right">
+											<div className="inline-flex relative justify-center items-center">
+												{/* Glow illustration */}
+												<svg
+													className="absolute mr-12 mt-32 pointer-events-none -z-1"
+													aria-hidden="true"
+													width="678"
+													height="634"
+													viewBox="0 0 678 634"
+													fill="none"
+													xmlns="http://www.w3.org/2000/svg"
+												>
+													<circle
+														cx="240"
+														cy="394"
+														r="240"
+														fill="url(#piphoneill_paint0_radial)"
+														fillOpacity=".4"
+													/>
+													<circle
+														cx="438"
+														cy="240"
+														r="240"
+														fill="url(#piphoneill_paint1_radial)"
+														fillOpacity=".6"
+													/>
+													<defs>
+														<radialGradient
+															id="piphoneill_paint0_radial"
+															cx="0"
+															cy="0"
+															r="1"
+															gradientUnits="userSpaceOnUse"
+															gradientTransform="rotate(90 -77 317) scale(189.054)"
+														>
+															<stop stopColor="#667EEA" />
+															<stop offset="1" stopColor="#667EEA" stopOpacity=".01" />
+														</radialGradient>
+														<radialGradient
+															id="piphoneill_paint1_radial"
+															cx="0"
+															cy="0"
+															r="1"
+															gradientUnits="userSpaceOnUse"
+															gradientTransform="rotate(90 99 339) scale(189.054)"
+														>
+															<stop stopColor="#9F7AEA" />
+															<stop offset="1" stopColor="#9F7AEA" stopOpacity=".01" />
+														</radialGradient>
+													</defs>
+												</svg>
+												{/* Image inside mockup size: 290x624px (or 580x1248px for Retina devices) */}
+												<img
+													className="absolute max-w-[84.33%]"
+													src={mockupImage.src}
+													width={290}
+													height={624}
+													alt="Features illustration"
+												/>
+												{/* iPhone mockup */}
+												<img
+													className="relative max-w-full mx-auto md:mr-0 md:max-w-none h-auto pointer-events-none"
+													src={iphoneMockup.src}
+													width={344}
+													height={674}
+													alt="iPhone mockup"
+													aria-hidden="true"
+												/>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</section>
+					</main>
+				</section>
 			</section>
 		</>
 	);
