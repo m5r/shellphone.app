@@ -1,5 +1,6 @@
 import { resolver, NotFoundError } from "blitz";
 import { z } from "zod";
+import PhoneNumber from "awesome-phonenumber";
 
 import db, { Direction, Message, Prisma } from "../../../db";
 import { decrypt } from "../../../db/_encryption";
@@ -33,6 +34,8 @@ export default resolver.pipe(
 			} else {
 				recipient = message.from;
 			}
+			const parsedPhoneNumber = new PhoneNumber(recipient);
+			recipient = parsedPhoneNumber.getNumber("international");
 
 			if (!conversations[recipient]) {
 				conversations[recipient] = [];
