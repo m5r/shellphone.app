@@ -146,6 +146,6 @@ module.exports = {
 			translate: ["group-hover"],
 		},
 	},
-	plugins: [require("@tailwindcss/forms"), require("@tailwindcss/typography")],
+	plugins: [require("@tailwindcss/line-clamp"), require("@tailwindcss/forms"), require("@tailwindcss/typography")],
 	purge: ["{pages,app}/**/*.{js,ts,jsx,tsx}"],
 };
