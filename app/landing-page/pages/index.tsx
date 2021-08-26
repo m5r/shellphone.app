@@ -34,8 +34,12 @@ const LandingPage: BlitzPage = () => {
 									<div className="md:grid md:grid-cols-12 md:gap-12 lg:gap-20 items-center">
 										{/* Content */}
 										<div className="md:col-span-7 lg:col-span-7 mb-8 md:mb-0 text-center md:text-left">
-											<h1 className="h1 lg:text-5xl mb-4 font-red-hat-display font-extrabold font-mackinac">
-												Take your phone number anywhere you go
+											<h1 className="h1 lg:text-5xl mb-4 font-extrabold font-mackinac">
+												<strong className="bg-gradient-to-br from-primary-500 to-indigo-600 bg-clip-text text-transparent">
+													Take your phone number
+												</strong>
+												<br />
+												<strong className="text-[#24185B]">anywhere you go</strong>
 											</h1>
 											<p className="text-xl text-gray-600">
 												Coming soon! &#128026; Keep your phone number and pay less for your
