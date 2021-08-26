@@ -24,16 +24,18 @@ class MyDocument extends Document {
 					<meta name="msapplication-starturl" content="/" />
 					<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
+					<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+					<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+					<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+					<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#663399" />
+					<meta name="apple-mobile-web-app-title" content="Shellphone: Your Personal Cloud Phone" />
+					<meta name="application-name" content="Shellphone: Your Personal Cloud Phone" />
+					<meta name="msapplication-TileColor" content="#663399" />
+					<meta name="theme-color" content="#ffffff" />
+
 					<link
 						rel="preload"
 						href="/fonts/inter-roman.var.woff2"
-						as="font"
-						type="font/woff2"
-						crossOrigin="anonymous"
-					/>
-					<link
-						rel="preload"
-						href="/fonts/inter-italic.var.woff2"
 						as="font"
 						type="font/woff2"
 						crossOrigin="anonymous"

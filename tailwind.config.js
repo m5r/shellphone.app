@@ -7,7 +7,7 @@ module.exports = {
 			fontFamily: {
 				sans: ["Inter var", ...defaultTheme.fontFamily.sans],
 				inter: ["Inter var", "sans-serif"],
-				mackinac: [`"P22 Mackinac Pro"`, "sans-serif"],
+				mackinac: ["P22 Mackinac Pro", "sans-serif"],
 			},
 			colors: {
 				primary: {
