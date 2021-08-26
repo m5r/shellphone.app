@@ -1,35 +1,18 @@
-import { Suspense } from "react";
 import type { BlitzPage } from "blitz";
-import { Head, Link, useMutation, Routes } from "blitz";
+import { Head } from "blitz";
+import { XIcon } from "@heroicons/react/outline";
 
-import BaseLayout from "../../core/layouts/base-layout";
-import logout from "../../auth/mutations/logout";
-import useCurrentUser from "../../core/hooks/use-current-user";
 import Header from "../components/header";
 
 import iphoneMockup from "../images/iphone-mockup.png";
-import mockupImage from "../images/mockup-image-01.jpg";
+import mockupImage from "../images/mockup-image-01.png";
+import Checkmark from "../components/checkmark";
 
 const LandingPage: BlitzPage = () => {
 	return (
 		<>
 			<Head>
 				<title>Shellphone: Your Personal Cloud Phone</title>
-
-				{/*<link
-					rel="preload"
-					href="/fonts/P22MackinacPro-Book.woff2"
-					as="font"
-					type="font/woff2"
-					crossOrigin="anonymous"
-				/>
-				<link
-					rel="preload"
-					href="/fonts/P22MackinacPro-Bold.woff2"
-					as="font"
-					type="font/woff2"
-					crossOrigin="anonymous"
-				/>
 				<link
 					rel="preload"
 					href="/fonts/P22MackinacPro-ExtraBold.woff2"
@@ -37,14 +20,8 @@ const LandingPage: BlitzPage = () => {
 					type="font/woff2"
 					crossOrigin="anonymous"
 				/>
-				<link
-					rel="preload"
-					href="/fonts/P22MackinacPro-Medium.woff2"
-					as="font"
-					type="font/woff2"
-					crossOrigin="anonymous"
-				/>*/}
 			</Head>
+			<ReferralBanner />
 			<section className="font-inter antialiased bg-white text-gray-900 tracking-tight">
 				<section className="flex flex-col min-h-screen overflow-hidden">
 					<Header />
@@ -52,7 +29,7 @@ const LandingPage: BlitzPage = () => {
 					<main className="flex-grow">
 						<section>
 							<div className="max-w-6xl mx-auto px-4 sm:px-6">
-								<div className="pt-32 pb-10 md:pt-40 md:pb-16">
+								<div className="pt-32 pb-10 md:pt-34 md:pb-16">
 									{/* Hero content */}
 									<div className="md:grid md:grid-cols-12 md:gap-12 lg:gap-20 items-center">
 										{/* Content */}
@@ -61,23 +38,22 @@ const LandingPage: BlitzPage = () => {
 												Take your phone number anywhere you go
 											</h1>
 											<p className="text-xl text-gray-600">
-												Keep your phone number and pay less for your communications, even
-												abroad. No download required.
+												Coming soon! &#128026; Keep your phone number and pay less for your
+												communications, even abroad.
 											</p>
 											{/* CTA form */}
 											<form className="mt-8">
 												<div className="flex flex-col sm:flex-row justify-center max-w-sm mx-auto sm:max-w-md md:mx-0">
 													<input
-														type="tel"
+														type="email"
 														className="form-input w-full mb-2 sm:mb-0 sm:mr-2"
-														placeholder="Phone number"
-														aria-label="Phone number"
+														placeholder="Enter your email address"
 													/>
 													<a
 														className="btn text-white bg-primary-500 hover:bg-primary-400 flex-shrink-0"
 														href="#0"
 													>
-														Request code
+														Request access
 													</a>
 												</div>
 												{/* Success message */}
@@ -85,34 +61,16 @@ const LandingPage: BlitzPage = () => {
 											</form>
 											<ul className="max-w-sm sm:max-w-md mx-auto md:max-w-none text-gray-600 mt-8 -mb-2">
 												<li className="flex items-center mb-2">
-													<svg
-														className="w-3 h-3 fill-current text-primary-400 mr-2 flex-shrink-0"
-														viewBox="0 0 12 12"
-														xmlns="http://www.w3.org/2000/svg"
-													>
-														<path d="M10.28 2.28L3.989 8.575 1.695 6.28A1 1 0 00.28 7.695l3 3a1 1 0 001.414 0l7-7A1 1 0 0010.28 2.28z" />
-													</svg>
-													<span>Lorem ipsum is placeholder text commonly.</span>
+													<Checkmark />
+													<span>Send and receive SMS messages.</span>
 												</li>
 												<li className="flex items-center mb-2">
-													<svg
-														className="w-3 h-3 fill-current text-primary-400 mr-2 flex-shrink-0"
-														viewBox="0 0 12 12"
-														xmlns="http://www.w3.org/2000/svg"
-													>
-														<path d="M10.28 2.28L3.989 8.575 1.695 6.28A1 1 0 00.28 7.695l3 3a1 1 0 001.414 0l7-7A1 1 0 0010.28 2.28z" />
-													</svg>
-													<span>Excepteur sint occaecat cupidatat.</span>
+													<Checkmark />
+													<span>Make and receive phone calls.</span>
 												</li>
 												<li className="flex items-center mb-2">
-													<svg
-														className="w-3 h-3 fill-current text-primary-400 mr-2 flex-shrink-0"
-														viewBox="0 0 12 12"
-														xmlns="http://www.w3.org/2000/svg"
-													>
-														<path d="M10.28 2.28L3.989 8.575 1.695 6.28A1 1 0 00.28 7.695l3 3a1 1 0 001.414 0l7-7A1 1 0 0010.28 2.28z" />
-													</svg>
-													<span>Lorem ipsum is placeholder text commonly.</span>
+													<Checkmark />
+													<span>No download required.</span>
 												</li>
 											</ul>
 										</div>
@@ -198,6 +156,40 @@ const LandingPage: BlitzPage = () => {
 		</>
 	);
 };
+
+function ReferralBanner() {
+	const isDisabled = true;
+	if (isDisabled) {
+		return null;
+	}
+
+	return (
+		<div className="relative bg-primary-600">
+			<div className="max-w-7xl mx-auto py-3 px-3 sm:px-6 lg:px-8">
+				<div className="pr-16 sm:text-center sm:px-16">
+					<p className="font-medium text-white">
+						<span>&#127881; New: Get one month free for every friend that joins and subscribe!</span>
+						<span className="block sm:ml-2 sm:inline-block">
+							<a href="#" className="text-white font-bold underline">
+								{" "}
+								Learn more <span aria-hidden="true">&rarr;</span>
+							</a>
+						</span>
+					</p>
+				</div>
+				<div className="absolute inset-y-0 right-0 pt-1 pr-1 flex items-start sm:pt-1 sm:pr-2 sm:items-start">
+					<button
+						type="button"
+						className="flex p-2 rounded-md hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-white"
+					>
+						<span className="sr-only">Dismiss</span>
+						<XIcon className="h-6 w-6 text-white" aria-hidden="true" />
+					</button>
+				</div>
+			</div>
+		</div>
+	);
+}
 
 LandingPage.suppressFirstRenderFlicker = true;
 
