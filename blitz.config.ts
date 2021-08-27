@@ -25,6 +25,9 @@ type Module = Omit<NodeModule, "exports"> & { exports: BlitzConfig };
 			isAuthorized: simpleRolesIsAuthorized,
 		}),
 	],
+	images: {
+		domains: ["www.datocms-assets.com"],
+	},
 	serverRuntimeConfig: {
 		paddle: {
 			apiKey: process.env.PADDLE_API_KEY,
