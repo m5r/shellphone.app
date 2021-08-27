@@ -58,7 +58,7 @@ jobs:
               with:
                   webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
                   webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
-                  args: "https://dev.shellphone.dev deployed with commit `${{ github.sha }}` from branch `${{ github.ref }}`"
+                  args: "https://dev.shellphone.app deployed with commit `${{ github.sha }}` from branch `${{ github.ref }}`"
 
     deploy_prod:
         if: github.ref == 'refs/heads/production'
@@ -76,5 +76,5 @@ jobs:
               with:
                   webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
                   webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
-                  args: "https://www.shellphone.dev deployed with commit `${{ github.sha }}` from branch `${{ github.ref }}`"
+                  args: "https://www.shellphone.app deployed with commit `${{ github.sha }}` from branch `${{ github.ref }}`"
 # TODO: on pull_request, deploy 24hour-long deployment at {commit_short_hash}.shellphone.app, provision db and seed data
