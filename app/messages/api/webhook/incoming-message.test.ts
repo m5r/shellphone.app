@@ -1,6 +1,6 @@
-import { testApiHandler } from "next-test-api-route-handler";
 import twilio from "twilio";
 
+import { testApiHandler } from "../../../../test/test-api-handler";
 import db from "db";
 import handler from "./incoming-message";
 import insertIncomingMessageQueue from "../queue/insert-incoming-message";
