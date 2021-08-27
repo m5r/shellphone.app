@@ -2,7 +2,7 @@ import { BlitzPage, GetStaticPaths, GetStaticProps, Head, useRouter } from "blit
 import ErrorPage from "next/error";
 
 import type { Post } from "integrations/datocms";
-import { getAllPostsWithSlug, getPostAndMorePosts } from "integrations/datocms";
+import { getAllPostsWithSlug, getPostAndMorePosts, markdownToHtml } from "integrations/datocms";
 
 type Props = {
 	post: Post;
@@ -63,7 +63,7 @@ export const getStaticProps: GetStaticProps = async ({ params, preview = false }
 	}
 
 	const data = await getPostAndMorePosts(params.slug, preview);
-	const content = /*await markdownToHtml(data.post.content || "");*/ "";
+	const content = await markdownToHtml(data.post.content || "");
 
 	return {
 		props: {
