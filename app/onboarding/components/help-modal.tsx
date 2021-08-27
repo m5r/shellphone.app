@@ -30,6 +30,13 @@ const HelpModal: FunctionComponent<Props> = ({ isHelpModalOpen, closeModal }) =>
 							</a>{" "}
 							and we will help you get started!
 						</p>
+						<p>
+							Don&#39;t miss out on free $10 Twilio credit by using{" "}
+							<a className="underline" href="https://www.twilio.com/referral/gNvX8p">
+								our referral link
+							</a>
+							.
+						</p>
 					</div>
 				</div>
 			</div>
