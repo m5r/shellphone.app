@@ -29,7 +29,7 @@ export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ 
 
 	try {
 		await twilio(organization.twilioAccountSid, organization.twilioAuthToken).lookups.v1.phoneNumbers(to).fetch();
-	} catch (error) {
+	} catch (error: any) {
 		logger.error(error);
 		return;
 	}

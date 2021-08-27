@@ -38,7 +38,7 @@ const UpdatePassword: FunctionComponent = () => {
 		try {
 			// TODO
 			// await customer.updateUser({ password: newPassword });
-		} catch (error) {
+		} catch (error: any) {
 			logger.error(error.response, "error updating user infos");
 
 			if (error.response.status === 401) {

@@ -30,7 +30,7 @@ export default async function subscribeToNewsletter(req: BlitzApiRequest, res: B
 	let body;
 	try {
 		body = bodySchema.parse(req.body);
-	} catch (error) {
+	} catch (error: any) {
 		const statusCode = 400;
 		const apiError: ApiError = {
 			statusCode,
@@ -44,7 +44,7 @@ export default async function subscribeToNewsletter(req: BlitzApiRequest, res: B
 
 	try {
 		await addSubscriber(body.email);
-	} catch (error) {
+	} catch (error: any) {
 		console.log("error", error.response?.data);
 
 		if (error.response?.data.title !== "Member Exists") {

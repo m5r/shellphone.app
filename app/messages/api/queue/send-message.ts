@@ -33,7 +33,7 @@ const sendMessageQueue = Queue<Payload>(
 				where: { organizationId_phoneNumberId_id: { id, organizationId, phoneNumberId } },
 				data: { id: message.sid },
 			});
-		} catch (error) {
+		} catch (error: any) {
 			// TODO: handle twilio error
 			console.log(error.code); // 21211
 			console.log(error.moreInfo); // https://www.twilio.com/docs/errors/21211
