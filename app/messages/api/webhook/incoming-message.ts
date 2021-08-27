@@ -84,7 +84,7 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 
 		res.setHeader("content-type", "text/html");
 		res.status(200).send("<Response></Response>");
-	} catch (error) {
+	} catch (error: any) {
 		const statusCode = error.statusCode ?? 500;
 		const apiError: ApiError = {
 			statusCode,

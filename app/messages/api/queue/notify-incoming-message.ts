@@ -49,7 +49,7 @@ const notifyIncomingMessageQueue = Queue<Payload>(
 
 				try {
 					await webpush.sendNotification(webPushSubscription, JSON.stringify(notification));
-				} catch (error) {
+				} catch (error: any) {
 					logger.error(error);
 					if (error instanceof WebPushError) {
 						// subscription most likely expired or has been revoked

@@ -41,7 +41,7 @@ const ProfileInformations: FunctionComponent = () => {
 		try {
 			// TODO
 			// await updateUser({ email, data: { name } });
-		} catch (error) {
+		} catch (error: any) {
 			logger.error(error.response, "error updating user infos");
 
 			if (error.response.status === 401) {
