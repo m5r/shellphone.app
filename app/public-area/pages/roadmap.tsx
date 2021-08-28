@@ -23,78 +23,76 @@ const Roadmap: BlitzPage = () => {
 					<Header />
 
 					<main className="flex-grow">
-						<section>
-							<div className="max-w-6xl mx-auto px-4 sm:px-6">
-								<div className="pt-32 pb-10 md:pt-34 md:pb-16">
-									<div className="max-w-5xl mx-auto">
-										<h1 className="h1 mb-16 font-extrabold font-mackinac">(Rough) Roadmap</h1>
-									</div>
+						<section className="max-w-6xl mx-auto px-4 sm:px-6">
+							<div className="pt-32 pb-10 md:pt-34 md:pb-16">
+								<div className="max-w-5xl mx-auto">
+									<h1 className="h1 mb-16 font-extrabold font-mackinac">(Rough) Roadmap</h1>
+								</div>
 
-									<div className="max-w-2xl mx-auto text-lg xl:text-xl flow-root">
-										<ul role="list" className="-mb-8">
-											{roadmap.map((feature, index) => {
-												const isDone = feature.status === "done";
-												const isInProgress = feature.status === "in-progress";
-												return (
-													<li key={feature.name}>
-														<div className="relative pb-8">
-															{index !== roadmap.length - 1 ? (
+								<div className="max-w-3xl mx-auto text-lg xl:text-xl flow-root">
+									<ul role="list" className="-mb-8">
+										{roadmap.map((feature, index) => {
+											const isDone = feature.status === "done";
+											const isInProgress = feature.status === "in-progress";
+											return (
+												<li key={feature.name}>
+													<div className="relative pb-8">
+														{index !== roadmap.length - 1 ? (
+															<span
+																className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
+																aria-hidden="true"
+															/>
+														) : null}
+														<div className="relative flex space-x-3">
+															<div>
 																<span
-																	className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
-																	aria-hidden="true"
-																/>
-															) : null}
-															<div className="relative flex space-x-3">
-																<div>
-																	<span
-																		className={clsx(
-																			isDone
-																				? "bg-green-500"
-																				: isInProgress
-																				? "bg-yellow-500"
-																				: "bg-gray-400",
-																			"h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white",
-																		)}
-																	>
-																		{isDone ? (
-																			<CheckIcon
-																				className="h-5 w-5 text-white"
-																				aria-hidden="true"
-																			/>
-																		) : isInProgress ? (
-																			<TerminalIcon
-																				className="h-5 w-5 text-white"
-																				aria-hidden="true"
-																			/>
-																		) : (
-																			<XIcon
-																				className="h-5 w-5 text-white"
-																				aria-hidden="true"
-																			/>
-																		)}
-																	</span>
-																</div>
-																<div className="min-w-0 flex-1 items-center flex justify-between space-x-4">
-																	<div>
-																		<p className="text-md xl:text-lg text-gray-900">
-																			{feature.name}
-																		</p>
-																	</div>
+																	className={clsx(
+																		isDone
+																			? "bg-green-500"
+																			: isInProgress
+																			? "bg-yellow-500"
+																			: "bg-gray-400",
+																		"h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white",
+																	)}
+																>
 																	{isDone ? (
-																		<div className="text-right self-start text-md xl:text-lg whitespace-nowrap text-gray-500">
-																			<time>
-																				{formatter.format(feature.doneDate)}
-																			</time>
-																		</div>
-																	) : null}
+																		<CheckIcon
+																			className="h-5 w-5 text-white"
+																			aria-hidden="true"
+																		/>
+																	) : isInProgress ? (
+																		<TerminalIcon
+																			className="h-5 w-5 text-white"
+																			aria-hidden="true"
+																		/>
+																	) : (
+																		<XIcon
+																			className="h-5 w-5 text-white"
+																			aria-hidden="true"
+																		/>
+																	)}
+																</span>
+															</div>
+															<div className="min-w-0 flex-1 items-center flex justify-between space-x-4">
+																<div>
+																	<p className="text-md xl:text-lg text-gray-900">
+																		{feature.name}
+																	</p>
 																</div>
+																{isDone ? (
+																	<div className="text-right self-start text-md xl:text-lg whitespace-nowrap text-gray-500">
+																		<time>
+																			{formatter.format(feature.doneDate)}
+																		</time>
+																	</div>
+																) : null}
 															</div>
 														</div>
-													</li>
-												);
-											})}
-										</ul>
-									</div>
+													</div>
+												</li>
+											);
+										})}
+									</ul>
 								</div>
 							</div>
 						</section>
