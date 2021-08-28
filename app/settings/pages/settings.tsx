@@ -1,5 +1,5 @@
 import type { BlitzPage } from "blitz";
-import { Routes } from "blitz";
+import { Routes, useMutation } from "blitz";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCreditCard, faUserCircle } from "@fortawesome/pro-regular-svg-icons";
 
@@ -7,6 +7,7 @@ import Layout from "../../core/layouts/layout";
 
 import appLogger from "../../../integrations/logger";
 import useRequireOnboarding from "../../core/hooks/use-require-onboarding";
+import logout from "../../auth/mutations/logout";
 
 const logger = appLogger.child({ page: "/settings" });
 
@@ -27,6 +28,7 @@ const navigation = [
 
 const Settings: BlitzPage = () => {
 	useRequireOnboarding();
+	const [logoutMutation] = useMutation(logout);
 
 	return (
 		<>
@@ -48,6 +50,8 @@ const Settings: BlitzPage = () => {
 						))}
 					</nav>
 				</aside>
+
+				<button onClick={() => logoutMutation()}>Log out</button>
 			</div>
 		</>
 	);
