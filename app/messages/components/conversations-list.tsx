@@ -14,18 +14,14 @@ export default function ConversationsList() {
 
 	return (
 		<ul className="divide-y">
-			{Object.entries(conversations).map(([recipient, messages]) => {
+			{Object.values(conversations).map(({ recipient, formattedPhoneNumber, messages }) => {
 				const lastMessage = messages[messages.length - 1]!;
 				return (
 					<li key={recipient} className="py-2 p-4">
-						<Link
-							href={Routes.ConversationPage({
-								recipient: encodeURIComponent(recipient),
-							})}
-						>
+						<Link href={Routes.ConversationPage({ recipient })}>
 							<a className="flex flex-col">
 								<div className="flex flex-row justify-between">
-									<strong>{recipient}</strong>
+									<strong>{formattedPhoneNumber}</strong>
 									<div className="text-gray-700 flex flex-row gap-x-1">
 										{formatMessageDate(lastMessage.sentAt)}
 										<FontAwesomeIcon className="w-4 h-4 my-auto" icon={faChevronRight} />
