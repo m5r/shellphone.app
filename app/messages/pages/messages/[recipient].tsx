@@ -7,12 +7,14 @@ import { faLongArrowLeft, faInfoCircle, faPhoneAlt as faPhone } from "@fortaweso
 import Layout from "../../../core/layouts/layout";
 import Conversation from "../../components/conversation";
 import useRequireOnboarding from "../../../core/hooks/use-require-onboarding";
+import useConversation from "../../hooks/use-conversation";
 
 const ConversationPage: BlitzPage = () => {
 	useRequireOnboarding();
 
 	const router = useRouter();
 	const recipient = decodeURIComponent(router.params.recipient);
+	const conversation = useConversation(recipient)[0];
 
 	return (
 		<>
@@ -20,7 +22,7 @@ const ConversationPage: BlitzPage = () => {
 				<span className="col-start-1 col-span-1 pl-2 cursor-pointer" onClick={router.back}>
 					<FontAwesomeIcon size="lg" className="h-8 w-8" icon={faLongArrowLeft} />
 				</span>
-				<strong className="col-span-1">{recipient}</strong>
+				<strong className="col-span-1">{conversation?.formattedPhoneNumber ?? recipient}</strong>
 				<span className="col-span-1 flex justify-end space-x-4 pr-2">
 					<FontAwesomeIcon size="lg" className="h-8 w-8" icon={faPhone} />
 					<FontAwesomeIcon size="lg" className="h-8 w-8" icon={faInfoCircle} />
