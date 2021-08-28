@@ -1,9 +1,20 @@
 import type { BlitzPage } from "blitz";
-import { Head } from "blitz";
+import { Head, useQuery } from "blitz";
+
+import getMetrics from "../queries/get-metrics";
 
 import Header from "../components/header";
 
+const initialData = {
+	phoneNumbers: 0,
+	smsExchanged: 0,
+	minutesCalled: 0,
+};
+
 const OpenMetrics: BlitzPage = () => {
+	const [metrics] = useQuery(getMetrics, {}, { suspense: false, initialData });
+	const { phoneNumbers, smsExchanged, minutesCalled } = metrics ?? initialData;
+
 	return (
 		<>
 			<Head>
@@ -29,9 +40,9 @@ const OpenMetrics: BlitzPage = () => {
 
 								<div className="max-w-3xl mx-auto text-lg xl:text-xl flow-root">
 									<dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
-										<Card title="Phone Numbers Registered" value={41} />
-										<Card title="SMS Exchanged" value={4929} />
-										<Card title="Minutes on Call" value={1612} />
+										<Card title="Phone Numbers Registered" value={phoneNumbers} />
+										<Card title="SMS Exchanged" value={smsExchanged} />
+										<Card title="Minutes on Call" value={minutesCalled} />
 									</dl>
 								</div>
 							</div>
