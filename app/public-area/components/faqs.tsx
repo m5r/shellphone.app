@@ -11,30 +11,20 @@ export default function FAQs() {
 				</div>
 
 				<ul className="max-w-3xl mx-auto pl-12">
-					<Accordion title="Do I need coding knowledge to use this product?">
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-						labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-						laboris nisi ut aliquip ex ea commodo consequat.
+					<Accordion title="How does it work?">
+						Shellphone is your go-to app to use your phone number over the internet. It integrates
+						seamlessly with Twilio to provide the best experience for your personal cloud phone.
 					</Accordion>
-					<Accordion title="Do you have student or non-profit discounts?">
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-						labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-						laboris nisi ut aliquip ex ea commodo consequat.
+					<Accordion title="Do I need a Twilio account to use Shellphone?">
+						Shellphone is still in its early stages and we&#39;re working hard to make it as easy-to-use as
+						possible. Currently, you need to link your Twilio account when setting up your Shellphone
+						account.
 					</Accordion>
-					<Accordion title="Is there a way to become an Affiliate reseller of this product?">
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-						labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-						laboris nisi ut aliquip ex ea commodo consequat.
-					</Accordion>
-					<Accordion title="What is the difference between the Free and Paid versions?">
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-						labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-						laboris nisi ut aliquip ex ea commodo consequat.
-					</Accordion>
-					<Accordion title="How can I change the owner of a workspace?">
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-						labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-						laboris nisi ut aliquip ex ea commodo consequat.
+					<Accordion title="Why would I use this over an eSIM?">
+						Chances are you&#39;re currently using an eSIM-compatible device. eSIMs are a reasonable way of
+						using a phone number internationally but they are still subject to some irky limitations. For
+						example, you can only use an eSIM on one device at a time and you are still subject to
+						exorbitant rates from your carrier.
 					</Accordion>
 					<span className="block border-t border-gray-200" aria-hidden="true" />
 				</ul>
