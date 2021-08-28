@@ -4,7 +4,7 @@ import ErrorPage from "next/error";
 
 import type { Post } from "integrations/datocms";
 import { getAllPostsWithSlug, getPostAndMorePosts, markdownToHtml } from "integrations/datocms";
-import Header from "../../../landing-page/components/header";
+import Header from "../../../public-area/components/header";
 import PostBody from "../../components/post-body";
 import SectionSeparator from "../../components/section-separator";
 import MoreStories from "../../components/more-stories";
