@@ -2,7 +2,7 @@
 	"name": "shellphone.app",
 	"version": "1.0.0",
 	"scripts": {
-		"dev": "concurrently --raw \"blitz dev\" 'quirrel'",
+		"dev": "concurrently --raw \"blitz dev\" 'DISABLE_TELEMETRY=true quirrel'",
 		"build": "blitz build",
 		"start": "blitz start",
 		"studio": "blitz prisma studio",
