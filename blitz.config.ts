@@ -19,6 +19,14 @@ type Module = Omit<NodeModule, "exports"> & { exports: BlitzConfig };
 			},
 		];
 	},
+	async rewrites() {
+		return [
+			{
+				source: "/bear.js",
+				destination: "https://cdn.panelbear.com/analytics.js",
+			},
+		];
+	},
 	middleware: [
 		sessionMiddleware({
 			cookiePrefix: "shellphone",
@@ -58,6 +66,9 @@ type Module = Omit<NodeModule, "exports"> & { exports: BlitzConfig };
 	publicRuntimeConfig: {
 		webPush: {
 			publicKey: process.env.WEB_PUSH_VAPID_PUBLIC_KEY,
+		},
+		panelBear: {
+			siteId: process.env.PANELBEAR_SITE_ID,
 		},
 	},
 	/* Uncomment this to customize the webpack config
