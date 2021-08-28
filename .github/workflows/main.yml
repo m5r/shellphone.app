@@ -53,7 +53,7 @@ jobs:
               env:
                   FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
               with:
-                  args: "deploy -c ./fly.dev.toml --build-arg DATOCMS_API_TOKEN=${{ secrets.DATOCMS_API_TOKEN }}"
+                  args: "deploy -c ./fly.dev.toml --build-arg PANELBEAR_SITE_ID=${{ secrets.PANELBEAR_SITE_ID_DEV }} --build-arg DATOCMS_API_TOKEN=${{ secrets.DATOCMS_API_TOKEN }}"
             - uses: appleboy/discord-action@master
               with:
                   webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
@@ -71,7 +71,7 @@ jobs:
               env:
                   FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
               with:
-                  args: "deploy -c ./fly.prod.toml --build-arg DATOCMS_API_TOKEN=${{ secrets.DATOCMS_API_TOKEN }}"
+                  args: "deploy -c ./fly.prod.toml --build-arg PANELBEAR_SITE_ID=${{ secrets.PANELBEAR_SITE_ID_PROD }} --build-arg DATOCMS_API_TOKEN=${{ secrets.DATOCMS_API_TOKEN }}"
             - uses: appleboy/discord-action@master
               with:
                   webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
