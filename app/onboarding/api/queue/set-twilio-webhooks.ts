@@ -52,13 +52,13 @@ async function getTwimlApplication(
 	}
 
 	const twimlApps = await twilioClient.applications.list();
-	const twimlApp = twimlApps.find((app) => app.friendlyName === "Shellphone");
+	const twimlApp = twimlApps.find((app) => app.friendlyName.startsWith("Shellphone"));
 	if (twimlApp) {
 		return updateTwimlApplication(twilioClient, twimlApp.sid);
 	}
 
 	return twilioClient.applications.create({
-		friendlyName: "Shellphone",
+		friendlyName: getTwiMLName(),
 		smsUrl: `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/incoming-message`,
 		smsMethod: "POST",
 		voiceUrl: `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/call`,
@@ -75,6 +75,17 @@ async function updateTwimlApplication(twilioClient: twilio.Twilio, twimlAppSid: 
 	});
 
 	return twilioClient.applications.get(twimlAppSid).fetch();
+}
+
+function getTwiMLName() {
+	switch (serverRuntimeConfig.app.baseUrl) {
+		case "local.shellphone.app":
+			return "Shellphone LOCAL";
+		case "dev.shellphone.app":
+			return "Shellphone DEV";
+		case "www.shellphone.app":
+			return "Shellphone";
+	}
 }
 
 export default setTwilioWebhooks;

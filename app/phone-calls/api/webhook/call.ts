@@ -3,12 +3,16 @@ import { getConfig } from "blitz";
 import twilio from "twilio";
 import type { CallInstance } from "twilio/lib/rest/api/v2010/account/call";
 
-import type { ApiError } from "../../../_types";
 import db, { CallStatus, Direction } from "../../../../db";
 import appLogger from "../../../../integrations/logger";
 
 const { serverRuntimeConfig } = getConfig();
 const logger = appLogger.child({ route: "/api/webhook/call" });
+
+type ApiError = {
+	statusCode: number;
+	errorMessage: string;
+};
 
 export default async function incomingCallHandler(req: BlitzApiRequest, res: BlitzApiResponse) {
 	console.log("req.body", req.body);

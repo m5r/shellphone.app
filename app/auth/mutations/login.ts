@@ -1,6 +1,6 @@
 import { resolver, SecurePassword, AuthenticationError } from "blitz";
 
-import db, { GlobalRole } from "../../../db";
+import db from "../../../db";
 import { Login } from "../validations";
 
 export const authenticateUser = async (rawEmail: string, rawPassword: string) => {

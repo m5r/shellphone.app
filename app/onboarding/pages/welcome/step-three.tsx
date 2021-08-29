@@ -94,7 +94,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res }
 		await session.$revoke();
 		return {
 			redirect: {
-				destination: Routes.Home().pathname,
+				destination: Routes.LandingPage().pathname,
 				permanent: false,
 			},
 		};

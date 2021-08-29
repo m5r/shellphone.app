@@ -23,8 +23,8 @@ const insertMessagesQueue = Queue<Payload>(
 
 		const sms = messages
 			.map<Message>((message) => ({
-				organizationId,
 				id: message.sid,
+				organizationId,
 				phoneNumberId: phoneNumber.id,
 				content: encrypt(message.body, phoneNumber.organization.encryptionKey),
 				from: message.from,

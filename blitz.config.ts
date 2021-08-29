@@ -6,12 +6,36 @@ import { sessionMiddleware, simpleRolesIsAuthorized } from "blitz";
 type Module = Omit<NodeModule, "exports"> & { exports: BlitzConfig };
 
 (module as Module).exports = {
+	async header() {
+		return [
+			{
+				source: "/fonts/*.woff2",
+				headers: [
+					{
+						key: "Cache-Control",
+						value: "public, max-age=31536000, immutable",
+					},
+				],
+			},
+		];
+	},
+	async rewrites() {
+		return [
+			{
+				source: "/bear.js",
+				destination: "https://cdn.panelbear.com/analytics.js",
+			},
+		];
+	},
 	middleware: [
 		sessionMiddleware({
-			cookiePrefix: "virtual-phone",
+			cookiePrefix: "shellphone",
 			isAuthorized: simpleRolesIsAuthorized,
 		}),
 	],
+	images: {
+		domains: ["www.datocms-assets.com"],
+	},
 	serverRuntimeConfig: {
 		paddle: {
 			apiKey: process.env.PADDLE_API_KEY,
@@ -42,6 +66,9 @@ type Module = Omit<NodeModule, "exports"> & { exports: BlitzConfig };
 	publicRuntimeConfig: {
 		webPush: {
 			publicKey: process.env.WEB_PUSH_VAPID_PUBLIC_KEY,
+		},
+		panelBear: {
+			siteId: process.env.PANELBEAR_SITE_ID,
 		},
 	},
 	/* Uncomment this to customize the webpack config

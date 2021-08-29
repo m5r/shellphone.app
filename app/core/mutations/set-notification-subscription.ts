@@ -45,7 +45,7 @@ export default resolver.pipe(
 					keys_auth: subscription.keys.auth,
 				},
 			});
-		} catch (error) {
+		} catch (error: any) {
 			if (error.code !== "P2002") {
 				logger.error(error);
 				// we might want to `throw error`;

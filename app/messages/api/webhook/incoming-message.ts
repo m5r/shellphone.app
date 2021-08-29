@@ -2,10 +2,14 @@ import type { BlitzApiRequest, BlitzApiResponse } from "blitz";
 import { getConfig } from "blitz";
 import twilio from "twilio";
 
-import type { ApiError } from "../../../_types";
 import appLogger from "../../../../integrations/logger";
 import db from "../../../../db";
 import insertIncomingMessageQueue from "../queue/insert-incoming-message";
+
+type ApiError = {
+	statusCode: number;
+	errorMessage: string;
+};
 
 const logger = appLogger.child({ route: "/api/webhook/incoming-message" });
 const { serverRuntimeConfig } = getConfig();
@@ -83,7 +87,7 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 
 		res.setHeader("content-type", "text/html");
 		res.status(200).send("<Response></Response>");
-	} catch (error) {
+	} catch (error: any) {
 		const statusCode = error.statusCode ?? 500;
 		const apiError: ApiError = {
 			statusCode,
