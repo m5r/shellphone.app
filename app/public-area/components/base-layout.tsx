@@ -2,6 +2,7 @@ import type { FunctionComponent } from "react";
 import { Head } from "blitz";
 
 import Header from "./header";
+import Footer from "./footer";
 
 const BaseLayout: FunctionComponent = ({ children }) => (
 	<>
@@ -21,6 +22,8 @@ const BaseLayout: FunctionComponent = ({ children }) => (
 				<Header />
 
 				<main className="flex-grow">{children}</main>
+
+				<Footer />
 			</section>
 		</section>
 	</>
