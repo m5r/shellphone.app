@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { CheckIcon, XIcon, TerminalIcon } from "@heroicons/react/solid";
 
 import Header from "../components/header";
+import Footer from "../components/footer";
 
 const Roadmap: BlitzPage = () => {
 	return (
@@ -97,6 +98,8 @@ const Roadmap: BlitzPage = () => {
 							</div>
 						</section>
 					</main>
+
+					<Footer />
 				</section>
 			</section>
 		</>

@@ -4,6 +4,7 @@ import { Head, useQuery } from "blitz";
 import getMetrics from "../queries/get-metrics";
 
 import Header from "../components/header";
+import Footer from "../components/footer";
 
 const initialData = {
 	phoneNumbers: 0,
@@ -48,6 +49,8 @@ const OpenMetrics: BlitzPage = () => {
 							</div>
 						</section>
 					</main>
+
+					<Footer />
 				</section>
 			</section>
 		</>
