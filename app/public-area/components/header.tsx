@@ -12,7 +12,7 @@ function Header() {
 					<div className="flex-shrink-0 mr-5">
 						<Link href="/">
 							<a className="block">
-								<img className="w-10 h-10" src="/shellphone.png" />
+								<img className="w-10 h-10" src="/shellphone.png" alt="Shellphone logo" />
 							</a>
 						</Link>
 					</div>

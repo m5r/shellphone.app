@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "blitz";
 import clsx from "clsx";
 
@@ -10,7 +10,7 @@ export default function Conversation() {
 	const router = useRouter();
 	const recipient = decodeURIComponent(router.params.recipient);
 	const conversation = useConversation(recipient)[0];
-	const messages = conversation?.messages ?? [];
+	const messages = useMemo(() => conversation?.messages ?? [], [conversation?.messages]);
 	const messagesListRef = useRef<HTMLUListElement>(null);
 
 	useEffect(() => {

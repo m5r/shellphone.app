@@ -17,5 +17,6 @@ export const usePanelbear = (siteId?: string, config: PanelbearConfig = {}) => {
 		router.events.on("routeChangeComplete", handleRouteChange);
 
 		return () => router.events.off("routeChangeComplete", handleRouteChange);
+		// eslint-disable-next-line
 	}, [siteId]);
 };

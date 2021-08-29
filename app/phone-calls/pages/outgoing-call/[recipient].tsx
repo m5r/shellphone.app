@@ -41,6 +41,7 @@ const OutgoingCall: BlitzPage = () => {
 		if (call.state === "ready") {
 			call.makeCall();
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [call.state]);
 
 	return (

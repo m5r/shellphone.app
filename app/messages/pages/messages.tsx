@@ -19,7 +19,7 @@ const Messages: BlitzPage = () => {
 		if (!subscription) {
 			subscribe();
 		}
-	}, [subscription?.endpoint]);
+	}, [subscribe, subscription]);
 
 	return (
 		<>
