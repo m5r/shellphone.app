@@ -1,5 +1,5 @@
 import { Fragment, useState, useRef, useEffect } from "react";
-import type { LinkProps } from "next/link";
+import type { LinkProps } from "blitz";
 import { Link, Routes } from "blitz";
 import { Dialog, Transition } from "@headlessui/react";
 import { XIcon } from "@heroicons/react/outline";

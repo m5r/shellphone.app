@@ -1,6 +1,7 @@
 import { XIcon } from "@heroicons/react/outline";
 
 export default function ReferralBanner() {
+	// TODO
 	const isDisabled = true;
 	if (isDisabled) {
 		return null;
