@@ -50,14 +50,6 @@ function DesktopNavLink({ href, label }: NavLinkProps) {
 	);
 }
 
-function MobileNavLink({ href, label }: NavLinkProps) {
-	return (
-		<Link href={href}>
-			<a className="flex text-gray-600 hover:text-gray-900 py-2">{label}</a>
-		</Link>
-	);
-}
-
 function MobileNav() {
 	const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
@@ -183,6 +175,16 @@ function MobileNav() {
 			</Transition.Root>
 		</div>
 	);
+
+	function MobileNavLink({ href, label }: NavLinkProps) {
+		return (
+			<Link href={href}>
+				<a onClick={() => setMobileNavOpen(false)} className="flex text-gray-600 hover:text-gray-900 py-2">
+					{label}
+				</a>
+			</Link>
+		);
+	}
 }
 
 export default Header;
