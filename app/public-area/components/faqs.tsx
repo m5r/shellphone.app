@@ -15,10 +15,10 @@ export default function FAQs() {
 						Shellphone is your go-to app to use your phone number over the internet. It integrates
 						seamlessly with Twilio to provide the best experience for your personal cloud phone.
 					</Accordion>
-					<Accordion title="Do I need a Twilio account to use Shellphone?">
+					<Accordion title="What do I need to use Shellphone?">
 						Shellphone is still in its early stages and we&#39;re working hard to make it as easy-to-use as
-						possible. Currently, you need to link your Twilio account when setting up your Shellphone
-						account.
+						possible. Currently, you must have a Twilio account to set up your personal cloud phone with
+						Shellphone.
 					</Accordion>
 					<Accordion title="Why would I use this over an eSIM?">
 						Chances are you&#39;re currently using an eSIM-compatible device. eSIMs are a reasonable way of
