@@ -1,7 +1,9 @@
+import { Fragment, useRef } from "react";
 import type { BlitzPage } from "blitz";
 import { Link, Routes, useRouter } from "blitz";
-import { useRef } from "react";
 import { atom, useAtom } from "jotai";
+import { usePress } from "@react-aria/interactions";
+import { Transition } from "@headlessui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBackspace, faPhoneAlt as faPhone } from "@fortawesome/pro-solid-svg-icons";
 
@@ -13,12 +15,14 @@ const KeypadPage: BlitzPage = () => {
 	useRequireOnboarding();
 	const router = useRouter();
 	const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
-	const pressBackspace = useAtom(pressBackspaceAtom)[1];
+	const removeDigit = useAtom(pressBackspaceAtom)[1];
 	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const pressDigit = useAtom(pressDigitAtom)[1];
 	const longPressDigit = useAtom(longPressDigitAtom)[1];
 	const onZeroPressProps = {
 		onPressStart() {
+			console.log("0");
 			pressDigit("0");
 			timeoutRef.current = setTimeout(() => {
 				longPressDigit("+");
@@ -27,6 +31,7 @@ const KeypadPage: BlitzPage = () => {
 		onPressEnd() {
 			if (timeoutRef.current) {
 				clearTimeout(timeoutRef.current);
+				timeoutRef.current = null;
 			}
 		},
 	};
@@ -34,6 +39,28 @@ const KeypadPage: BlitzPage = () => {
 		onPress() {
 			// navigator.vibrate(1); // removed in webkit
 			pressDigit(digit);
+		},
+	});
+	const { pressProps: onBackspacePress } = usePress({
+		onPressStart() {
+			timeoutRef.current = setTimeout(() => {
+				removeDigit();
+				intervalRef.current = setInterval(removeDigit, 75);
+			}, 325);
+		},
+		onPressEnd() {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+				timeoutRef.current = null;
+			}
+
+			if (intervalRef.current) {
+				clearInterval(intervalRef.current);
+				intervalRef.current = null;
+				return;
+			}
+
+			removeDigit();
 		},
 	});
 
@@ -59,9 +86,21 @@ const KeypadPage: BlitzPage = () => {
 						<FontAwesomeIcon className="w-6 h-6" icon={faPhone} color="white" size="lg" />
 					</button>
 				</Link>
-				<div className="cursor-pointer select-none m-auto" onClick={pressBackspace}>
-					<FontAwesomeIcon className="w-6 h-6" icon={faBackspace} size="lg" />
-				</div>
+
+				<Transition
+					as={Fragment}
+					show={phoneNumber.length > 0}
+					enter="transition duration-300 ease-in-out"
+					enterFrom="transform scale-95 opacity-0"
+					enterTo="transform scale-100 opacity-100"
+					leave="transition duration-100 ease-out"
+					leaveFrom="transform scale-100 opacity-100"
+					leaveTo="transform scale-95 opacity-0"
+				>
+					<div {...onBackspacePress} className="cursor-pointer select-none m-auto">
+						<FontAwesomeIcon className="w-6 h-6" icon={faBackspace} size="lg" />
+					</div>
+				</Transition>
 			</Keypad>
 		</div>
 	);
