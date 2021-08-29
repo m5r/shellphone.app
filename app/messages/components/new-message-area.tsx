@@ -59,14 +59,20 @@ const NewMessageArea: FunctionComponent<Props> = ({ recipient, onSend }) => {
 			(conversations) => {
 				const nextConversations = { ...conversations };
 				if (!nextConversations[recipient]) {
-					nextConversations[recipient] = [];
+					nextConversations[recipient] = {
+						recipient,
+						formattedPhoneNumber: recipient,
+						messages: [],
+					};
 				}
 
-				nextConversations[recipient] = [...nextConversations[recipient]!, message];
+				nextConversations[recipient]!.messages = [...nextConversations[recipient]!.messages, message];
 
 				return Object.fromEntries(
 					Object.entries(nextConversations).sort(
-						([, a], [, b]) => b[b.length - 1]!.sentAt.getTime() - a[a.length - 1]!.sentAt.getTime(),
+						([, a], [, b]) =>
+							b.messages[b.messages.length - 1]!.sentAt.getTime() -
+							a.messages[a.messages.length - 1]!.sentAt.getTime(),
 					),
 				);
 			},

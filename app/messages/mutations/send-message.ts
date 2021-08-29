@@ -27,7 +27,7 @@ export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ 
 	const twilioClient = getTwilioClient(organization);
 	try {
 		await twilioClient.lookups.v1.phoneNumbers(to).fetch();
-	} catch (error) {
+	} catch (error: any) {
 		logger.error(error);
 		return;
 	}

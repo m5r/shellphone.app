@@ -7,13 +7,19 @@ import {
 	AuthorizationError,
 	ErrorFallbackProps,
 	useQueryErrorResetBoundary,
+	getConfig,
 } from "blitz";
 
 import LoginForm from "../auth/components/login-form";
+import { usePanelbear } from "../core/hooks/use-panelbear";
 
 import "app/core/styles/index.css";
 
+const { publicRuntimeConfig } = getConfig();
+
 export default function App({ Component, pageProps }: AppProps) {
+	usePanelbear(publicRuntimeConfig.panelBear.siteId);
+
 	const getLayout = Component.getLayout || ((page) => page);
 
 	return (

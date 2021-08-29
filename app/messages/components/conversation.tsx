@@ -10,21 +10,22 @@ export default function Conversation() {
 	const router = useRouter();
 	const recipient = decodeURIComponent(router.params.recipient);
 	const conversation = useConversation(recipient)[0];
+	const messages = conversation?.messages ?? [];
 	const messagesListRef = useRef<HTMLUListElement>(null);
 
 	useEffect(() => {
 		messagesListRef.current?.querySelector("li:last-child")?.scrollIntoView();
-	}, [conversation, messagesListRef]);
+	}, [messages, messagesListRef]);
 
 	return (
 		<>
 			<div className="flex flex-col space-y-6 p-6 pt-12 pb-16">
 				<ul ref={messagesListRef}>
-					{conversation.length === 0 ? "empty state" : null}
-					{conversation.map((message, index) => {
+					{messages.length === 0 ? "empty state" : null}
+					{messages.map((message, index) => {
 						const isOutbound = message.direction === Direction.Outbound;
-						const nextMessage = conversation![index + 1];
-						const previousMessage = conversation![index - 1];
+						const nextMessage = messages![index + 1];
+						const previousMessage = messages![index - 1];
 						const isNextMessageFromSameSender = message.from === nextMessage?.from;
 						const isPreviousMessageFromSameSender = message.from === previousMessage?.from;
 

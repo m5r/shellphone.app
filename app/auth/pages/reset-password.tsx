@@ -19,7 +19,7 @@ const ResetPasswordPage: BlitzPage = () => {
 				<div>
 					<h2>Password Reset Successfully</h2>
 					<p>
-						Go to the <Link href={Routes.Home()}>homepage</Link>
+						Go to the <Link href={Routes.LandingPage()}>homepage</Link>
 					</p>
 				</div>
 			) : (
@@ -34,7 +34,7 @@ const ResetPasswordPage: BlitzPage = () => {
 					onSubmit={async (values) => {
 						try {
 							await resetPasswordMutation(values);
-						} catch (error) {
+						} catch (error: any) {
 							if (error.name === "ResetPasswordError") {
 								return {
 									[FORM_ERROR]: error.message,
