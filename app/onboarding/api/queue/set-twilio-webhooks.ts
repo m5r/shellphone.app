@@ -30,7 +30,7 @@ const setTwilioWebhooks = Queue<Payload>("api/queue/set-twilio-webhooks", async 
 				.applications.get(organization.twimlAppSid)
 				.fetch()
 		: await twilio(organization.twilioAccountSid, organization.twilioAuthToken).applications.create({
-				friendlyName: "Shellphone",
+				friendlyName: getTwiMLName(),
 				smsUrl: `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/incoming-message`,
 				smsMethod: "POST",
 				voiceUrl: `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/incoming-call`,
@@ -51,5 +51,16 @@ const setTwilioWebhooks = Queue<Payload>("api/queue/set-twilio-webhooks", async 
 			}),
 	]);
 });
+
+function getTwiMLName() {
+	switch (serverRuntimeConfig.app.baseUrl) {
+		case "local.shellphone.app":
+			return "Shellphone LOCAL";
+		case "dev.shellphone.app":
+			return "Shellphone DEV";
+		case "www.shellphone.app":
+			return "Shellphone";
+	}
+}
 
 export default setTwilioWebhooks;
