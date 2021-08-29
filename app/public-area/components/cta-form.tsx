@@ -1,5 +1,6 @@
 import { useMutation } from "blitz";
 import { useForm } from "react-hook-form";
+import * as Panelbear from "@panelbear/panelbear-js";
 
 import joinWaitlist from "../mutations/join-waitlist";
 
@@ -19,6 +20,7 @@ export default function CTAForm() {
 			return;
 		}
 
+		Panelbear.track("join-waitlist");
 		return joinWaitlistMutation({ email });
 	});
 
