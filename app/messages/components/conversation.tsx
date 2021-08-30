@@ -42,14 +42,14 @@ export default function Conversation() {
 								{(!isPreviousMessageFromSameSender || !shouldGroupMessages) && (
 									<div className="flex py-2 space-x-1 text-xs justify-center">
 										<strong>
-											{new Date(message.sentAt).toLocaleDateString("fr-FR", {
+											{new Date(message.sentAt).toLocaleDateString("en-US", {
 												weekday: "long",
 												day: "2-digit",
 												month: "short",
 											})}
 										</strong>
 										<span>
-											{new Date(message.sentAt).toLocaleTimeString("fr-FR", {
+											{new Date(message.sentAt).toLocaleTimeString("en-US", {
 												hour: "2-digit",
 												minute: "2-digit",
 											})}

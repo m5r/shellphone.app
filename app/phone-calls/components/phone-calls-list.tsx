@@ -15,7 +15,7 @@ export default function PhoneCallsList() {
 				return (
 					<li key={phoneCall.id} className="flex flex-row justify-between py-2">
 						<div>{recipient}</div>
-						<div>{new Date(phoneCall.createdAt).toLocaleString("fr-FR")}</div>
+						<div>{new Date(phoneCall.createdAt).toLocaleString("en-US")}</div>
 					</li>
 				);
 			})}
