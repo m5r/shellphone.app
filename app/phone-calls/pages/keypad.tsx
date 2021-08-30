@@ -25,7 +25,6 @@ const KeypadPage: BlitzPage = () => {
 	const longPressDigit = useAtom(longPressDigitAtom)[1];
 	const onZeroPressProps = {
 		onPressStart() {
-			console.log("0");
 			pressDigit("0");
 			timeoutRef.current = setTimeout(() => {
 				longPressDigit("+");

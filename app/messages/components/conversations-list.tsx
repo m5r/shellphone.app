@@ -17,7 +17,7 @@ export default function ConversationsList() {
 			{Object.values(conversations).map(({ recipient, formattedPhoneNumber, messages }) => {
 				const lastMessage = messages[messages.length - 1]!;
 				return (
-					<li key={recipient} className="py-2 p-4">
+					<li key={`sms-conversation-${recipient}`} className="py-2 px-4">
 						<Link href={Routes.ConversationPage({ recipient })}>
 							<a className="flex flex-col">
 								<div className="flex flex-row justify-between">

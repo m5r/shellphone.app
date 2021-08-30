@@ -3,6 +3,9 @@ import { Queue } from "quirrel/blitz";
 import db from "../../../../db";
 import insertCallsQueue from "./insert-calls";
 import getTwilioClient from "../../../../integrations/twilio";
+import appLogger from "../../../../integrations/logger";
+
+const logger = appLogger.child({ queue: "fetch-calls" });
 
 type Payload = {
 	organizationId: string;
@@ -15,7 +18,7 @@ const fetchCallsQueue = Queue<Payload>("api/queue/fetch-calls", async ({ organiz
 		include: { organization: true },
 	});
 	if (!phoneNumber) {
-		console.log("no phone number found");
+		logger.warn(`No phone number found with id=${phoneNumberId}, organizationId=${organizationId}`);
 		return;
 	}
 
