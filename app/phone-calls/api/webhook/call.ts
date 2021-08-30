@@ -1,13 +1,11 @@
 import type { BlitzApiRequest, BlitzApiResponse } from "blitz";
-import { getConfig } from "blitz";
 import twilio from "twilio";
-import type { CallInstance } from "twilio/lib/rest/api/v2010/account/call";
 
-import db, { CallStatus, Direction } from "../../../../db";
+import db, { Direction } from "../../../../db";
 import appLogger from "../../../../integrations/logger";
-import { voiceUrl } from "../../../../integrations/twilio";
+import { translateCallStatus, voiceUrl } from "../../../../integrations/twilio";
+import updateCallDurationQueue from "../queue/update-call-duration";
 
-const { serverRuntimeConfig } = getConfig();
 const logger = appLogger.child({ route: "/api/webhook/call" });
 
 type ApiError = {
@@ -60,13 +58,21 @@ export default async function incomingCallHandler(req: BlitzApiRequest, res: Bli
 				id: req.body.CallSid,
 				from: phoneNumber.number,
 				to: req.body.To,
-				status: translateStatus(req.body.CallStatus),
+				status: translateCallStatus(req.body.CallStatus),
 				direction: Direction.Outbound,
-				duration: "", // TODO
+				duration: "0",
 				organizationId: phoneNumber.organization.id,
 				phoneNumberId: phoneNumber.id,
 			},
 		});
+		await updateCallDurationQueue.enqueue(
+			{
+				organizationId: phoneNumber.organization.id,
+				callId: req.body.CallSid,
+			},
+			{ delay: "30s" },
+		);
+
 		const twiml = new twilio.twiml.VoiceResponse();
 		const dial = twiml.dial({
 			answerOnBridge: true,
@@ -129,24 +135,3 @@ const outgoingBody = {
 	From: "client:95267d60-3d35-4c36-9905-8543ecb4f174__673b461a-11ba-43a4-89d7-9e29403053d4",
 	To: "+33613370787",
 };
-
-function translateStatus(status: CallInstance["status"]): CallStatus {
-	switch (status) {
-		case "busy":
-			return CallStatus.Busy;
-		case "canceled":
-			return CallStatus.Canceled;
-		case "completed":
-			return CallStatus.Completed;
-		case "failed":
-			return CallStatus.Failed;
-		case "in-progress":
-			return CallStatus.InProgress;
-		case "no-answer":
-			return CallStatus.NoAnswer;
-		case "queued":
-			return CallStatus.Queued;
-		case "ringing":
-			return CallStatus.Ringing;
-	}
-}
