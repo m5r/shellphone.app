@@ -43,7 +43,7 @@ function formatMessageDate(date: Date): string {
 
 	const isToday = diff.days > -1;
 	if (isToday) {
-		return messageDate.toFormat("HH:mm", { locale: "fr-FR" });
+		return messageDate.toFormat("HH:mm", { locale: "en-US" });
 	}
 
 	const isDuringLastWeek = diff.days > -8;
@@ -51,5 +51,5 @@ function formatMessageDate(date: Date): string {
 		return messageDate.weekdayLong;
 	}
 
-	return messageDate.toFormat("dd/MM/yyyy", { locale: "fr-FR" });
+	return messageDate.toFormat("dd/MM/yyyy", { locale: "en-US" });
 }
