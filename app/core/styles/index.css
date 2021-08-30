@@ -52,6 +52,14 @@
 	font-display: optional;
 }
 
+.divide-y > :first-child {
+	@apply border-t;
+}
+
+.divide-y > :last-child:not([hidden]) {
+	@apply border-b;
+}
+
 .h1 {
 	@apply text-4xl font-extrabold tracking-tighter;
 }

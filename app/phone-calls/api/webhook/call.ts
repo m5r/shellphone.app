@@ -116,9 +116,8 @@ export default async function incomingCallHandler(req: BlitzApiRequest, res: Bli
 		// TODO dial.client("unique id of device user is picking up with");
 		// TODO send notification
 		// TODO db.phoneCall.create(...);
+		// TODO subscribe to status updates to update duration when call ends
 	}
-
-	// TODO queue job to update duration when call ends
 
 	res.status(500).end();
 }
@@ -134,4 +133,33 @@ const outgoingBody = {
 	Direction: "inbound",
 	From: "client:95267d60-3d35-4c36-9905-8543ecb4f174__673b461a-11ba-43a4-89d7-9e29403053d4",
 	To: "+33613370787",
+};
+
+const incomingBody = {
+	AccountSid: "ACa886d066be0832990d1cf43fb1d53362",
+	ApiVersion: "2010-04-01",
+	ApplicationSid: "APa43d85150ad6f6cf9869fbe1c1e36a66",
+	CallSid: "CA09a5d9a4cfacf2b56d66f8f743d2881a",
+	CallStatus: "ringing",
+	Called: "+33757592025",
+	CalledCity: "",
+	CalledCountry: "FR",
+	CalledState: "",
+	CalledZip: "",
+	Caller: "+33613370787",
+	CallerCity: "",
+	CallerCountry: "FR",
+	CallerState: "",
+	CallerZip: "",
+	Direction: "inbound",
+	From: "+33613370787",
+	FromCity: "",
+	FromCountry: "FR",
+	FromState: "",
+	FromZip: "",
+	To: "+33757592025",
+	ToCity: "",
+	ToCountry: "FR",
+	ToState: "",
+	ToZip: "",
 };
