@@ -1,7 +1,8 @@
 import { Queue } from "quirrel/blitz";
 import type { CallInstance } from "twilio/lib/rest/api/v2010/account/call";
 
-import db, { Direction, CallStatus } from "../../../../db";
+import db from "../../../../db";
+import { translateCallDirection, translateCallStatus } from "../../../../integrations/twilio";
 
 type Payload = {
 	organizationId: string;
@@ -25,8 +26,8 @@ const insertCallsQueue = Queue<Payload>("api/queue/insert-calls", async ({ calls
 			id: call.sid,
 			from: call.from,
 			to: call.to,
-			direction: translateDirection(call.direction),
-			status: translateStatus(call.status),
+			direction: translateCallDirection(call.direction),
+			status: translateCallStatus(call.status),
 			duration: call.duration,
 			createdAt: new Date(call.dateCreated),
 		}))
@@ -36,34 +37,3 @@ const insertCallsQueue = Queue<Payload>("api/queue/insert-calls", async ({ calls
 });
 
 export default insertCallsQueue;
-
-function translateDirection(direction: CallInstance["direction"]): Direction {
-	switch (direction) {
-		case "inbound":
-			return Direction.Inbound;
-		case "outbound":
-		default:
-			return Direction.Outbound;
-	}
-}
-
-function translateStatus(status: CallInstance["status"]): CallStatus {
-	switch (status) {
-		case "busy":
-			return CallStatus.Busy;
-		case "canceled":
-			return CallStatus.Canceled;
-		case "completed":
-			return CallStatus.Completed;
-		case "failed":
-			return CallStatus.Failed;
-		case "in-progress":
-			return CallStatus.InProgress;
-		case "no-answer":
-			return CallStatus.NoAnswer;
-		case "queued":
-			return CallStatus.Queued;
-		case "ringing":
-			return CallStatus.Ringing;
-	}
-}
