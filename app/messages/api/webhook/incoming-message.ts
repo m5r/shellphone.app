@@ -5,6 +5,7 @@ import twilio from "twilio";
 import appLogger from "../../../../integrations/logger";
 import db from "../../../../db";
 import insertIncomingMessageQueue from "../queue/insert-incoming-message";
+import { smsUrl } from "../../../../integrations/twilio";
 
 type ApiError = {
 	statusCode: number;
@@ -53,13 +54,12 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 			return;
 		}
 
-		const url = `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/incoming-message`;
 		const phoneNumber = phoneNumbers.find((phoneNumber) => {
 			// if multiple organizations have the same number
 			// find the organization currently using that phone number
 			// maybe we shouldn't let multiple organizations use the same phone number
 			const authToken = phoneNumber.organization.twilioAuthToken ?? "";
-			return twilio.validateRequest(authToken, twilioSignature, url, req.body);
+			return twilio.validateRequest(authToken, twilioSignature, smsUrl, req.body);
 		});
 		if (!phoneNumber) {
 			const statusCode = 400;
