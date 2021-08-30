@@ -1,9 +1,11 @@
 import type { BlitzPage, GetStaticPaths, GetStaticProps } from "blitz";
-import { Head, useRouter } from "blitz";
+import { useRouter } from "blitz";
 import ErrorPage from "next/error";
 
 import type { Post } from "integrations/datocms";
 import { getAllPostsWithSlug, getPostAndMorePosts, markdownToHtml } from "integrations/datocms";
+import { formatDate } from "../../../core/helpers/date-formatter";
+
 import Header from "../../../public-area/components/header";
 import PostBody from "../../components/post-body";
 import SectionSeparator from "../../components/section-separator";
@@ -14,12 +16,6 @@ type Props = {
 	morePosts: Post[];
 	preview: boolean;
 };
-
-const formatter = Intl.DateTimeFormat("en-US", {
-	day: "2-digit",
-	month: "short",
-	year: "numeric",
-});
 
 const PostPage: BlitzPage<Props> = ({ post, morePosts, preview }) => {
 	const router = useRouter();
@@ -81,7 +77,7 @@ const PostPage: BlitzPage<Props> = ({ post, morePosts, preview }) => {
 													</a>
 													<span className="text-gray-600 dark:text-gray-400">
 														{" "}
-														· {formatter.format(new Date(post.date))}
+														· {formatDate(new Date(post.date))}
 													</span>
 												</div>
 											</div>

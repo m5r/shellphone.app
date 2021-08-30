@@ -1,10 +1,6 @@
-const formatter = Intl.DateTimeFormat("en-US", {
-	day: "2-digit",
-	month: "short",
-	year: "numeric",
-});
+import { formatDate } from "../../core/helpers/date-formatter";
 
 export default function DateComponent({ dateString }: any) {
 	const date = new Date(dateString);
-	return <time dateTime={dateString}>{formatter.format(date)}</time>;
+	return <time dateTime={dateString}>{formatDate(date)}</time>;
 }

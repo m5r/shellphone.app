@@ -5,6 +5,7 @@ import clsx from "clsx";
 import { Direction } from "../../../db";
 import useConversation from "../hooks/use-conversation";
 import NewMessageArea from "./new-message-area";
+import { formatDate, formatTime } from "../../core/helpers/date-formatter";
 
 export default function Conversation() {
 	const router = useRouter();
@@ -42,18 +43,13 @@ export default function Conversation() {
 								{(!isPreviousMessageFromSameSender || !shouldGroupMessages) && (
 									<div className="flex py-2 space-x-1 text-xs justify-center">
 										<strong>
-											{new Date(message.sentAt).toLocaleDateString("en-US", {
+											{formatDate(new Date(message.sentAt), {
 												weekday: "long",
 												day: "2-digit",
 												month: "short",
 											})}
 										</strong>
-										<span>
-											{new Date(message.sentAt).toLocaleTimeString("en-US", {
-												hour: "2-digit",
-												minute: "2-digit",
-											})}
-										</span>
+										<span>{formatTime(new Date(message.sentAt))}</span>
 									</div>
 								)}
 
