@@ -1,10 +1,9 @@
 import type { BlitzPage } from "blitz";
-import { Head } from "blitz";
 import clsx from "clsx";
 import { CheckIcon, XIcon, TerminalIcon } from "@heroicons/react/solid";
 
-import Header from "../components/header";
-import Footer from "../components/footer";
+import { formatDate } from "../../core/helpers/date-formatter";
+
 import Layout from "../components/layout";
 
 const Roadmap: BlitzPage = () => {
@@ -45,7 +44,7 @@ const Roadmap: BlitzPage = () => {
 									</div>
 									{isDone ? (
 										<div className="text-right self-start text-md xl:text-lg whitespace-nowrap text-gray-500">
-											<time>{formatter.format(feature.doneDate)}</time>
+											<time>{formatDate(feature.doneDate)}</time>
 										</div>
 									) : null}
 								</div>
@@ -130,12 +129,6 @@ const roadmap: RoadmapItem[] = [
 		status: "to-do",
 	},
 ];
-
-const formatter = Intl.DateTimeFormat("en-US", {
-	day: "2-digit",
-	month: "short",
-	year: "numeric",
-});
 
 Roadmap.getLayout = (page) => <Layout title="(Rough) Roadmap">{page}</Layout>;
 Roadmap.suppressFirstRenderFlicker = true;

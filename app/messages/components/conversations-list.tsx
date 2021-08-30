@@ -1,9 +1,9 @@
 import { Link, useQuery, Routes } from "blitz";
-import { DateTime } from "luxon";
 import { faChevronRight } from "@fortawesome/pro-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import getConversationsQuery from "../queries/get-conversations";
+import { formatRelativeDate } from "../../core/helpers/date-formatter";
 
 export default function ConversationsList() {
 	const conversations = useQuery(getConversationsQuery, {})[0];
@@ -23,7 +23,7 @@ export default function ConversationsList() {
 								<div className="flex flex-row justify-between">
 									<strong>{formattedPhoneNumber}</strong>
 									<div className="text-gray-700 flex flex-row gap-x-1">
-										{formatMessageDate(lastMessage.sentAt)}
+										{formatRelativeDate(lastMessage.sentAt)}
 										<FontAwesomeIcon className="w-4 h-4 my-auto" icon={faChevronRight} />
 									</div>
 								</div>
@@ -35,21 +35,4 @@ export default function ConversationsList() {
 			})}
 		</ul>
 	);
-}
-
-function formatMessageDate(date: Date): string {
-	const messageDate = DateTime.fromJSDate(date);
-	const diff = messageDate.diffNow("days");
-
-	const isToday = diff.days > -1;
-	if (isToday) {
-		return messageDate.toFormat("HH:mm", { locale: "en-US" });
-	}
-
-	const isDuringLastWeek = diff.days > -8;
-	if (isDuringLastWeek) {
-		return messageDate.weekdayLong;
-	}
-
-	return messageDate.toFormat("dd/MM/yyyy", { locale: "en-US" });
 }

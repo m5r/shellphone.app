@@ -1,16 +1,13 @@
 import { Link, Routes } from "blitz";
-import PostPreview from "./post-preview";
+
 import type { Post } from "../../../integrations/datocms";
+import { formatDate } from "../../core/helpers/date-formatter";
+
+import PostPreview from "./post-preview";
 
 type Props = {
 	posts: Post[];
 };
-
-const formatter = Intl.DateTimeFormat("en-US", {
-	day: "2-digit",
-	month: "short",
-	year: "numeric",
-});
 
 export default function MoreStories({ posts }: Props) {
 	return (
@@ -46,9 +43,7 @@ export default function MoreStories({ posts }: Props) {
 													</h3>
 												</a>
 											</Link>
-											<div className="text-sm opacity-80">
-												{formatter.format(new Date(post.date))}
-											</div>
+											<div className="text-sm opacity-80">{formatDate(new Date(post.date))}</div>
 										</header>
 										<footer>
 											{/* Author meta */}
