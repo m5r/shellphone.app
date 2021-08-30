@@ -4,7 +4,7 @@ import type twilio from "twilio";
 import type { ApplicationInstance } from "twilio/lib/rest/api/v2010/account/application";
 
 import db from "../../../../db";
-import getTwilioClient from "../../../../integrations/twilio";
+import getTwilioClient, { getTwiMLName, smsUrl, voiceUrl } from "../../../../integrations/twilio";
 
 type Payload = {
 	organizationId: string;
@@ -45,7 +45,7 @@ async function getTwimlApplication(
 ): Promise<ApplicationInstance> {
 	try {
 		if (organizationTwimlAppSid) {
-			return updateTwimlApplication(twilioClient, organizationTwimlAppSid);
+			return await updateTwimlApplication(twilioClient, organizationTwimlAppSid);
 		}
 	} catch {
 		// twiml app with sid `organizationTwimlAppSid` probably doesn't exist anymore
@@ -59,33 +59,23 @@ async function getTwimlApplication(
 
 	return twilioClient.applications.create({
 		friendlyName: getTwiMLName(),
-		smsUrl: `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/incoming-message`,
+		smsUrl,
 		smsMethod: "POST",
-		voiceUrl: `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/call`,
+		voiceUrl,
 		voiceMethod: "POST",
 	});
 }
 
 async function updateTwimlApplication(twilioClient: twilio.Twilio, twimlAppSid: string) {
 	await twilioClient.applications.get(twimlAppSid).update({
-		smsUrl: `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/incoming-message`,
+		friendlyName: getTwiMLName(),
+		smsUrl,
 		smsMethod: "POST",
-		voiceUrl: `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/call`,
+		voiceUrl,
 		voiceMethod: "POST",
 	});
 
 	return twilioClient.applications.get(twimlAppSid).fetch();
-}
-
-function getTwiMLName() {
-	switch (serverRuntimeConfig.app.baseUrl) {
-		case "local.shellphone.app":
-			return "Shellphone LOCAL";
-		case "dev.shellphone.app":
-			return "Shellphone DEV";
-		case "www.shellphone.app":
-			return "Shellphone";
-	}
 }
 
 export default setTwilioWebhooks;

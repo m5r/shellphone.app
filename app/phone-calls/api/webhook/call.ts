@@ -5,6 +5,7 @@ import type { CallInstance } from "twilio/lib/rest/api/v2010/account/call";
 
 import db, { CallStatus, Direction } from "../../../../db";
 import appLogger from "../../../../integrations/logger";
+import { voiceUrl } from "../../../../integrations/twilio";
 
 const { serverRuntimeConfig } = getConfig();
 const logger = appLogger.child({ route: "/api/webhook/call" });
@@ -17,7 +18,6 @@ type ApiError = {
 export default async function incomingCallHandler(req: BlitzApiRequest, res: BlitzApiResponse) {
 	console.log("req.body", req.body);
 
-	const url = `https://${serverRuntimeConfig.app.baseUrl}/api/webhook/call`;
 	const twilioSignature = req.headers["X-Twilio-Signature"] || req.headers["x-twilio-signature"];
 	if (!twilioSignature || Array.isArray(twilioSignature)) {
 		const statusCode = 400;
@@ -42,7 +42,7 @@ export default async function incomingCallHandler(req: BlitzApiRequest, res: Bli
 		if (
 			!phoneNumber ||
 			!phoneNumber.organization.twilioAuthToken ||
-			!twilio.validateRequest(phoneNumber.organization.twilioAuthToken, twilioSignature, url, req.body)
+			!twilio.validateRequest(phoneNumber.organization.twilioAuthToken, twilioSignature, voiceUrl, req.body)
 		) {
 			const statusCode = 400;
 			const apiError: ApiError = {
@@ -93,7 +93,7 @@ export default async function incomingCallHandler(req: BlitzApiRequest, res: Bli
 			// find the organization currently using that phone number
 			// maybe we shouldn't let multiple organizations use the same phone number
 			const authToken = phoneNumber.organization.twilioAuthToken ?? "";
-			return twilio.validateRequest(authToken, twilioSignature, url, req.body);
+			return twilio.validateRequest(authToken, twilioSignature, voiceUrl, req.body);
 		});
 		if (!phoneNumber) {
 			const statusCode = 400;

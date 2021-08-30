@@ -2,6 +2,7 @@ import { BlitzApiRequest, BlitzApiResponse } from "blitz";
 
 import db from "db";
 import twilio from "twilio";
+import setTwilioWebhooks from "../onboarding/api/queue/set-twilio-webhooks";
 
 export default async function ddd(req: BlitzApiRequest, res: BlitzApiResponse) {
 	/*await Promise.all([
@@ -49,7 +50,12 @@ export default async function ddd(req: BlitzApiRequest, res: BlitzApiResponse) {
 	console.log("messagesReceived", messagesReceived.sort((a, b) => a.dateCreated.getTime() - b.dateCreated.getTime()));
 	// console.log("messagesReceived", messagesReceived);*/
 
-	setTimeout(() => {
-		res.status(200).end();
-	}, 1000 * 60 * 5);
+	/*setTwilioWebhooks.enqueue({
+		phoneNumberId: "PNb77c9690c394368bdbaf20ea6fe5e9fc",
+		organizationId: "95267d60-3d35-4c36-9905-8543ecb4f174",
+	});*/
+
+	// setTimeout(() => {
+	res.status(200).end();
+	// }, 1000 * 60 * 5);
 }
