@@ -7,13 +7,16 @@ import { Transition } from "@headlessui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBackspace, faPhoneAlt as faPhone } from "@fortawesome/pro-solid-svg-icons";
 
+import { Direction } from "db";
 import Layout from "../../core/layouts/layout";
 import Keypad from "../components/keypad";
 import useRequireOnboarding from "../../core/hooks/use-require-onboarding";
+import usePhoneCalls from "../hooks/use-phone-calls";
 
 const KeypadPage: BlitzPage = () => {
 	useRequireOnboarding();
 	const router = useRouter();
+	const [phoneCalls] = usePhoneCalls();
 	const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
 	const removeDigit = useAtom(pressBackspaceAtom)[1];
 	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -71,21 +74,26 @@ const KeypadPage: BlitzPage = () => {
 			</div>
 
 			<Keypad onDigitPressProps={onDigitPressProps} onZeroPressProps={onZeroPressProps}>
-				<Link href={Routes.OutgoingCall({ recipient: encodeURI(phoneNumber) })}>
-					<button
-						onClick={async () => {
-							if (phoneNumber === "") {
-								// TODO setPhoneNumber(lastCallRecipient);
+				<button
+					onClick={async () => {
+						if (phoneNumber === "") {
+							const lastCall = phoneCalls[0];
+							if (lastCall) {
+								const lastCallRecipient =
+									lastCall.direction === Direction.Inbound ? lastCall.from : lastCall.to;
+								setPhoneNumber(lastCallRecipient);
 							}
 
-							await router.push(Routes.OutgoingCall({ recipient: encodeURI(phoneNumber) }));
-							setPhoneNumber("");
-						}}
-						className="cursor-pointer select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-green-800 rounded-full"
-					>
-						<FontAwesomeIcon className="w-6 h-6" icon={faPhone} color="white" size="lg" />
-					</button>
-				</Link>
+							return;
+						}
+
+						await router.push(Routes.OutgoingCall({ recipient: encodeURI(phoneNumber) }));
+						setPhoneNumber("");
+					}}
+					className="cursor-pointer select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-green-800 rounded-full"
+				>
+					<FontAwesomeIcon className="w-6 h-6" icon={faPhone} color="white" size="lg" />
+				</button>
 
 				<Transition
 					as={Fragment}
