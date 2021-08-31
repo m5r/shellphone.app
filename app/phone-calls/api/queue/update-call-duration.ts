@@ -18,7 +18,7 @@ const updateCallDurationQueue = Queue<Payload>("api/queue/update-call-duration",
 		data: { duration: call.duration, status: translateCallStatus(call.status) },
 	});
 
-	const callHasFinished = ["busy", "no-answer", "canceled", "failed"].includes(call.status);
+	const callHasFinished = ["completed", "busy", "no-answer", "canceled", "failed"].includes(call.status);
 	if (!callHasFinished) {
 		await updateCallDurationQueue.enqueue({ organizationId, callId }, { delay: "30s" });
 	}
