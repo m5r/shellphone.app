@@ -1,6 +1,6 @@
 import { Fragment, useRef } from "react";
 import type { BlitzPage } from "blitz";
-import { Link, Routes, useRouter } from "blitz";
+import { Routes, useRouter } from "blitz";
 import { atom, useAtom } from "jotai";
 import { usePress } from "@react-aria/interactions";
 import { Transition } from "@headlessui/react";
@@ -12,6 +12,7 @@ import Layout from "../../core/layouts/layout";
 import Keypad from "../components/keypad";
 import useRequireOnboarding from "../../core/hooks/use-require-onboarding";
 import usePhoneCalls from "../hooks/use-phone-calls";
+import useKeyPress from "../hooks/use-key-press";
 
 const KeypadPage: BlitzPage = () => {
 	useRequireOnboarding();
@@ -22,6 +23,13 @@ const KeypadPage: BlitzPage = () => {
 	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const pressDigit = useAtom(pressDigitAtom)[1];
+	useKeyPress((key) => {
+		if (key === "Backspace") {
+			return removeDigit();
+		}
+
+		pressDigit(key);
+	});
 	const longPressDigit = useAtom(longPressDigitAtom)[1];
 	const onZeroPressProps = {
 		onPressStart() {
@@ -116,6 +124,10 @@ const KeypadPage: BlitzPage = () => {
 const phoneNumberAtom = atom("");
 const pressDigitAtom = atom(null, (get, set, digit: string) => {
 	if (get(phoneNumberAtom).length > 17) {
+		return;
+	}
+
+	if ("0123456789+#*".indexOf(digit) === -1) {
 		return;
 	}
 
