@@ -6,23 +6,18 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPhoneAlt as faPhone } from "@fortawesome/pro-solid-svg-icons";
 
 import useRequireOnboarding from "../../../core/hooks/use-require-onboarding";
-import Keypad from "../../components/keypad";
 import useMakeCall from "../../hooks/use-make-call";
+import useDevice from "../../hooks/use-device";
+
+import Keypad from "../../components/keypad";
 
 const OutgoingCall: BlitzPage = () => {
 	useRequireOnboarding();
 	const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
 	const router = useRouter();
+	const device = useDevice();
 	const recipient = decodeURIComponent(router.params.recipient);
-	const onHangUp = useMemo(
-		() => () => {
-			setPhoneNumber("");
-
-			// return router.replace(Routes.KeypadPage());
-			return router.push(Routes.KeypadPage());
-		},
-		[router, setPhoneNumber],
-	);
+	const onHangUp = useMemo(() => () => setPhoneNumber(""), [setPhoneNumber]);
 	const call = useMakeCall({ recipient, onHangUp });
 	const pressDigit = useAtom(pressDigitAtom)[1];
 	const onDigitPressProps = useMemo(
@@ -37,12 +32,10 @@ const OutgoingCall: BlitzPage = () => {
 	);
 
 	useEffect(() => {
-		console.log("call.state", call.state);
-		if (call.state === "ready") {
+		if (device !== null) {
 			call.makeCall();
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [call.state]);
+	}, [device]);
 
 	return (
 		<div className="w-96 h-full flex flex-col justify-around py-5 mx-auto text-center text-black bg-white">

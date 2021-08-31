@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { useMutation } from "blitz";
-import { Call, Device, TwilioError } from "@twilio/voice-sdk";
+import { useState } from "react";
+import { useRouter, Routes } from "blitz";
+import { Call } from "@twilio/voice-sdk";
 
-import getToken from "../mutations/get-token";
+import useDevice from "./use-device";
 
 type Params = {
 	recipient: string;
@@ -11,39 +11,9 @@ type Params = {
 
 export default function useMakeCall({ recipient, onHangUp }: Params) {
 	const [outgoingConnection, setOutgoingConnection] = useState<Call | null>(null);
-	const [device, setDevice] = useState<Device | null>(null);
-	const [getTokenMutation] = useMutation(getToken);
 	const [state, setState] = useState<State>("initial");
-
-	useEffect(() => {
-		(async () => {
-			const token = await getTokenMutation();
-			const device = new Device(token, {
-				codecPreferences: [Call.Codec.Opus, Call.Codec.PCMU],
-				sounds: {
-					[Device.SoundName.Disconnect]: undefined, // TODO
-				},
-			});
-			device.register();
-			setDevice(device);
-		})();
-	}, [getTokenMutation]);
-
-	useEffect(() => {
-		if (!device) {
-			return;
-		}
-
-		device.on("error", onDeviceError);
-		device.on("registered", onDeviceRegistered);
-		device.on("incoming", onDeviceIncoming);
-
-		return () => {
-			device.off("error", onDeviceError);
-			device.off("registered", onDeviceRegistered);
-			device.off("incoming", onDeviceIncoming);
-		};
-	}, [device]);
+	const device = useDevice();
+	const router = useRouter();
 
 	return {
 		makeCall,
@@ -58,8 +28,7 @@ export default function useMakeCall({ recipient, onHangUp }: Params) {
 			return;
 		}
 
-		if (state !== "ready") {
-			console.error("not a good time", state);
+		if (state !== "initial") {
 			return;
 		}
 
@@ -74,12 +43,20 @@ export default function useMakeCall({ recipient, onHangUp }: Params) {
 		// TODO: setState("call_in_progress");
 
 		// TODO: remove event listeners
-		outgoingConnection.on("cancel", () => setState("call_ended"));
-		outgoingConnection.on("disconnect", () => setState("call_ending"));
+		outgoingConnection.on("cancel", endCall);
+		outgoingConnection.on("disconnect", endCall);
 		outgoingConnection.on("error", (error) => {
 			console.error("call error", error);
 			alert(error);
 		});
+	}
+
+	function endCall() {
+		setState("call_ending");
+		setTimeout(() => {
+			setState("call_ended");
+			setTimeout(() => router.replace(Routes.KeypadPage()), 100);
+		}, 150);
 	}
 
 	function sendDigits(digits: string) {
@@ -88,34 +65,12 @@ export default function useMakeCall({ recipient, onHangUp }: Params) {
 
 	function hangUp() {
 		setState("call_ending");
-		outgoingConnection?.reject();
+		outgoingConnection?.disconnect();
 		device?.disconnectAll();
-		device?.destroy();
 		onHangUp?.();
-	}
-
-	function onDeviceError(error: TwilioError.TwilioError, call?: Call) {
-		console.error("device error", error);
-		alert(error);
-	}
-
-	function onDeviceRegistered() {
-		setState("ready");
-	}
-
-	function onDeviceIncoming(call: Call) {
-		// TODO
-		console.log("call", call);
-		console.log("Incoming connection from " + call.parameters.From);
-		let archEnemyPhoneNumber = "+12093373517";
-
-		if (call.parameters.From === archEnemyPhoneNumber) {
-			call.reject();
-			console.log("It's your nemesis. Rejected call.");
-		} else {
-			// accept the incoming connection and start two-way audio
-			call.accept();
-		}
+		router.replace(Routes.KeypadPage());
+		outgoingConnection?.off("cancel", endCall);
+		outgoingConnection?.off("disconnect", endCall);
 	}
 }
 
