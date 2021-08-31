@@ -40,9 +40,8 @@ export default function useMakeCall({ recipient, onHangUp }: Params) {
 		// @ts-ignore
 		window.ddd = outgoingConnection;
 
-		// TODO: setState("call_in_progress");
-
 		// TODO: remove event listeners
+		outgoingConnection.once("accept", (call: Call) => setState("call_in_progress"));
 		outgoingConnection.on("cancel", endCall);
 		outgoingConnection.on("disconnect", endCall);
 		outgoingConnection.on("error", (error) => {
