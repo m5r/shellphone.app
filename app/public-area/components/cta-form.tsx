@@ -25,13 +25,13 @@ export default function CTAForm() {
 	});
 
 	return (
-		<form onSubmit={onSubmit} className="mt-8">
+		<form onSubmit={onSubmit}>
 			{isSubmitted ? (
 				<p className="text-center md:text-left mt-2 opacity-75 text-green-900 text-md">
 					You&#39;re on the list! We will be in touch soon
 				</p>
 			) : (
-				<div className="flex flex-col sm:flex-row justify-center max-w-sm mx-auto sm:max-w-md md:mx-0">
+				<div className="flex flex-col sm:flex-row justify-center w-full md:max-w-md md:mx-0">
 					<input
 						{...register("email")}
 						type="email"

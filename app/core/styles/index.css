@@ -52,6 +52,11 @@
 	font-display: optional;
 }
 
+.font-heading {
+	@apply font-mackinac tracking-tight font-bold;
+	word-spacing: 0.025em;
+}
+
 .divide-y > :first-child {
 	@apply border-t;
 }
