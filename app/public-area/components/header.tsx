@@ -6,8 +6,56 @@ import { XIcon } from "@heroicons/react/outline";
 
 function Header() {
 	return (
-		<header className="absolute w-full z-30">
-			<div className="max-w-6xl mx-auto px-4 sm:px-6">
+		<header className="absolute inset-x-0 top-0 z-10 w-full">
+			<div className="px-4 mx-auto sm:px-6 lg:px-8">
+				<div className="flex items-center justify-between h-16 lg:h-20">
+					<div className="hidden lg:flex lg:items-center lg:justify-center lg:ml-10 lg:mr-auto lg:space-x-10">
+						<a
+							href="#"
+							title=""
+							className="text-base text-black transition-all duration-200 hover:text-opacity-80"
+						>
+							{" "}
+							Features{" "}
+						</a>
+
+						<a
+							href="#"
+							title=""
+							className="text-base text-black transition-all duration-200 hover:text-opacity-80"
+						>
+							{" "}
+							Solutions{" "}
+						</a>
+
+						<a
+							href="#"
+							title=""
+							className="text-base text-black transition-all duration-200 hover:text-opacity-80"
+						>
+							{" "}
+							Resources{" "}
+						</a>
+
+						<a
+							href="#"
+							title=""
+							className="text-base text-black transition-all duration-200 hover:text-opacity-80"
+						>
+							{" "}
+							Pricing{" "}
+						</a>
+					</div>
+				</div>
+			</div>
+		</header>
+	);
+}
+
+function Headerold() {
+	return (
+		<header className="absolute w-full z-30 inset-x-0 top-0">
+			<div className="px-4 mx-auto sm:px-6 lg:px-8">
 				<div className="flex items-center justify-between h-20">
 					<div className="flex-shrink-0 mr-5">
 						<Link href="/">
@@ -18,12 +66,18 @@ function Header() {
 					</div>
 
 					<nav className="hidden md:flex md:flex-grow">
-						<ul className="flex flex-grow flex-wrap items-center font-medium">
+						<ul className="flex items-center justify-center ml-10 mr-auto space-x-10">
+							<li>
+								<DesktopNavLink href={Routes.Features()} label="Features" />
+							</li>
 							<li>
 								<DesktopNavLink href={Routes.Roadmap()} label="Roadmap" />
 							</li>
 							<li>
 								<DesktopNavLink href={Routes.OpenMetrics()} label="Open Metrics" />
+							</li>
+							<li>
+								<DesktopNavLink href={Routes.Pricing()} label="Pricing" />
 							</li>
 						</ul>
 					</nav>
@@ -43,9 +97,7 @@ type NavLinkProps = {
 function DesktopNavLink({ href, label }: NavLinkProps) {
 	return (
 		<Link href={href}>
-			<a className="text-gray-600 hover:text-gray-900 px-5 py-2 flex items-center transition duration-150 ease-in-out">
-				{label}
-			</a>
+			<a className="text-base text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out">{label}</a>
 		</Link>
 	);
 }
@@ -132,7 +184,7 @@ function MobileNav() {
 								leaveFrom="translate-x-0"
 								leaveTo="translate-x-full"
 							>
-								<div ref={mobileNav} className="w-screen max-w-xs">
+								<div ref={mobileNav} className="w-screen max-w-[16rem] sm:max-w-sm">
 									<div className="h-full flex flex-col py-6 bg-white shadow-xl overflow-y-scroll">
 										<div className="px-4 sm:px-6">
 											<div className="flex items-start justify-between">
@@ -153,7 +205,10 @@ function MobileNav() {
 										</div>
 										<div className="mt-6 relative flex-1 px-4 sm:px-6">
 											<div className="absolute inset-0 px-4 sm:px-6">
-												<ul>
+												<ul className="space-y-4">
+													<li>
+														<MobileNavLink href={Routes.Features()} label="Features" />
+													</li>
 													<li>
 														<MobileNavLink href={Routes.Roadmap()} label="Roadmap" />
 													</li>
@@ -162,6 +217,9 @@ function MobileNav() {
 															href={Routes.OpenMetrics()}
 															label="Open Metrics"
 														/>
+													</li>
+													<li>
+														<MobileNavLink href={Routes.Pricing()} label="Pricing" />
 													</li>
 												</ul>
 											</div>
@@ -179,7 +237,7 @@ function MobileNav() {
 	function MobileNavLink({ href, label }: NavLinkProps) {
 		return (
 			<Link href={href}>
-				<a onClick={() => setMobileNavOpen(false)} className="flex text-gray-600 hover:text-gray-900 py-2">
+				<a onClick={() => setMobileNavOpen(false)} className="text-base flex text-gray-600 hover:text-gray-900">
 					{label}
 				</a>
 			</Link>
@@ -187,4 +245,4 @@ function MobileNav() {
 	}
 }
 
-export default Header;
+export default Headerold;
