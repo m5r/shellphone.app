@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useMutation } from "blitz";
 import type { TwilioError } from "@twilio/voice-sdk";
 import { Call, Device } from "@twilio/voice-sdk";
@@ -21,14 +21,14 @@ export default function useDevice() {
 		const token = await getTokenMutation();
 		device.updateToken(token);
 	}, [device, getTokenMutation]);
-	const isDeviceReady = device?.state === Device.State.Registered;
+	const isDeviceReady = useMemo(() => device?.state === Device.State.Registered, [device]);
 
 	useEffect(() => {
 		if (!isDeviceReady) {
 			return;
 		}
 
-		const intervalId = setInterval(refreshToken, ttl - 30);
+		const intervalId = setInterval(refreshToken, (ttl - 30) * 1000);
 		return () => clearInterval(intervalId);
 	}, [isDeviceReady, refreshToken]);
 
@@ -74,8 +74,8 @@ export default function useDevice() {
 
 	function onDeviceError(error: TwilioError.TwilioError, call?: Call) {
 		// TODO gracefully handle errors: possibly hang up the call, redirect to keypad
-		console.error("device error", error);
-		alert(error);
+		console.error("device error", JSON.parse(JSON.stringify(error)));
+		alert(error.code);
 	}
 
 	function onDeviceIncoming(call: Call) {
@@ -95,3 +95,15 @@ export default function useDevice() {
 }
 
 const deviceAtom = atom<Device | null>(null);
+
+let e = {
+	message:
+		"ConnectionError (53000): Raised whenever a signaling connection error occurs that is not covered by a more specific error code.",
+	causes: [],
+	code: 53000,
+	description: "Signaling connection error",
+	explanation:
+		"Raised whenever a signaling connection error occurs that is not covered by a more specific error code.",
+	name: "ConnectionError",
+	solutions: [],
+};
