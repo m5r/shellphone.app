@@ -1,6 +1,6 @@
 import type { BlitzPage } from "blitz";
 import { Routes, useRouter } from "blitz";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect } from "react";
 import { atom, useAtom } from "jotai";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPhoneAlt as faPhone } from "@fortawesome/pro-solid-svg-icons";
@@ -15,13 +15,13 @@ const OutgoingCall: BlitzPage = () => {
 	useRequireOnboarding();
 	const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
 	const router = useRouter();
-	const device = useDevice();
+	const { isDeviceReady } = useDevice();
 	const recipient = decodeURIComponent(router.params.recipient);
-	const onHangUp = useMemo(() => () => setPhoneNumber(""), [setPhoneNumber]);
+	const onHangUp = useCallback(() => setPhoneNumber(""), [setPhoneNumber]);
 	const call = useMakeCall({ recipient, onHangUp });
 	const pressDigit = useAtom(pressDigitAtom)[1];
-	const onDigitPressProps = useMemo(
-		() => (digit: string) => ({
+	const onDigitPressProps = useCallback(
+		(digit: string) => ({
 			onPress() {
 				pressDigit(digit);
 
@@ -32,10 +32,10 @@ const OutgoingCall: BlitzPage = () => {
 	);
 
 	useEffect(() => {
-		if (device !== null) {
+		if (isDeviceReady) {
 			call.makeCall();
 		}
-	}, [device]);
+	}, [isDeviceReady]);
 
 	return (
 		<div className="w-96 h-full flex flex-col justify-around py-5 mx-auto text-center text-black bg-white">
