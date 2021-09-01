@@ -4,6 +4,8 @@ import Twilio from "twilio";
 import db from "db";
 import getCurrentPhoneNumber from "../../phone-numbers/queries/get-current-phone-number";
 
+export const ttl = 3600;
+
 export default resolver.pipe(resolver.authorize(), async (_ = null, context) => {
 	const phoneNumber = await getCurrentPhoneNumber({}, context);
 	if (!phoneNumber) {

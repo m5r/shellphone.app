@@ -1,14 +1,36 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useMutation } from "blitz";
 import type { TwilioError } from "@twilio/voice-sdk";
 import { Call, Device } from "@twilio/voice-sdk";
 import { atom, useAtom } from "jotai";
 
-import getToken from "../mutations/get-token";
+import getToken, { ttl } from "../mutations/get-token";
+import appLogger from "../../../integrations/logger";
+
+const logger = appLogger.child({ module: "use-device" });
 
 export default function useDevice() {
 	const [device, setDevice] = useAtom(deviceAtom);
 	const [getTokenMutation] = useMutation(getToken);
+	const refreshToken = useCallback(async () => {
+		if (!device) {
+			logger.error("Tried refreshing accessToken for an uninitialized device");
+			return;
+		}
+
+		const token = await getTokenMutation();
+		device.updateToken(token);
+	}, [device, getTokenMutation]);
+	const isDeviceReady = device?.state === Device.State.Registered;
+
+	useEffect(() => {
+		if (!isDeviceReady) {
+			return;
+		}
+
+		const intervalId = setInterval(refreshToken, ttl - 30);
+		return () => clearInterval(intervalId);
+	}, [isDeviceReady, refreshToken]);
 
 	useEffect(() => {
 		(async () => {
@@ -22,14 +44,16 @@ export default function useDevice() {
 			device.register();
 			setDevice(device);
 		})();
-	}, [getTokenMutation]);
+	}, [getTokenMutation, setDevice]);
 
 	useEffect(() => {
 		if (!device) {
 			return;
 		}
 
-		(window as any).device = device;
+		console.log("ok");
+		// @ts-ignore
+		window.device = device;
 		device.on("error", onDeviceError);
 		device.on("incoming", onDeviceIncoming);
 
@@ -39,7 +63,14 @@ export default function useDevice() {
 		};
 	}, [device]);
 
-	return device;
+	// @ts-ignore
+	window.refreshToken = refreshToken;
+
+	return {
+		device,
+		isDeviceReady,
+		refreshToken,
+	};
 
 	function onDeviceError(error: TwilioError.TwilioError, call?: Call) {
 		// TODO gracefully handle errors: possibly hang up the call, redirect to keypad

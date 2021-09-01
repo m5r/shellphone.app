@@ -12,7 +12,7 @@ type Params = {
 export default function useMakeCall({ recipient, onHangUp }: Params) {
 	const [outgoingConnection, setOutgoingConnection] = useState<Call | null>(null);
 	const [state, setState] = useState<State>("initial");
-	const device = useDevice();
+	const { device, isDeviceReady } = useDevice();
 	const router = useRouter();
 
 	return {
@@ -23,8 +23,8 @@ export default function useMakeCall({ recipient, onHangUp }: Params) {
 	};
 
 	async function makeCall() {
-		if (!device) {
-			console.error("no device initialized, can't make the call");
+		if (!device || !isDeviceReady) {
+			console.error("device is not ready yet, can't make the call");
 			return;
 		}
 
