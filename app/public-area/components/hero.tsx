@@ -10,7 +10,7 @@ export default function Hero() {
 					<div className="flex items-center justify-center w-full lg:order-2 lg:w-7/12">
 						<div className="h-full px-4 pt-24 pb-16 sm:px-6 lg:px-24 2xl:px-32 lg:pt-40 lg:pb-14">
 							<div className="flex flex-col flex-1 justify-center h-full space-y-8">
-								<h1 className="font-heading text-4xl leading-tight lg:leading-tight xl:text-5xl xl:leading-tight">
+								<h1 className="font-heading text-4xl leading-none lg:leading-tight xl:text-5xl xl:leading-tight">
 									<span className="bg-gradient-to-br from-primary-500 to-indigo-600 bg-clip-text decoration-clone text-transparent">
 										Take your phone number
 									</span>{" "}
