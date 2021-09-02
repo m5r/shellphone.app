@@ -9,6 +9,7 @@ processes = []
 
 [build.args]
   QUIRREL_BASE_URL = "www.shellphone.app"
+  HUSKY_SKIP_INSTALL = 1
 
 [env]
   AWS_SES_REGION = "eu-central-1"
@@ -16,6 +17,9 @@ processes = []
   QUIRREL_API_URL = "https://queue.mokhtar.dev"
   QUIRREL_BASE_URL = "www.shellphone.app"
   APP_BASE_URL = "www.shellphone.app"
+
+[deploy]
+  release_command = "/app/node_modules/.bin/blitz prisma migrate deploy"
 
 [experimental]
   allowed_public_ports = []
