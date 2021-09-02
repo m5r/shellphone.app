@@ -1,4 +1,3 @@
-import { getConfig } from "blitz";
 import { Queue } from "quirrel/blitz";
 import type twilio from "twilio";
 import type { ApplicationInstance } from "twilio/lib/rest/api/v2010/account/application";
@@ -10,8 +9,6 @@ type Payload = {
 	organizationId: string;
 	phoneNumberId: string;
 };
-
-const { serverRuntimeConfig } = getConfig();
 
 const setTwilioWebhooks = Queue<Payload>("api/queue/set-twilio-webhooks", async ({ organizationId, phoneNumberId }) => {
 	const phoneNumber = await db.phoneNumber.findFirst({
