@@ -40,17 +40,24 @@ export default function useMakeCall({ recipient, onHangUp }: Params) {
 		// @ts-ignore
 		window.ddd = outgoingConnection;
 
-		// TODO: remove event listeners
+		outgoingConnection.on("error", (error) => {
+			outgoingConnection.off("cancel", endCall);
+			outgoingConnection.off("disconnect", endCall);
+			setState(() => {
+				// hack to trigger the error boundary
+				throw error;
+			});
+		});
 		outgoingConnection.once("accept", (call: Call) => setState("call_in_progress"));
 		outgoingConnection.on("cancel", endCall);
 		outgoingConnection.on("disconnect", endCall);
-		outgoingConnection.on("error", (error) => {
-			console.error("call error", error);
-			alert(error);
-		});
 	}
 
 	function endCall() {
+		outgoingConnection?.off("cancel", endCall);
+		outgoingConnection?.off("disconnect", endCall);
+		outgoingConnection?.disconnect();
+
 		setState("call_ending");
 		setTimeout(() => {
 			setState("call_ended");
