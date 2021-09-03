@@ -12,6 +12,7 @@ processes = []
   HUSKY_SKIP_INSTALL = 1
 
 [env]
+  NODE_ENV = "production"
   AWS_SES_REGION = "eu-central-1"
   AWS_SES_FROM_EMAIL = "mokhtar@fss.dev"
   QUIRREL_API_URL = "https://queue.mokhtar.dev"
