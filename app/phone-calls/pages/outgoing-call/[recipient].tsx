@@ -1,6 +1,7 @@
-import type { BlitzPage } from "blitz";
-import { Routes, useRouter } from "blitz";
+import type { BlitzPage, ErrorFallbackProps, WithRouterProps } from "blitz";
+import { ErrorBoundary, Routes, useRouter, withRouter } from "blitz";
 import { useCallback, useEffect } from "react";
+import type { TwilioError } from "@twilio/voice-sdk";
 import { atom, useAtom } from "jotai";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPhoneAlt as faPhone } from "@fortawesome/pro-solid-svg-icons";
@@ -67,7 +68,7 @@ const OutgoingCall: BlitzPage = () => {
 			case "calling":
 				return "Calling...";
 			case "call_in_progress":
-				return ""; // TODO display time elapsed
+				return "In call"; // TODO display time elapsed
 			case "call_ending":
 				return "Call ending...";
 			case "call_ended":
@@ -86,5 +87,48 @@ const pressDigitAtom = atom(null, (get, set, digit: string) => {
 });
 
 OutgoingCall.authenticate = { redirectTo: Routes.SignIn() };
+OutgoingCall.getLayout = (page) => <ErrorBoundary FallbackComponent={ErrorFallback}>{page}</ErrorBoundary>;
+
+const ErrorFallback = withRouter(function WrappedErrorFallback({
+	error,
+	router,
+}: ErrorFallbackProps & WithRouterProps) {
+	console.log("error", JSON.parse(JSON.stringify(error)));
+	return (
+		<div className="w-screen h-screen flex">
+			<div className="max-w-md m-auto p-4">
+				<h2 className="text-lg py-3 leading-relaxed font-medium text-gray-900">
+					Sorry, an error has occurred during your call
+				</h2>
+				{isTwilioError(error) ? (
+					<pre className="break-normal whitespace-normal mt-2 text-sm rounded py-3 px-5 bg-[#111] text-gray-300">
+						<div>
+							{error.description} ({error.code})
+						</div>
+						<div>{error.explanation}</div>
+					</pre>
+				) : null}
+				<p className="mt-2 text-sm text-gray-500">
+					We have been automatically notified and we&#39;re doing our best to make sure this does not happen
+					again!
+				</p>
+
+				<div className="mt-5 md:mt-4 md:flex md:flex-row-reverse">
+					<button
+						type="button"
+						className="transition-colors duration-150 mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 md:mt-0 md:w-auto md:text-sm"
+						onClick={() => router.replace(Routes.KeypadPage())}
+					>
+						Take me back to the app
+					</button>
+				</div>
+			</div>
+		</div>
+	);
+});
+
+function isTwilioError(error: any): error is typeof TwilioError {
+	return error.hasOwnProperty("explanation");
+}
 
 export default OutgoingCall;
