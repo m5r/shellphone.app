@@ -16,10 +16,10 @@ const OutgoingCall: BlitzPage = () => {
 	useRequireOnboarding();
 	const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
 	const router = useRouter();
-	const { isDeviceReady } = useDevice();
 	const recipient = decodeURIComponent(router.params.recipient);
 	const onHangUp = useCallback(() => setPhoneNumber(""), [setPhoneNumber]);
 	const call = useMakeCall({ recipient, onHangUp });
+	const { isDeviceReady } = useDevice();
 	const pressDigit = useAtom(pressDigitAtom)[1];
 	const onDigitPressProps = useCallback(
 		(digit: string) => ({
@@ -36,7 +36,7 @@ const OutgoingCall: BlitzPage = () => {
 		if (isDeviceReady) {
 			call.makeCall();
 		}
-	}, [isDeviceReady]);
+	}, [call, isDeviceReady]);
 
 	return (
 		<div className="w-96 h-full flex flex-col justify-around py-5 mx-auto text-center text-black bg-white">

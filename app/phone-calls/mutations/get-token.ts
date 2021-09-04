@@ -4,8 +4,6 @@ import Twilio from "twilio";
 import db from "db";
 import getCurrentPhoneNumber from "../../phone-numbers/queries/get-current-phone-number";
 
-export const ttl = 3600;
-
 export default resolver.pipe(resolver.authorize(), async (_ = null, context) => {
 	const phoneNumber = await getCurrentPhoneNumber({}, context);
 	if (!phoneNumber) {
@@ -30,7 +28,7 @@ export default resolver.pipe(resolver.authorize(), async (_ = null, context) => 
 		organization.twilioAccountSid,
 		organization.twilioApiKey,
 		organization.twilioApiSecret,
-		{ identity: `${context.session.orgId}__${context.session.userId}` },
+		{ identity: `${context.session.orgId}__${context.session.userId}`, ttl: 3600 },
 	);
 	const grant = new Twilio.jwt.AccessToken.VoiceGrant({
 		outgoingApplicationSid: organization.twimlAppSid,
