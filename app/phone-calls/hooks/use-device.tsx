@@ -1,16 +1,16 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useMutation } from "blitz";
 import type { TwilioError } from "@twilio/voice-sdk";
 import { Call, Device } from "@twilio/voice-sdk";
-import { atom, useAtom } from "jotai";
 
-import getToken, { ttl } from "../mutations/get-token";
+import getToken from "../mutations/get-token";
 import appLogger from "../../../integrations/logger";
 
 const logger = appLogger.child({ module: "use-device" });
 
 export default function useDevice() {
-	const [device, setDevice] = useAtom(deviceAtom);
+	const [device, setDevice] = useState<Device | null>(null);
+	const [isDeviceReady, setIsDeviceReady] = useState(() => device?.state === Device.State.Registered);
 	const [getTokenMutation] = useMutation(getToken);
 	const refreshToken = useCallback(async () => {
 		if (!device) {
@@ -21,16 +21,13 @@ export default function useDevice() {
 		const token = await getTokenMutation();
 		device.updateToken(token);
 	}, [device, getTokenMutation]);
-	const isDeviceReady = useMemo(() => device?.state === Device.State.Registered, [device]);
 
 	useEffect(() => {
-		if (!isDeviceReady) {
-			return;
-		}
-
-		const intervalId = setInterval(refreshToken, (ttl - 30) * 1000);
+		const intervalId = setInterval(() => {
+			return refreshToken();
+		}, (3600 - 30) * 1000);
 		return () => clearInterval(intervalId);
-	}, [isDeviceReady, refreshToken]);
+	}, [refreshToken]);
 
 	useEffect(() => {
 		(async () => {
@@ -51,20 +48,18 @@ export default function useDevice() {
 			return;
 		}
 
-		console.log("ok");
-		// @ts-ignore
-		window.device = device;
+		device.on("registered", onDeviceRegistered);
+		device.on("unregistered", onDeviceUnregistered);
 		device.on("error", onDeviceError);
 		device.on("incoming", onDeviceIncoming);
 
 		return () => {
+			device.off("registered", onDeviceRegistered);
+			device.off("unregistered", onDeviceUnregistered);
 			device.off("error", onDeviceError);
 			device.off("incoming", onDeviceIncoming);
 		};
 	}, [device]);
-
-	// @ts-ignore
-	window.refreshToken = refreshToken;
 
 	return {
 		device,
@@ -72,10 +67,20 @@ export default function useDevice() {
 		refreshToken,
 	};
 
+	function onDeviceRegistered() {
+		setIsDeviceReady(true);
+	}
+
+	function onDeviceUnregistered() {
+		setIsDeviceReady(false);
+	}
+
 	function onDeviceError(error: TwilioError.TwilioError, call?: Call) {
-		// TODO gracefully handle errors: possibly hang up the call, redirect to keypad
-		console.error("device error", JSON.parse(JSON.stringify(error)));
-		alert(error.code);
+		// we might have to change this if we instantiate the device on every page to receive calls
+		setDevice(() => {
+			// hack to trigger the error boundary
+			throw error;
+		});
 	}
 
 	function onDeviceIncoming(call: Call) {
@@ -93,8 +98,6 @@ export default function useDevice() {
 		}
 	}
 }
-
-const deviceAtom = atom<Device | null>(null);
 
 let e = {
 	message:
