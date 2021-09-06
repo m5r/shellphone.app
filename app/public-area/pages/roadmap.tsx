@@ -42,11 +42,6 @@ const Roadmap: BlitzPage = () => {
 									<div>
 										<p className="text-md xl:text-lg text-gray-900">{feature.name}</p>
 									</div>
-									{isDone ? (
-										<div className="text-right self-start text-md xl:text-lg whitespace-nowrap text-gray-500">
-											<time>{formatDate(feature.doneDate)}</time>
-										</div>
-									) : null}
 								</div>
 							</div>
 						</div>
@@ -86,11 +81,12 @@ const roadmap: RoadmapItem[] = [
 	},
 	{
 		name: "Make a phone call",
-		status: "in-progress",
+		status: "done",
+		doneDate: new Date("2021-09-04T16:29:00"),
 	},
 	{
 		name: "Receive a phone call",
-		status: "to-do",
+		status: "in-progress",
 	},
 	{
 		name: "Get notified of incoming messages and calls",
