@@ -27,9 +27,13 @@ export function formatTime(date: Date, config?: Intl.DateTimeFormatOptions): str
 
 export function formatRelativeDate(date: Date): string {
 	const dateTime = DateTime.fromJSDate(date);
+	const now = new Date();
 	const diff = dateTime.diffNow("days");
 
-	const isToday = diff.days >= -1;
+	const isToday =
+		date.getDate() === now.getDate() &&
+		date.getMonth() === now.getMonth() &&
+		date.getFullYear() === now.getFullYear();
 	if (isToday) {
 		return dateTime.toFormat("HH:mm", { locale: "en-US" });
 	}
