@@ -18,6 +18,8 @@ processes = []
   QUIRREL_API_URL = "https://queue.mokhtar.dev"
   QUIRREL_BASE_URL = "dev.shellphone.app"
   APP_BASE_URL = "dev.shellphone.app"
+  SENTRY_ORG = "capsule-corp"
+  SENTRY_PROJECT = "shellphone"
 
 [deploy]
   release_command = "/app/node_modules/.bin/blitz prisma migrate deploy"

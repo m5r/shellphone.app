@@ -1,4 +1,6 @@
-import { Head, ErrorComponent } from "blitz";
+import { Head } from "blitz";
+
+import ErrorComponent from "../core/components/error-component";
 
 // ------------------------------------------------------
 // This page is rendered if a route match is not found
