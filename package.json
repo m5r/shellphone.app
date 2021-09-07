@@ -33,18 +33,7 @@
 		]
 	},
 	"dependencies": {
-		"@fortawesome/fontawesome-pro": "file:./fontawesome/fortawesome-fontawesome-pro-5.15.3.tgz",
-		"@fortawesome/fontawesome-svg-core": "1.2.36",
-		"@fortawesome/free-brands-svg-icons": "5.15.4",
-		"@fortawesome/free-regular-svg-icons": "5.15.4",
-		"@fortawesome/free-solid-svg-icons": "5.15.4",
-		"@fortawesome/pro-duotone-svg-icons": "file:./fontawesome/fortawesome-pro-duotone-svg-icons-5.15.3.tgz",
-		"@fortawesome/pro-light-svg-icons": "file:./fontawesome/fortawesome-pro-light-svg-icons-5.15.3.tgz",
-		"@fortawesome/pro-regular-svg-icons": "file:./fontawesome/fortawesome-pro-regular-svg-icons-5.15.3.tgz",
-		"@fortawesome/pro-solid-svg-icons": "file:./fontawesome/fortawesome-pro-solid-svg-icons-5.15.3.tgz",
-		"@fortawesome/react-fontawesome": "0.1.15",
 		"@headlessui/react": "1.4.0",
-		"@heroicons/react": "1.0.4",
 		"@hookform/resolvers": "2.8.0",
 		"@panelbear/panelbear-js": "1.2.0",
 		"@prisma/client": "2.30.0",
