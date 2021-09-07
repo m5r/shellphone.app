@@ -1,7 +1,6 @@
 import type { FunctionComponent } from "react";
 import { useMutation, useQuery } from "blitz";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperPlane } from "@fortawesome/pro-regular-svg-icons";
+import { IoSend } from "react-icons/io5";
 import { useForm } from "react-hook-form";
 
 import sendMessage from "../mutations/send-message";
@@ -99,7 +98,7 @@ const NewMessageArea: FunctionComponent<Props> = ({ recipient, onSend }) => {
 				{...register("content", { required: true })}
 			/>
 			<button type="submit">
-				<FontAwesomeIcon size="2x" className="h-8 w-8 pl-1 pr-2" icon={faPaperPlane} />
+				<IoSend className="h-8 w-8 pl-1 pr-2" />
 			</button>
 		</form>
 	);

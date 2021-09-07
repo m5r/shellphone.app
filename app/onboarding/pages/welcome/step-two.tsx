@@ -4,8 +4,7 @@ import type { BlitzPage, GetServerSideProps } from "blitz";
 import { getSession, Routes, useMutation, useRouter } from "blitz";
 import clsx from "clsx";
 import { useForm } from "react-hook-form";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faQuestionCircle } from "@fortawesome/pro-solid-svg-icons";
+import { IoHelpCircle } from "react-icons/io5";
 
 import db from "db";
 import setTwilioApiFields from "../../mutations/set-twilio-api-fields";
@@ -52,7 +51,7 @@ const StepTwo: BlitzPage = () => {
 		<>
 			<div className="flex flex-col space-y-4 items-center relative">
 				<button onClick={() => setIsHelpModalOpen(true)} className="absolute top-0 right-0">
-					<FontAwesomeIcon size="lg" className="w-6 h-6 text-primary-700" icon={faQuestionCircle} />
+					<IoHelpCircle className="w-6 h-6 text-primary-700" />
 				</button>
 				<form onSubmit={onSubmit} className="flex flex-col gap-6">
 					<article>

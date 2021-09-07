@@ -1,6 +1,5 @@
 import { Link, useQuery, Routes } from "blitz";
-import { faChevronRight } from "@fortawesome/pro-regular-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { IoChevronForward } from "react-icons/io5";
 
 import getConversationsQuery from "../queries/get-conversations";
 import { formatRelativeDate } from "../../core/helpers/date-formatter";
@@ -24,7 +23,7 @@ export default function ConversationsList() {
 									<strong>{formattedPhoneNumber}</strong>
 									<div className="text-gray-700 flex flex-row gap-x-1">
 										{formatRelativeDate(lastMessage.sentAt)}
-										<FontAwesomeIcon className="w-4 h-4 my-auto" icon={faChevronRight} />
+										<IoChevronForward className="w-4 h-4 my-auto" />
 									</div>
 								</div>
 								<div className="line-clamp-2 text-gray-700">{lastMessage.content}</div>

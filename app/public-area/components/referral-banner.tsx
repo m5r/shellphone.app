@@ -1,4 +1,4 @@
-import { XIcon } from "@heroicons/react/outline";
+import { IoClose } from "react-icons/io5";
 
 export default function ReferralBanner() {
 	// TODO
@@ -8,7 +8,7 @@ export default function ReferralBanner() {
 	}
 
 	return (
-		<div className="relative bg-primary-600">
+		<div className="relative bg-primary-600 z-40">
 			<div className="max-w-7xl mx-auto py-3 px-3 sm:px-6 lg:px-8">
 				<div className="pr-16 sm:text-center sm:px-16">
 					<p className="font-medium text-white">
@@ -27,7 +27,7 @@ export default function ReferralBanner() {
 						className="flex p-2 rounded-md hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-white"
 					>
 						<span className="sr-only">Dismiss</span>
-						<XIcon className="h-6 w-6 text-white" aria-hidden="true" />
+						<IoClose className="h-6 w-6 text-white" aria-hidden="true" />
 					</button>
 				</div>
 			</div>
