@@ -1,4 +1,4 @@
-import { PhoneMissedCallIcon, PhoneOutgoingIcon } from "@heroicons/react/solid";
+import { HiPhoneMissedCall, HiPhoneOutgoing } from "react-icons/hi";
 
 import { Direction } from "../../../db";
 import usePhoneCalls from "../hooks/use-phone-calls";
@@ -23,7 +23,7 @@ export default function PhoneCallsList() {
 				return (
 					<li key={phoneCall.id} className="flex flex-row py-2 px-4 ml-12">
 						<div className="h-4 w-4 mt-1 -ml-12">
-							{isOutboundCall ? <PhoneOutgoingIcon className="text-[#C4C4C6]" /> : null}
+							{isOutboundCall ? <HiPhoneOutgoing className="text-[#C4C4C6]" /> : null}
 						</div>
 
 						<div className="flex flex-col items-start justify-center ml-4">
