@@ -1,7 +1,6 @@
 import type { BlitzPage } from "blitz";
 import { Routes, useMutation } from "blitz";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCreditCard, faUserCircle } from "@fortawesome/pro-regular-svg-icons";
+import { IoCardOutline, IoPersonCircleOutline } from "react-icons/io5";
 
 import Layout from "../../core/layouts/layout";
 
@@ -16,12 +15,12 @@ const navigation = [
 	{
 		name: "Account",
 		href: "/settings/account",
-		icon: ({ className = "w-8 h-8" }) => <FontAwesomeIcon size="lg" className={className} icon={faUserCircle} />,
+		icon: ({ className = "w-8 h-8" }) => <IoPersonCircleOutline className={className} />,
 	},
 	{
 		name: "Billing",
 		href: "/settings/billing",
-		icon: ({ className = "w-8 h-8" }) => <FontAwesomeIcon size="lg" className={className} icon={faCreditCard} />,
+		icon: ({ className = "w-8 h-8" }) => <IoCardOutline className={className} />,
 	},
 ];
 /* eslint-enable react/display-name */

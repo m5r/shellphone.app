@@ -3,8 +3,7 @@ import { ErrorBoundary, Routes, useRouter, withRouter } from "blitz";
 import { useCallback, useEffect } from "react";
 import type { TwilioError } from "@twilio/voice-sdk";
 import { atom, useAtom } from "jotai";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPhoneAlt as faPhone } from "@fortawesome/pro-solid-svg-icons";
+import { IoCall } from "react-icons/io5";
 
 import useRequireOnboarding from "../../../core/hooks/use-require-onboarding";
 import useMakeCall from "../../hooks/use-make-call";
@@ -54,7 +53,7 @@ const OutgoingCall: BlitzPage = () => {
 					onClick={call.hangUp}
 					className="cursor-pointer select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-red-800 rounded-full"
 				>
-					<FontAwesomeIcon className="w-6 h-6" icon={faPhone} color="white" size="lg" />
+					<IoCall className="w-6 h-6 text-white" />
 				</button>
 			</Keypad>
 		</div>

@@ -2,7 +2,7 @@ import { Fragment, useState, useRef, useEffect } from "react";
 import type { LinkProps } from "blitz";
 import { Link, Routes } from "blitz";
 import { Dialog, Transition } from "@headlessui/react";
-import { XIcon } from "@heroicons/react/outline";
+import { IoClose } from "react-icons/io5";
 
 function Header() {
 	return (
@@ -198,7 +198,7 @@ function MobileNav() {
 														onClick={() => setMobileNavOpen(false)}
 													>
 														<span className="sr-only">Close panel</span>
-														<XIcon className="h-6 w-6" aria-hidden="true" />
+														<IoClose className="h-6 w-6" aria-hidden="true" />
 													</button>
 												</div>
 											</div>

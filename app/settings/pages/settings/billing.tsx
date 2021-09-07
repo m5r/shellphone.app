@@ -1,7 +1,6 @@
 /* TODO
 import type { FunctionComponent, MouseEventHandler } from "react";
 import type { BlitzPage } from "blitz";
-import { ExternalLinkIcon } from "@heroicons/react/outline";
 
 import SettingsLayout from "../../components/settings/settings-layout";
 import SettingsSection from "../../components/settings/settings-section";

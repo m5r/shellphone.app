@@ -1,8 +1,6 @@
 import type { BlitzPage } from "blitz";
 import clsx from "clsx";
-import { CheckIcon, XIcon, TerminalIcon } from "@heroicons/react/solid";
-
-import { formatDate } from "../../core/helpers/date-formatter";
+import { IoClose, IoCheckmark, IoCodeSlash } from "react-icons/io5";
 
 import Layout from "../components/layout";
 
@@ -30,11 +28,11 @@ const Roadmap: BlitzPage = () => {
 										)}
 									>
 										{isDone ? (
-											<CheckIcon className="h-5 w-5 text-white" aria-hidden="true" />
+											<IoCheckmark className="h-5 w-5 text-white" aria-hidden="true" />
 										) : isInProgress ? (
-											<TerminalIcon className="h-5 w-5 text-white" aria-hidden="true" />
+											<IoCodeSlash className="h-5 w-5 text-white" aria-hidden="true" />
 										) : (
-											<XIcon className="h-5 w-5 text-white" aria-hidden="true" />
+											<IoClose className="h-5 w-5 text-white" aria-hidden="true" />
 										)}
 									</span>
 								</div>

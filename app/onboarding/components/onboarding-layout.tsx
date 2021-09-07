@@ -1,6 +1,6 @@
 import type { FunctionComponent } from "react";
 import { Link } from "blitz";
-import { CheckIcon } from "@heroicons/react/solid";
+import { IoCheckmark } from "react-icons/io5";
 import clsx from "clsx";
 
 type StepLink = {
@@ -32,7 +32,7 @@ const OnboardingLayout: FunctionComponent<Props> = ({ children, currentStep, pre
 					<nav className="grid grid-cols-1 gap-y-3 mx-auto">
 						{next ? (
 							<Link href={next.href}>
-								<a className="max-w-[240px] mx-auto w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:text-sm">
+								<a className="max-w-[240px] text-center mx-auto w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:text-sm">
 									{next.label}
 								</a>
 							</Link>
@@ -40,7 +40,7 @@ const OnboardingLayout: FunctionComponent<Props> = ({ children, currentStep, pre
 
 						{previous ? (
 							<Link href={previous.href}>
-								<a className="max-w-[240px] mx-auto w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:text-sm">
+								<a className="max-w-[240px] text-center mx-auto w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:text-sm">
 									{previous.label}
 								</a>
 							</Link>
@@ -65,7 +65,7 @@ const OnboardingLayout: FunctionComponent<Props> = ({ children, currentStep, pre
 													<div className="h-0.5 w-full bg-primary-600" />
 												</div>
 												<a className="relative w-8 h-8 flex items-center justify-center bg-primary-600 rounded-full">
-													<CheckIcon className="w-5 h-5 text-white" />
+													<IoCheckmark className="w-5 h-5 text-white" />
 													<span className="sr-only">{step}</span>
 												</a>
 											</>

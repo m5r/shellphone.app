@@ -12,23 +12,21 @@ const Account: BlitzPage = () => {
 	useRequireOnboarding();
 
 	return (
-		<SettingsLayout>
-			<div className="flex flex-col space-y-6 p-6">
-				<ProfileInformations />
+		<div className="flex flex-col space-y-6 p-6">
+			<ProfileInformations />
 
-				<div className="hidden lg:block">
-					<Divider />
-				</div>
-
-				<UpdatePassword />
-
-				<div className="hidden lg:block">
-					<Divider />
-				</div>
-
-				<DangerZone />
+			<div className="hidden lg:block">
+				<Divider />
 			</div>
-		</SettingsLayout>
+
+			<UpdatePassword />
+
+			<div className="hidden lg:block">
+				<Divider />
+			</div>
+
+			<DangerZone />
+		</div>
 	);
 };
 

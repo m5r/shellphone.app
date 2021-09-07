@@ -11,7 +11,7 @@ const StepOne: BlitzPage = () => {
 	return (
 		<div className="flex flex-col space-y-4 items-center">
 			<h2>Welcome to Shellphone</h2>
-			<span>
+			<span className="text-center">
 				We&#39;ll help you connect your Twilio phone number to our service and set up your virtual phone!
 			</span>
 		</div>
