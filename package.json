@@ -48,6 +48,7 @@
 		"@tailwindcss/typography": "0.4.1",
 		"@twilio/voice-sdk": "2.0.1",
 		"awesome-phonenumber": "2.58.0",
+		"aws-sdk": "2.985.0",
 		"blitz": "0.40.0-canary.7",
 		"clsx": "1.1.1",
 		"got": "11.8.2",

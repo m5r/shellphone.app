@@ -56,6 +56,11 @@ const { SENTRY_DSN, SENTRY_ORG, SENTRY_PROJECT, SENTRY_AUTH_TOKEN, NODE_ENV, GIT
 			secretAccessKey: process.env.AWS_SES_ACCESS_KEY_SECRET,
 			fromEmail: process.env.AWS_SES_FROM_EMAIL,
 		},
+		awsS3: {
+			awsRegion: process.env.AWS_S3_REGION,
+			accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
+			secretAccessKey: process.env.AWS_S3_ACCESS_KEY_SECRET,
+		},
 		mailChimp: {
 			apiKey: process.env.MAILCHIMP_API_KEY,
 			audienceId: process.env.MAILCHIMP_AUDIENCE_ID,
