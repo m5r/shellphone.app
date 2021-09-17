@@ -23,7 +23,7 @@ processes = []
   SENTRY_PROJECT = "shellphone"
 
 [deploy]
-  release_command = "/app/node_modules/.bin/blitz prisma migrate deploy"
+  release_command = "sh /app/release.sh"
 
 [experimental]
   allowed_public_ports = []
