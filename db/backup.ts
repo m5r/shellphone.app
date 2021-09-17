@@ -81,14 +81,18 @@ export default async function backup(schedule: "daily" | "weekly" | "monthly") {
 	});
 }
 
+function pad(number: number) {
+	return number.toString().padStart(2, "0");
+}
+
 function getFileName(database: string) {
 	const now = new Date();
 	const year = now.getUTCFullYear();
-	const month = (now.getUTCMonth() + 1).toString().padStart(2, "0");
-	const day = now.getUTCDate();
-	const hours = now.getUTCHours();
-	const minutes = now.getUTCMinutes();
-	const seconds = now.getUTCSeconds();
+	const month = pad(now.getUTCMonth() + 1);
+	const day = pad(now.getUTCDate());
+	const hours = pad(now.getUTCHours());
+	const minutes = pad(now.getUTCMinutes());
+	const seconds = pad(now.getUTCSeconds());
 
 	return `${database}-${year}-${month}-${day}_${hours}-${minutes}-${seconds}.sql.gz`; // 2021-09-15_16-00-02.sql.gz
 }
