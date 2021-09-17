@@ -1,5 +1,5 @@
 import { getConfig, useMutation } from "blitz";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import setNotificationSubscription from "../mutations/set-notification-subscription";
 import useCurrentPhoneNumber from "./use-current-phone-number";
@@ -7,7 +7,7 @@ import useCurrentPhoneNumber from "./use-current-phone-number";
 const { publicRuntimeConfig } = getConfig();
 
 export default function useNotifications() {
-	const isServiceWorkerSupported = "serviceWorker" in navigator;
+	const isServiceWorkerSupported = useMemo(() => "serviceWorker" in navigator, []);
 	const [subscription, setSubscription] = useState<PushSubscription | null>(null);
 	const [setNotificationSubscriptionMutation] = useMutation(setNotificationSubscription);
 	const phoneNumber = useCurrentPhoneNumber();
