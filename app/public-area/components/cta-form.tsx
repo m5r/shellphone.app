@@ -1,4 +1,5 @@
-import { useMutation } from "blitz";
+import { useEffect, useRef } from "react";
+import { useMutation, useRouter } from "blitz";
 import { useForm } from "react-hook-form";
 import * as Panelbear from "@panelbear/panelbear-js";
 
@@ -9,12 +10,22 @@ type Form = {
 };
 
 export default function CTAForm() {
+	const router = useRouter();
 	const [joinWaitlistMutation] = useMutation(joinWaitlist);
 	const {
 		handleSubmit,
 		register,
+		setFocus,
 		formState: { isSubmitted },
 	} = useForm<Form>();
+
+	useEffect(() => {
+		if (typeof router.query.join_waitlist !== "undefined") {
+			setFocus("email");
+			router.replace("/");
+		}
+	}, []);
+
 	const onSubmit = handleSubmit(async ({ email }) => {
 		if (isSubmitted) {
 			return;
