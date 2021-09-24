@@ -12,7 +12,7 @@ const Layout: FunctionComponent<Props> = ({ children, title }) => (
 			<div className="pt-32 pb-10 md:pt-34 md:pb-16">
 				{title ? (
 					<div className="max-w-5xl mx-auto">
-						<h1 className="h1 mb-16 font-extrabold font-mackinac">{title}</h1>
+						<h1 className="h1 mb-16 text-navy font-extrabold font-mackinac">{title}</h1>
 					</div>
 				) : null}
 
