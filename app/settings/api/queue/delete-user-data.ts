@@ -29,38 +29,12 @@ const deleteUserData = Queue<Payload>("api/queue/delete-user-data", async ({ use
 	switch (user.memberships[0]!.role) {
 		case MembershipRole.OWNER: {
 			const organization = user.memberships[0]!.organization;
-			const where = { organizationId: organization.id };
-			await Promise.all<unknown>([
-				db.notificationSubscription.deleteMany({ where }),
-				db.phoneCall.deleteMany({ where }),
-				db.message.deleteMany({ where }),
-				db.processingPhoneNumber.deleteMany({ where }),
-			]);
-			await db.phoneNumber.deleteMany({ where });
-
-			const orgMembers = organization.memberships
-				.map((membership) => membership.user!)
-				.filter((user) => user !== null);
-			await Promise.all(
-				orgMembers.map((member) =>
-					Promise.all([
-						db.token.deleteMany({ where: { userId: member.id } }),
-						db.session.deleteMany({ where: { userId: member.id } }),
-						db.membership.deleteMany({ where: { userId: member.id } }),
-						db.user.delete({ where: { id: member.id } }),
-					]),
-				),
-			);
 			await db.organization.delete({ where: { id: organization.id } });
+			await db.user.delete({ where: { id: user.id } });
 			break;
 		}
 		case MembershipRole.USER: {
-			await Promise.all([
-				db.token.deleteMany({ where: { userId: user.id } }),
-				db.session.deleteMany({ where: { userId: user.id } }),
-				db.user.delete({ where: { id: user.id } }),
-				db.membership.deleteMany({ where: { userId: user.id } }),
-			]);
+			await db.user.delete({ where: { id: user.id } });
 			break;
 		}
 		case MembershipRole.ADMIN:
