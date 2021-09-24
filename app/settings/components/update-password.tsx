@@ -1,6 +1,6 @@
 import type { FunctionComponent } from "react";
 import { useState } from "react";
-import { useRouter } from "blitz";
+import { useMutation } from "blitz";
 import { useForm } from "react-hook-form";
 
 import Alert from "./alert";
@@ -8,16 +8,17 @@ import Button from "./button";
 import SettingsSection from "./settings-section";
 
 import appLogger from "../../../integrations/logger";
+import changePassword from "../mutations/change-password";
 
 const logger = appLogger.child({ module: "update-password" });
 
 type Form = {
+	currentPassword: string;
 	newPassword: string;
-	newPasswordConfirmation: string;
 };
 
 const UpdatePassword: FunctionComponent = () => {
-	const router = useRouter();
+	const changePasswordMutation = useMutation(changePassword)[0];
 	const {
 		register,
 		handleSubmit,
@@ -25,28 +26,18 @@ const UpdatePassword: FunctionComponent = () => {
 	} = useForm<Form>();
 	const [errorMessage, setErrorMessage] = useState("");
 
-	const onSubmit = handleSubmit(async ({ newPassword, newPasswordConfirmation }) => {
+	const onSubmit = handleSubmit(async ({ currentPassword, newPassword }) => {
 		if (isSubmitting) {
 			return;
 		}
 
-		if (newPassword !== newPasswordConfirmation) {
-			setErrorMessage("New passwords don't match");
-			return;
-		}
+		setErrorMessage("");
 
 		try {
-			// TODO
-			// await customer.updateUser({ password: newPassword });
+			await changePasswordMutation({ currentPassword, newPassword });
 		} catch (error: any) {
-			logger.error(error.response, "error updating user infos");
-
-			if (error.response.status === 401) {
-				logger.error("session expired, redirecting to sign in page");
-				return router.push("/auth/sign-in");
-			}
-
-			setErrorMessage(error.response.data.errorMessage);
+			logger.error(error, "error updating user infos");
+			setErrorMessage(error.message);
 		}
 	});
 
@@ -62,7 +53,7 @@ const UpdatePassword: FunctionComponent = () => {
 					</div>
 				) : null}
 
-				{isSubmitSuccessful ? (
+				{!isSubmitting && isSubmitSuccessful && !errorMessage ? (
 					<div className="mb-8">
 						<Alert title="Saved successfully" message="Your changes have been saved." variant="success" />
 					</div>
@@ -70,6 +61,25 @@ const UpdatePassword: FunctionComponent = () => {
 
 				<div className="shadow sm:rounded-md sm:overflow-hidden">
 					<div className="px-4 py-5 bg-white space-y-6 sm:p-6">
+						<div>
+							<label
+								htmlFor="currentPassword"
+								className="flex justify-between text-sm font-medium leading-5 text-gray-700"
+							>
+								<div>Current password</div>
+							</label>
+							<div className="mt-1 rounded-md shadow-sm">
+								<input
+									id="currentPassword"
+									type="password"
+									tabIndex={3}
+									className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-primary focus:border-primary-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+									{...register("currentPassword")}
+									required
+								/>
+							</div>
+						</div>
+
 						<div>
 							<label
 								htmlFor="newPassword"
@@ -81,28 +91,9 @@ const UpdatePassword: FunctionComponent = () => {
 								<input
 									id="newPassword"
 									type="password"
-									tabIndex={3}
-									className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-primary focus:border-primary-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
-									{...register("newPassword")}
-									required
-								/>
-							</div>
-						</div>
-
-						<div>
-							<label
-								htmlFor="newPasswordConfirmation"
-								className="flex justify-between text-sm font-medium leading-5 text-gray-700"
-							>
-								<div>Confirm new password</div>
-							</label>
-							<div className="mt-1 rounded-md shadow-sm">
-								<input
-									id="newPasswordConfirmation"
-									type="password"
 									tabIndex={4}
 									className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-primary focus:border-primary-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
-									{...register("newPasswordConfirmation")}
+									{...register("newPassword")}
 									required
 								/>
 							</div>
