@@ -1,8 +1,9 @@
 import type { FunctionComponent } from "react";
 import { useEffect, useState } from "react";
-import { useRouter } from "blitz";
+import { useMutation } from "blitz";
 import { useForm } from "react-hook-form";
 
+import updateUser from "../mutations/update-user";
 import Alert from "./alert";
 import Button from "./button";
 import SettingsSection from "./settings-section";
@@ -19,7 +20,7 @@ const logger = appLogger.child({ module: "profile-settings" });
 
 const ProfileInformations: FunctionComponent = () => {
 	const { user } = useCurrentUser();
-	const router = useRouter();
+	const updateUserMutation = useMutation(updateUser)[0];
 	const {
 		register,
 		handleSubmit,
@@ -39,16 +40,9 @@ const ProfileInformations: FunctionComponent = () => {
 		}
 
 		try {
-			// TODO
-			// await updateUser({ email, data: { name } });
+			await updateUserMutation({ email, name });
 		} catch (error: any) {
 			logger.error(error.response, "error updating user infos");
-
-			if (error.response.status === 401) {
-				logger.error("session expired, redirecting to sign in page");
-				return router.push("/auth/sign-in");
-			}
-
 			setErrorMessage(error.response.data.errorMessage);
 		}
 	});

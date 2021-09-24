@@ -1,11 +1,14 @@
 import { useRef, useState } from "react";
+import { useMutation } from "blitz";
 import clsx from "clsx";
 
 import Button from "./button";
 import SettingsSection from "./settings-section";
 import Modal, { ModalTitle } from "./modal";
+import deleteUser from "../mutations/delete-user";
 
 export default function DangerZone() {
+	const deleteUserMutation = useMutation(deleteUser)[0];
 	const [isDeletingUser, setIsDeletingUser] = useState(false);
 	const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
 	const modalCancelButtonRef = useRef<HTMLButtonElement>(null);
@@ -19,14 +22,17 @@ export default function DangerZone() {
 	};
 	const onConfirm = () => {
 		setIsDeletingUser(true);
-		// user.deleteUser();
+		return deleteUserMutation();
 	};
 
 	return (
 		<SettingsSection title="Danger Zone" description="Highway to the Danger Zone 𝅘𝅥𝅮">
 			<div className="shadow border border-red-300 sm:rounded-md sm:overflow-hidden">
-				<div className="flex justify-between items-center flex-row px-4 py-5 bg-white sm:p-6">
-					<p>Once you delete your account, all of its data will be permanently deleted.</p>
+				<div className="flex justify-between items-center flex-row px-4 py-5 space-x-2 bg-white sm:p-6">
+					<p>
+						Once you delete your account, all of its data will be permanently deleted and any ongoing
+						subscription will be cancelled.
+					</p>
 
 					<span className="text-base font-medium">
 						<Button variant="error" type="button" onClick={() => setIsConfirmationModalOpen(true)}>
