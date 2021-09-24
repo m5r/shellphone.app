@@ -4,6 +4,7 @@ import clsx from "clsx";
 
 import { Direction } from "../../../db";
 import PhoneInitLoader from "../../core/components/phone-init-loader";
+import EmptyCalls from "../components/empty-calls";
 import usePhoneCalls from "../hooks/use-phone-calls";
 import { formatRelativeDate } from "../../core/helpers/date-formatter";
 
@@ -22,7 +23,7 @@ export default function PhoneCallsList() {
 	}
 
 	if (phoneCalls.length === 0) {
-		return <div>empty state</div>;
+		return <EmptyCalls />;
 	}
 
 	return (
