@@ -10,6 +10,11 @@ const Body = z.object({
 
 export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ phoneNumberId }, context) => {
 	const organizationId = context.session.orgId;
+	const processingState = await db.processingPhoneNumber.findFirst({ where: { organizationId, phoneNumberId } });
+	if (processingState && !processingState.hasFetchedCalls) {
+		return;
+	}
+
 	const phoneCalls = await db.phoneCall.findMany({
 		where: { organizationId, phoneNumberId },
 		orderBy: { createdAt: Prisma.SortOrder.desc },

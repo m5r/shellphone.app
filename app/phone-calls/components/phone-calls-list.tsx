@@ -1,12 +1,25 @@
+import { useEffect } from "react";
 import { HiPhoneMissedCall, HiPhoneOutgoing } from "react-icons/hi";
-
-import { Direction } from "../../../db";
-import usePhoneCalls from "../hooks/use-phone-calls";
-import { formatRelativeDate } from "../../core/helpers/date-formatter";
 import clsx from "clsx";
 
+import { Direction } from "../../../db";
+import PhoneInitLoader from "../../core/components/phone-init-loader";
+import usePhoneCalls from "../hooks/use-phone-calls";
+import { formatRelativeDate } from "../../core/helpers/date-formatter";
+
 export default function PhoneCallsList() {
-	const phoneCalls = usePhoneCalls()[0];
+	const [phoneCalls, query] = usePhoneCalls();
+
+	useEffect(() => {
+		if (!phoneCalls) {
+			const pollInterval = setInterval(() => query.refetch(), 1500);
+			return () => clearInterval(pollInterval);
+		}
+	}, [phoneCalls, query]);
+
+	if (!phoneCalls) {
+		return <PhoneInitLoader />;
+	}
 
 	if (phoneCalls.length === 0) {
 		return <div>empty state</div>;

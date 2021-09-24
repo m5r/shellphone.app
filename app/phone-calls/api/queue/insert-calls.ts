@@ -34,6 +34,22 @@ const insertCallsQueue = Queue<Payload>("api/queue/insert-calls", async ({ calls
 		.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
 	await db.phoneCall.createMany({ data: phoneCalls, skipDuplicates: true });
+
+	const processingState = await db.processingPhoneNumber.findFirst({ where: { organizationId, phoneNumberId } });
+	if (!processingState) {
+		return;
+	}
+
+	if (processingState.hasFetchedMessages) {
+		await db.processingPhoneNumber.delete({
+			where: { organizationId_phoneNumberId: { organizationId, phoneNumberId } },
+		});
+	} else {
+		await db.processingPhoneNumber.update({
+			where: { organizationId_phoneNumberId: { organizationId, phoneNumberId } },
+			data: { hasFetchedCalls: true },
+		});
+	}
 });
 
 export default insertCallsQueue;

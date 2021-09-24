@@ -31,6 +31,7 @@ model Organization {
   notificationSubscriptions NotificationSubscription[]
   messages                  Message[]
   phoneCalls                PhoneCall[]
+  processingPhoneNumbers    ProcessingPhoneNumber[]
 
   @@unique([id, twilioAccountSid])
 }
@@ -194,10 +195,23 @@ model PhoneNumber {
   phoneCalls                PhoneCall[]
   notificationSubscriptions NotificationSubscription[]
 
-  organization   Organization @relation(fields: [organizationId], references: [id])
-  organizationId String
+  processingPhoneNumber ProcessingPhoneNumber?
+  organization          Organization           @relation(fields: [organizationId], references: [id])
+  organizationId        String
 
   @@unique([organizationId, id])
+}
+
+model ProcessingPhoneNumber {
+  createdAt          DateTime     @default(now()) @db.Timestamptz
+  hasFetchedMessages Boolean
+  hasFetchedCalls    Boolean
+  phoneNumber        PhoneNumber  @relation(fields: [phoneNumberId], references: [id])
+  phoneNumberId      String
+  organization       Organization @relation(fields: [organizationId], references: [id])
+  organizationId     String
+
+  @@id([organizationId, phoneNumberId])
 }
 
 model NotificationSubscription {

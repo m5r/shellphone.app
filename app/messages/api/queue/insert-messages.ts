@@ -37,6 +37,22 @@ const insertMessagesQueue = Queue<Payload>(
 			.sort((a, b) => a.sentAt.getTime() - b.sentAt.getTime());
 
 		await db.message.createMany({ data: sms, skipDuplicates: true });
+
+		const processingState = await db.processingPhoneNumber.findFirst({ where: { organizationId, phoneNumberId } });
+		if (!processingState) {
+			return;
+		}
+
+		if (processingState.hasFetchedCalls) {
+			await db.processingPhoneNumber.delete({
+				where: { organizationId_phoneNumberId: { organizationId, phoneNumberId } },
+			});
+		} else {
+			await db.processingPhoneNumber.update({
+				where: { organizationId_phoneNumberId: { organizationId, phoneNumberId } },
+				data: { hasFetchedMessages: true },
+			});
+		}
 	},
 );
 

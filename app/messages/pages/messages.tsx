@@ -26,9 +26,11 @@ const Messages: BlitzPage = () => {
 			<div className="flex flex-col space-y-6 p-3">
 				<h2 className="text-3xl font-bold">Messages</h2>
 			</div>
-			<Suspense fallback="Loading...">
-				<ConversationsList />
-			</Suspense>
+			<section className="flex flex-grow flex-col">
+				<Suspense fallback="Loading...">
+					<ConversationsList />
+				</Suspense>
+			</section>
 			<NewMessageButton onClick={() => setIsOpen(true)} />
 			<NewMessageBottomSheet />
 		</>

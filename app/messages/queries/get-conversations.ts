@@ -27,6 +27,12 @@ export default resolver.pipe(
 		}
 
 		const phoneNumberId = organization.phoneNumbers[0]!.id;
+
+		const processingState = await db.processingPhoneNumber.findFirst({ where: { organizationId, phoneNumberId } });
+		if (processingState && !processingState.hasFetchedMessages) {
+			return;
+		}
+
 		const messages = await db.message.findMany({
 			where: { organizationId, phoneNumberId },
 			orderBy: { sentAt: Prisma.SortOrder.desc },

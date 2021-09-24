@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useMutation, useRouter } from "blitz";
 import { useForm } from "react-hook-form";
 import * as Panelbear from "@panelbear/panelbear-js";

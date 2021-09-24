@@ -3,9 +3,22 @@ import { IoChevronForward } from "react-icons/io5";
 
 import getConversationsQuery from "../queries/get-conversations";
 import { formatRelativeDate } from "../../core/helpers/date-formatter";
+import { useEffect } from "react";
+import PhoneInitLoader from "../../core/components/phone-init-loader";
 
 export default function ConversationsList() {
-	const conversations = useQuery(getConversationsQuery, {})[0];
+	const [conversations, query] = useQuery(getConversationsQuery, {});
+
+	useEffect(() => {
+		if (!conversations) {
+			const pollInterval = setInterval(() => query.refetch(), 1500);
+			return () => clearInterval(pollInterval);
+		}
+	}, [conversations, query]);
+
+	if (!conversations) {
+		return <PhoneInitLoader />;
+	}
 
 	if (Object.keys(conversations).length === 0) {
 		return <div>empty state</div>;
