@@ -82,6 +82,7 @@ module.exports = {
 					800: "#97266D",
 					900: "#702459",
 				},
+				navy: "#24185B",
 			},
 			boxShadow: {
 				"2xl": "0 25px 50px -12px rgba(0, 0, 0, 0.08)",

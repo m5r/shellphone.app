@@ -2,6 +2,7 @@ import type { BlitzPage } from "blitz";
 import { Link, Routes } from "blitz";
 import { HiCheck, HiX } from "react-icons/hi";
 import clsx from "clsx";
+import * as Panelbear from "@panelbear/panelbear-js";
 
 import BaseLayout from "../components/base-layout";
 
@@ -29,7 +30,7 @@ const pricing = {
 		},
 		{
 			title: "Yearly",
-			price: 10,
+			price: 12.5,
 			frequency: "/month",
 			description: "Text and call anyone, anywhere in the world, all year long.",
 			features: paidFeatures,
@@ -54,7 +55,7 @@ const Pricing: BlitzPage = () => {
 	return (
 		<section className="pt-32 pb-10 px-4 sm:px-6 md:pt-34 md:pb-16">
 			<div className="bg-white">
-				<h2 className="text-3xl font-mackinac font-extrabold text-gray-900 sm:text-5xl sm:leading-none sm:tracking-tight">
+				<h2 className="text-3xl font-mackinac font-extrabold text-navy sm:text-5xl sm:leading-none sm:tracking-tight">
 					Simple no-tricks pricing
 				</h2>
 				<p className="mt-6 max-w-2xl text-xl text-gray-500">
@@ -68,18 +69,18 @@ const Pricing: BlitzPage = () => {
 							className="relative p-8 bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col"
 						>
 							<div className="flex-1">
-								<h3 className="text-xl font-semibold text-gray-900">{tier.title}</h3>
+								<h3 className="text-2xl font-mackinac font-semibold text-gray-900">{tier.title}</h3>
 								{tier.yearly ? (
 									<p className="absolute top-0 py-1.5 px-4 bg-primary-500 rounded-full text-xs font-semibold uppercase tracking-wide text-white transform -translate-y-1/2">
 										Get 2 months free!
 									</p>
 								) : null}
 								<p className="mt-4 flex items-baseline text-gray-900">
-									<span className="text-5xl font-extrabold tracking-tight">{tier.price}€</span>
+									<span className="text-4xl font-extrabold tracking-tight">{tier.price}€</span>
 									<span className="ml-1 text-xl font-semibold">{tier.frequency}</span>
 								</p>
 								{tier.yearly ? (
-									<p className="text-gray-500 text-sm">Billed yearly ({tier.price * 10}€)</p>
+									<p className="text-gray-500 text-sm">Billed yearly ({tier.price * 12}€)</p>
 								) : null}
 								<p className="mt-6 text-gray-500">{tier.description}</p>
 
@@ -108,6 +109,7 @@ const Pricing: BlitzPage = () => {
 
 							<Link href={Routes.LandingPage({ join_waitlist: "" })}>
 								<a
+									onClick={() => Panelbear.track("redirect-to-join-waitlist")}
 									className={clsx(
 										tier.yearly
 											? "bg-primary-500 text-white hover:bg-primary-600"
