@@ -5,6 +5,7 @@ import getConversationsQuery from "../queries/get-conversations";
 import { formatRelativeDate } from "../../core/helpers/date-formatter";
 import { useEffect } from "react";
 import PhoneInitLoader from "../../core/components/phone-init-loader";
+import EmptyMessages from "./empty-messages";
 
 export default function ConversationsList() {
 	const [conversations, query] = useQuery(getConversationsQuery, {});
@@ -17,11 +18,12 @@ export default function ConversationsList() {
 	}, [conversations, query]);
 
 	if (!conversations) {
+		// we're still importing messages from twilio
 		return <PhoneInitLoader />;
 	}
 
 	if (Object.keys(conversations).length === 0) {
-		return <div>empty state</div>;
+		return <EmptyMessages />;
 	}
 
 	return (
