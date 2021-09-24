@@ -7,6 +7,10 @@ export default function useKnownRecipients() {
 		{},
 		{
 			select(conversations) {
+				if (!conversations) {
+					return [];
+				}
+
 				return Object.keys(conversations);
 			},
 		},

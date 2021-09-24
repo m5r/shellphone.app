@@ -83,7 +83,7 @@ const KeypadPage: BlitzPage = () => {
 				<button
 					onClick={async () => {
 						if (phoneNumber === "") {
-							const lastCall = phoneCalls[0];
+							const lastCall = phoneCalls?.[0];
 							if (lastCall) {
 								const lastCallRecipient =
 									lastCall.direction === Direction.Inbound ? lastCall.from : lastCall.to;

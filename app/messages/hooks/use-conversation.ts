@@ -8,7 +8,7 @@ export default function useConversation(recipient: string) {
 		{},
 		{
 			select(conversations) {
-				if (!conversations[recipient]) {
+				if (!conversations?.[recipient]) {
 					return null;
 				}
 
