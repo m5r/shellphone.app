@@ -40,10 +40,10 @@ model Membership {
   id   String         @id @default(uuid())
   role MembershipRole
 
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String
 
-  user   User?   @relation(fields: [userId], references: [id])
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String?
 
   // When the user joins, we will clear out the name and email and set the user.
@@ -95,7 +95,7 @@ model Session {
   publicData         String?
   privateData        String?
 
-  user   User?   @relation(fields: [userId], references: [id])
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String?
 }
 
@@ -108,7 +108,7 @@ model Token {
   expiresAt   DateTime  @db.Timestamptz
   sentTo      String
 
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
   @@unique([hashedToken, type])
@@ -127,9 +127,9 @@ model Message {
   direction Direction
   status    MessageStatus
 
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String
-  phoneNumber    PhoneNumber  @relation(fields: [phoneNumberId], references: [id])
+  phoneNumber    PhoneNumber  @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
   phoneNumberId  String
 
   @@unique([organizationId, phoneNumberId, id])
@@ -167,9 +167,9 @@ model PhoneCall {
   direction Direction
   duration  String
 
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String
-  phoneNumber    PhoneNumber  @relation(fields: [phoneNumberId], references: [id])
+  phoneNumber    PhoneNumber  @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
   phoneNumberId  String
 
   @@unique([organizationId, phoneNumberId, id])
@@ -196,7 +196,7 @@ model PhoneNumber {
   notificationSubscriptions NotificationSubscription[]
 
   processingPhoneNumber ProcessingPhoneNumber?
-  organization          Organization           @relation(fields: [organizationId], references: [id])
+  organization          Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId        String
 
   @@unique([organizationId, id])
@@ -206,9 +206,9 @@ model ProcessingPhoneNumber {
   createdAt          DateTime     @default(now()) @db.Timestamptz
   hasFetchedMessages Boolean
   hasFetchedCalls    Boolean
-  phoneNumber        PhoneNumber  @relation(fields: [phoneNumberId], references: [id])
+  phoneNumber        PhoneNumber  @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
   phoneNumberId      String
-  organization       Organization @relation(fields: [organizationId], references: [id])
+  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId     String
 
   @@id([organizationId, phoneNumberId])
@@ -223,8 +223,8 @@ model NotificationSubscription {
   keys_p256dh    String
   keys_auth      String
 
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String
-  phoneNumber    PhoneNumber  @relation(fields: [phoneNumberId], references: [id])
+  phoneNumber    PhoneNumber  @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
   phoneNumberId  String
 }
