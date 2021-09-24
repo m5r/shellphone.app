@@ -35,7 +35,7 @@ const Layout: FunctionComponent<Props> = ({ children, title, pageTitle = title, 
 			<div className="h-full w-full overflow-hidden fixed bg-gray-50">
 				<div className="flex flex-col w-full h-full">
 					<div className="flex flex-col flex-1 w-full overflow-y-auto">
-						<main className="flex-1 my-0 h-full">
+						<main className="flex flex-col flex-1 my-0 h-full">
 							<ErrorBoundary>{children}</ErrorBoundary>
 						</main>
 					</div>

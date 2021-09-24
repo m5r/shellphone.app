@@ -46,6 +46,14 @@ export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ 
 
 	const phoneNumberId = phoneNumberSid;
 	await Promise.all([
+		db.processingPhoneNumber.create({
+			data: {
+				organizationId,
+				phoneNumberId,
+				hasFetchedMessages: false,
+				hasFetchedCalls: false,
+			},
+		}),
 		fetchMessagesQueue.enqueue(
 			{ organizationId, phoneNumberId },
 			{ id: `fetch-messages-${organizationId}-${phoneNumberId}` },
