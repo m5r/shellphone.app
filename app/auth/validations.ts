@@ -3,6 +3,7 @@ import { z } from "zod";
 export const password = z.string().min(10).max(100);
 
 export const Signup = z.object({
+	name: z.string(),
 	email: z.string().email(),
 	password,
 });

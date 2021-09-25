@@ -54,7 +54,7 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
 				</div>
 
 				{error ? (
-					<div role="alert" style={{ color: "red" }}>
+					<div role="alert" className="text-red-600">
 						{error}
 					</div>
 				) : null}
