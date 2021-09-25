@@ -40,7 +40,7 @@ const SignUp: BlitzPage = () => {
 				}
 			}}
 		>
-			<LabeledTextField name="name" label="Name" type="text" />
+			<LabeledTextField name="fullName" label="Full name" type="text" />
 			<LabeledTextField name="email" label="Email" type="email" />
 			<LabeledTextField name="password" label="Password" type="password" />
 		</Form>

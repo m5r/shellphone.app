@@ -12,7 +12,7 @@ import useCurrentUser from "../../core/hooks/use-current-user";
 import appLogger from "../../../integrations/logger";
 
 type Form = {
-	name: string;
+	fullName: string;
 	email: string;
 };
 
@@ -30,17 +30,17 @@ const ProfileInformations: FunctionComponent = () => {
 	const [errorMessage, setErrorMessage] = useState("");
 
 	useEffect(() => {
-		setValue("name", user?.name ?? "");
+		setValue("fullName", user?.fullName ?? "");
 		setValue("email", user?.email ?? "");
 	}, [setValue, user]);
 
-	const onSubmit = handleSubmit(async ({ name, email }) => {
+	const onSubmit = handleSubmit(async ({ fullName, email }) => {
 		if (isSubmitting) {
 			return;
 		}
 
 		try {
-			await updateUserMutation({ email, name });
+			await updateUserMutation({ email, fullName });
 		} catch (error: any) {
 			logger.error(error.response, "error updating user infos");
 			setErrorMessage(error.response.data.errorMessage);
@@ -68,16 +68,16 @@ const ProfileInformations: FunctionComponent = () => {
 				<div className="shadow sm:rounded-md sm:overflow-hidden">
 					<div className="px-4 py-5 bg-white space-y-6 sm:p-6">
 						<div className="col-span-3 sm:col-span-2">
-							<label htmlFor="name" className="block text-sm font-medium leading-5 text-gray-700">
-								Name
+							<label htmlFor="fullName" className="block text-sm font-medium leading-5 text-gray-700">
+								Full name
 							</label>
 							<div className="mt-1 rounded-md shadow-sm">
 								<input
-									id="name"
+									id="fullName"
 									type="text"
 									tabIndex={1}
 									className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-primary focus:border-primary-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
-									{...register("name")}
+									{...register("fullName")}
 									required
 								/>
 							</div>
