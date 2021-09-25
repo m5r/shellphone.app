@@ -47,14 +47,8 @@ const SignIn: BlitzPage = () => {
 				}
 			}}
 		>
-			<LabeledTextField name="email" label="Email" placeholder="Email" type="email" />
-			<LabeledTextField
-				name="password"
-				label="Password"
-				placeholder="Password"
-				type="password"
-				showForgotPasswordLabel
-			/>
+			<LabeledTextField name="email" label="Email" type="email" />
+			<LabeledTextField name="password" label="Password" type="password" showForgotPasswordLabel />
 		</Form>
 	);
 };
