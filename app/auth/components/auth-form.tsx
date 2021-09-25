@@ -71,13 +71,13 @@ export function AuthForm<S extends z.ZodType<any, any>>({
 						className="form"
 						{...props}
 					>
-						{children}
-
 						{formError ? (
-							<div role="alert" className="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
+							<div role="alert" className="mb-8 sm:mx-auto sm:w-full sm:max-w-sm">
 								<Alert title="Oops, there was an issue" message={formError} variant="error" />
 							</div>
 						) : null}
+
+						{children}
 
 						<button
 							type="submit"
