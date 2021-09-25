@@ -1,6 +1,6 @@
 import type { BlitzPage } from "blitz";
 import { Link, Routes } from "blitz";
-import { HiCheck, HiX } from "react-icons/hi";
+import { HiCheck } from "react-icons/hi";
 import clsx from "clsx";
 import * as Panelbear from "@panelbear/panelbear-js";
 
@@ -96,8 +96,7 @@ const Pricing: BlitzPage = () => {
 									))}
 									{tier.unavailableFeatures.map((feature) => (
 										<li key={feature} className="flex">
-											<HiX className="flex-shrink-0 w-6 h-6 text-[#d95565]" aria-hidden="true" />
-											<span className="ml-3 text-gray-500">
+											<span className="ml-9 text-gray-400">
 												{~feature.indexOf("(coming soon)")
 													? feature.slice(0, feature.indexOf("(coming soon)"))
 													: feature}
