@@ -1,4 +1,4 @@
-import type { BlitzPage } from "blitz";
+import type { BlitzPage, GetServerSideProps } from "blitz";
 import { useRouterQuery, Link, useMutation, Routes } from "blitz";
 
 import BaseLayout from "../../core/layouts/base-layout";
@@ -9,6 +9,7 @@ import resetPassword from "../../auth/mutations/reset-password";
 
 const ResetPasswordPage: BlitzPage = () => {
 	const query = useRouterQuery();
+	console.log("client query", query);
 	const [resetPasswordMutation, { isSuccess }] = useMutation(resetPassword);
 
 	return (
@@ -58,5 +59,18 @@ const ResetPasswordPage: BlitzPage = () => {
 ResetPasswordPage.redirectAuthenticatedTo = Routes.Messages();
 
 ResetPasswordPage.getLayout = (page) => <BaseLayout title="Reset Your Password">{page}</BaseLayout>;
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+	if (!context.query.token) {
+		return {
+			redirect: {
+				destination: Routes.ForgotPasswordPage().pathname,
+				permanent: false,
+			},
+		};
+	}
+
+	return { props: {} };
+};
 
 export default ResetPasswordPage;

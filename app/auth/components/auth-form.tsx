@@ -79,19 +79,21 @@ export function AuthForm<S extends z.ZodType<any, any>>({
 
 						{children}
 
-						<button
-							type="submit"
-							disabled={ctx.formState.isSubmitting}
-							className={clsx(
-								"w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white focus:outline-none focus:border-primary-700 focus:shadow-outline-primary transition duration-150 ease-in-out",
-								{
-									"bg-primary-400 cursor-not-allowed": ctx.formState.isSubmitting,
-									"bg-primary-600 hover:bg-primary-700": !ctx.formState.isSubmitting,
-								},
-							)}
-						>
-							{texts.submit}
-						</button>
+						{texts.submit ? (
+							<button
+								type="submit"
+								disabled={ctx.formState.isSubmitting}
+								className={clsx(
+									"w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white focus:outline-none focus:border-primary-700 focus:shadow-outline-primary transition duration-150 ease-in-out",
+									{
+										"bg-primary-400 cursor-not-allowed": ctx.formState.isSubmitting,
+										"bg-primary-600 hover:bg-primary-700": !ctx.formState.isSubmitting,
+									},
+								)}
+							>
+								{texts.submit}
+							</button>
+						) : null}
 					</form>
 				</FormProvider>
 			</div>
