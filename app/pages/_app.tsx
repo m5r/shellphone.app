@@ -5,6 +5,8 @@ import {
 	AuthenticationError,
 	AuthorizationError,
 	ErrorFallbackProps,
+	RedirectError,
+	Routes,
 	useQueryErrorResetBoundary,
 	getConfig,
 	useSession,
@@ -12,7 +14,6 @@ import {
 
 import Sentry from "../../integrations/sentry";
 import ErrorComponent from "../core/components/error-component";
-import LoginForm from "../auth/components/login-form";
 import { usePanelbear } from "../core/hooks/use-panelbear";
 
 import "app/core/styles/index.css";
@@ -46,9 +47,9 @@ export default function App({ Component, pageProps }: AppProps) {
 	);
 }
 
-function RootErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps) {
+function RootErrorFallback({ error }: ErrorFallbackProps) {
 	if (error instanceof AuthenticationError) {
-		return <LoginForm onSuccess={resetErrorBoundary} />;
+		throw new RedirectError(Routes.SignIn());
 	} else if (error instanceof AuthorizationError) {
 		return <ErrorComponent statusCode={error.statusCode} title="Sorry, you are not authorized to access this" />;
 	} else {
