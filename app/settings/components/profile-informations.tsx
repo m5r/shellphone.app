@@ -4,7 +4,7 @@ import { useMutation } from "blitz";
 import { useForm } from "react-hook-form";
 
 import updateUser from "../mutations/update-user";
-import Alert from "./alert";
+import Alert from "../../core/components/alert";
 import Button from "./button";
 import SettingsSection from "./settings-section";
 import useCurrentUser from "../../core/hooks/use-current-user";
