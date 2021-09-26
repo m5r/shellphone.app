@@ -19,7 +19,7 @@ const SettingsLayout: FunctionComponent = ({ children }) => {
 				</header>
 			</header>
 
-			<main>{children}</main>
+			<main className="flex flex-col flex-grow">{children}</main>
 		</Layout>
 	);
 };
