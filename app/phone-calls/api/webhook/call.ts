@@ -5,13 +5,9 @@ import db, { Direction } from "../../../../db";
 import appLogger from "../../../../integrations/logger";
 import { translateCallStatus, voiceUrl } from "../../../../integrations/twilio";
 import updateCallDurationQueue from "../queue/update-call-duration";
+import type { ApiError } from "../../../core/types";
 
 const logger = appLogger.child({ route: "/api/webhook/call" });
-
-type ApiError = {
-	statusCode: number;
-	errorMessage: string;
-};
 
 export default async function incomingCallHandler(req: BlitzApiRequest, res: BlitzApiResponse) {
 	console.log("req.body", req.body);

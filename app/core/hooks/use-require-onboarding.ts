@@ -16,11 +16,6 @@ export default function useRequireOnboarding() {
 		throw router.push(Routes.StepTwo());
 	}
 
-	/*if (!user.paddleCustomerId || !user.paddleSubscriptionId) {
-		throw router.push(Routes.StepTwo());
-		return;
-	}*/
-
 	if (!phoneNumber) {
 		throw router.push(Routes.StepThree());
 	}

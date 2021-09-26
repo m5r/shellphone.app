@@ -13,12 +13,10 @@ generator client {
 // --------------------------------------
 
 model Organization {
-  id                   String   @id @default(uuid())
-  createdAt            DateTime @default(now()) @db.Timestamptz
-  updatedAt            DateTime @updatedAt @db.Timestamptz
-  encryptionKey        String
-  paddleCustomerId     String?
-  paddleSubscriptionId String?
+  id            String   @id @default(uuid())
+  createdAt     DateTime @default(now()) @db.Timestamptz
+  updatedAt     DateTime @updatedAt @db.Timestamptz
+  encryptionKey String
 
   twilioAccountSid String?
   twilioAuthToken  String? // TODO: encrypt it with encryptionKey
@@ -32,8 +30,36 @@ model Organization {
   messages                  Message[]
   phoneCalls                PhoneCall[]
   processingPhoneNumbers    ProcessingPhoneNumber[]
+  subscription              Subscription?
 
   @@unique([id, twilioAccountSid])
+}
+
+model Subscription {
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
+
+  paddleSubscriptionId String             @id @unique
+  paddlePlanId         String
+  paddleCheckoutId     String
+  status               SubscriptionStatus
+  updateUrl            String
+  cancelUrl            String
+  currency             String
+  unitPrice            String
+  nextBillDate         DateTime           @db.Date
+  lastEventTime        DateTime           @db.Timestamp
+
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String?
+}
+
+enum SubscriptionStatus {
+  active
+  trialing
+  past_due
+  paused
+  deleted
 }
 
 model Membership {
