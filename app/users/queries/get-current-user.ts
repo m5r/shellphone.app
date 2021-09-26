@@ -18,8 +18,6 @@ export default async function getCurrentUser(_ = null, { session }: Ctx) {
 						select: {
 							id: true,
 							encryptionKey: true,
-							paddleCustomerId: true,
-							paddleSubscriptionId: true,
 							twilioAccountSid: true,
 							twilioAuthToken: true,
 							twilioApiKey: true,
