@@ -83,6 +83,9 @@ const { SENTRY_DSN, SENTRY_ORG, SENTRY_PROJECT, SENTRY_AUTH_TOKEN, NODE_ENV, GIT
 		panelBear: {
 			siteId: process.env.PANELBEAR_SITE_ID,
 		},
+		paddle: {
+			vendorId: process.env.PADDLE_VENDOR_ID,
+		},
 	},
 	// @ts-ignore
 	webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
