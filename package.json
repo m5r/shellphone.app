@@ -12,7 +12,7 @@
 		"prepare": "husky install"
 	},
 	"engines": {
-		"node": ">=12 <15"
+		"node": ">=16"
 	},
 	"prisma": {
 		"schema": "db/schema.prisma"

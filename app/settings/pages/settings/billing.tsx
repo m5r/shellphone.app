@@ -14,9 +14,13 @@ const logger = appLogger.child({ page: "/account/settings/billing" });
 const Billing: BlitzPage = () => {
 	/*
 	TODO: I want to be able to
-		- renew subscription (after pause/cancel for example) (message like "your subscription expired, would you like to renew ?")
-		- know when is the last time I paid and for how much
+		- subscribe
+		- cancel my sub
+		- upgrade to yearly
+		- downgrade to monthly
+		- resubscribe (after pause/cancel for example) (message like "your subscription expired, would you like to renew ?")
 		- know when is the next time I will pay and for how much
+		- have access to my past invoices
 	*/
 
 	useRequireOnboarding();

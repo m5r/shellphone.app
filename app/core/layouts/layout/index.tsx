@@ -28,11 +28,11 @@ const Layout: FunctionComponent<Props> = ({ children, title, pageTitle = title, 
 		<>
 			{pageTitle ? (
 				<Head>
-					<title>{pageTitle}</title>
+					<title>{pageTitle} | Shellphone</title>
 				</Head>
 			) : null}
 
-			<div className="h-full w-full overflow-hidden fixed bg-gray-50">
+			<div className="h-full w-full overflow-hidden fixed bg-gray-100">
 				<div className="flex flex-col w-full h-full">
 					<div className="flex flex-col flex-1 w-full overflow-y-auto">
 						<main className="flex flex-col flex-1 my-0 h-full">
