@@ -24,8 +24,8 @@ const SettingsLayout: FunctionComponent = ({ children }) => {
 				</header>
 			</header>
 
-			<main className="flex-grow mx-auto w-full max-w-7xl pb-10 lg:py-12 lg:px-8">
-				<div className="lg:grid lg:grid-cols-12 lg:gap-x-5">
+			<main className="flex flex-col flex-grow mx-auto w-full max-w-7xl pb-10 lg:py-12 lg:px-8">
+				<div className="flex flex-col flex-grow lg:grid lg:grid-cols-12 lg:gap-x-5">
 					<aside className="py-6 px-2 sm:px-6 lg:py-0 lg:px-0 lg:col-span-3">
 						<nav className="space-y-1">
 							{subNavigation.map((item) => {
@@ -59,7 +59,7 @@ const SettingsLayout: FunctionComponent = ({ children }) => {
 						</nav>
 					</aside>
 
-					<div className="overflow-y-auto space-y-6 px-2 sm:px-6 lg:px-0 lg:col-span-9">{children}</div>
+					<div className="flex-grow overflow-y-auto space-y-6 px-2 sm:px-6 lg:col-span-9">{children}</div>
 				</div>
 			</main>
 		</Layout>
