@@ -10,7 +10,7 @@ module.exports = {
 				mackinac: ["P22 Mackinac Pro", "ui-serif", "Georgia", "Cambria", "Times New Roman", "Times", "serif"],
 			},
 			colors: {
-				primary: {
+				rebeccapurple: {
 					50: "#f9fafb",
 					100: "#eef1fb",
 					200: "#dbd7f8",
@@ -21,6 +21,18 @@ module.exports = {
 					700: "#663399",
 					800: "#39236b",
 					900: "#1f163f",
+				},
+				primary: {
+					50: "#E5F2FF",
+					100: "#CCE4FF",
+					200: "#99CAFF",
+					300: "#66AFFF",
+					400: "#3395FF",
+					500: "#007AFF",
+					600: "#0062CC",
+					700: "#004999",
+					800: "#003166",
+					900: "#001833",
 				},
 				gray: {
 					50: "#FAFAFA",

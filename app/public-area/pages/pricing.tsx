@@ -71,7 +71,7 @@ const Pricing: BlitzPage = () => {
 							<div className="flex-1">
 								<h3 className="text-2xl font-mackinac font-semibold text-gray-900">{tier.title}</h3>
 								{tier.yearly ? (
-									<p className="absolute top-0 py-1.5 px-4 bg-primary-500 rounded-full text-xs font-semibold uppercase tracking-wide text-white transform -translate-y-1/2">
+									<p className="absolute top-0 py-1.5 px-4 bg-rebeccapurple-500 rounded-full text-xs font-semibold uppercase tracking-wide text-white transform -translate-y-1/2">
 										Get 2 months free!
 									</p>
 								) : null}
@@ -111,8 +111,8 @@ const Pricing: BlitzPage = () => {
 									onClick={() => Panelbear.track("redirect-to-join-waitlist")}
 									className={clsx(
 										tier.yearly
-											? "bg-primary-500 text-white hover:bg-primary-600"
-											: "bg-primary-50 text-primary-700 hover:bg-primary-100",
+											? "bg-rebeccapurple-500 text-white hover:bg-rebeccapurple-600"
+											: "bg-rebeccapurple-50 text-rebeccapurple-700 hover:bg-rebeccapurple-100",
 										"mt-8 block w-full py-3 px-6 border border-transparent rounded-md text-center font-medium",
 									)}
 								>
