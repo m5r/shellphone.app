@@ -74,7 +74,7 @@ const KeypadPage: BlitzPage = () => {
 	});
 
 	return (
-		<div className="w-96 h-full flex flex-col justify-around py-5 mx-auto text-center text-black bg-white">
+		<div className="w-96 h-full flex flex-col justify-around py-5 mx-auto text-center text-black">
 			<div className="h-16 text-3xl text-gray-700">
 				<span>{phoneNumber}</span>
 			</div>
