@@ -7,7 +7,7 @@ import Layout from "../../core/layouts/layout";
 
 const subNavigation = [
 	{ name: "Account", href: Routes.Account(), icon: IoPersonCircleOutline },
-	{ name: "Plan & Billing", href: Routes.Billing(), icon: IoCardOutline },
+	{ name: "Billing", href: Routes.Billing(), icon: IoCardOutline },
 	{ name: "Notifications", href: Routes.Notifications(), icon: IoNotificationsOutline },
 ];
 
@@ -36,7 +36,7 @@ const SettingsLayout: FunctionComponent = ({ children }) => {
 										<a
 											className={clsx(
 												isCurrentPage
-													? "bg-gray-50 text-orange-600 hover:bg-white"
+													? "bg-gray-50 text-primary-600 hover:bg-white"
 													: "text-gray-900 hover:text-gray-900 hover:bg-gray-50",
 												"group rounded-md px-3 py-2 flex items-center text-sm font-medium",
 											)}
@@ -45,7 +45,7 @@ const SettingsLayout: FunctionComponent = ({ children }) => {
 											<item.icon
 												className={clsx(
 													isCurrentPage
-														? "text-orange-500"
+														? "text-primary-500"
 														: "text-gray-400 group-hover:text-gray-500",
 													"flex-shrink-0 -ml-1 mr-3 h-6 w-6",
 												)}

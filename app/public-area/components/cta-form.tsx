@@ -46,10 +46,13 @@ export default function CTAForm() {
 					<input
 						{...register("email")}
 						type="email"
-						className="form-input w-full mb-2 sm:mb-0 sm:mr-2 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+						className="form-input w-full mb-2 sm:mb-0 sm:mr-2 focus:outline-none focus:ring-rebeccapurple-500 focus:border-rebeccapurple-500"
 						placeholder="Enter your email address"
 					/>
-					<button type="submit" className="btn text-white bg-primary-500 hover:bg-primary-400 flex-shrink-0">
+					<button
+						type="submit"
+						className="btn text-white bg-rebeccapurple-500 hover:bg-rebeccapurple-400 flex-shrink-0"
+					>
 						Request access
 					</button>
 				</div>
