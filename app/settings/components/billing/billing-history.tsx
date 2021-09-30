@@ -1,28 +1,8 @@
-const payments = [
-	{
-		id: 1,
-		date: new Date(),
-		description: "",
-		amount: "340 USD",
-		href: "",
-	},
-	{
-		id: 1,
-		date: new Date(),
-		description: "",
-		amount: "340 USD",
-		href: "",
-	},
-	{
-		id: 1,
-		date: new Date(),
-		description: "",
-		amount: "340 USD",
-		href: "",
-	},
-];
+import useSubscription from "../../hooks/use-subscription";
 
 export default function BillingHistory() {
+	const { payments } = useSubscription();
+
 	return (
 		<section>
 			<div className="bg-white pt-6 shadow sm:rounded-md sm:overflow-hidden">
@@ -46,17 +26,14 @@ export default function BillingHistory() {
 												scope="col"
 												className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
 											>
-												Description
+												Amount
 											</th>
 											<th
 												scope="col"
 												className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
 											>
-												Amount
+												Status
 											</th>
-											{/*
-                                `relative` is added here due to a weird bug in Safari that causes `sr-only` headings to introduce overflow on the body on mobile.
-                              */}
 											<th
 												scope="col"
 												className="relative px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -66,27 +43,33 @@ export default function BillingHistory() {
 										</tr>
 									</thead>
 									<tbody className="bg-white divide-y divide-gray-200">
-										{payments.map((payment) => (
-											<tr key={payment.id}>
-												<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-													<time>{payment.date.toDateString()}</time>
-												</td>
-												<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-													{payment.description}
-												</td>
-												<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-													{payment.amount}
-												</td>
-												<td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-													<a
-														href={payment.href}
-														className="text-primary-600 hover:text-primary-900"
-													>
-														View receipt
-													</a>
-												</td>
-											</tr>
-										))}
+										{typeof payments !== "undefined"
+											? payments.map((payment) => (
+													<tr key={payment.id}>
+														<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+															<time>{new Date(payment.payout_date).toDateString()}</time>
+														</td>
+														<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+															{payment.amount} {payment.currency}
+														</td>
+														<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+															{payment.is_paid === 1 ? "Paid" : "Not paid yet"}
+														</td>
+														<td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+															{typeof payment.receipt_url !== "undefined" ? (
+																<a
+																	href={payment.receipt_url}
+																	target="_blank"
+																	rel="noopener noreferrer"
+																	className="text-primary-600 hover:text-primary-900"
+																>
+																	View receipt
+																</a>
+															) : null}
+														</td>
+													</tr>
+											  ))
+											: null}
 									</tbody>
 								</table>
 							</div>
