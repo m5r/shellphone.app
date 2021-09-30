@@ -1,15 +1,20 @@
 import { useEffect, useRef } from "react";
 import { useQuery, useMutation, useRouter, useSession } from "blitz";
 
+import type { Subscription } from "db";
 import getSubscription from "../queries/get-subscription";
 import usePaddle from "./use-paddle";
 import useCurrentUser from "../../core/hooks/use-current-user";
 import updateSubscription from "../mutations/update-subscription";
 
-export default function useSubscription() {
+type Params = {
+	initialData?: Subscription;
+};
+
+export default function useSubscription({ initialData }: Params = {}) {
 	const session = useSession();
 	const { user } = useCurrentUser();
-	const [subscription] = useQuery(getSubscription, null, { enabled: Boolean(session.orgId) });
+	const [subscription] = useQuery(getSubscription, null, { enabled: Boolean(session.orgId), initialData });
 	const [updateSubscriptionMutation] = useMutation(updateSubscription);
 
 	const router = useRouter();
