@@ -3,6 +3,7 @@ import { useQuery, useMutation, useRouter, useSession } from "blitz";
 
 import type { Subscription } from "db";
 import getSubscription from "../queries/get-subscription";
+import getPayments from "../queries/get-payments";
 import usePaddle from "./use-paddle";
 import useCurrentUser from "../../core/hooks/use-current-user";
 import updateSubscription from "../mutations/update-subscription";
@@ -14,7 +15,8 @@ type Params = {
 export default function useSubscription({ initialData }: Params = {}) {
 	const session = useSession();
 	const { user } = useCurrentUser();
-	const [subscription] = useQuery(getSubscription, null, { enabled: Boolean(session.orgId), initialData });
+	const [subscription] = useQuery(getSubscription, null, { initialData });
+	const [payments] = useQuery(getPayments, null);
 	const [updateSubscriptionMutation] = useMutation(updateSubscription);
 
 	const router = useRouter();
@@ -49,7 +51,7 @@ export default function useSubscription({ initialData }: Params = {}) {
 			email: user.email,
 			product: planId,
 			allowQuantity: false,
-			passthrough: JSON.stringify({ orgId: session.orgId }),
+			passthrough: JSON.stringify({ organizationId: session.orgId }),
 			coupon: "",
 		};
 
@@ -93,6 +95,7 @@ export default function useSubscription({ initialData }: Params = {}) {
 
 	return {
 		subscription,
+		payments,
 		subscribe,
 		updatePaymentMethod,
 		cancelSubscription,

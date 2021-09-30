@@ -67,6 +67,8 @@ export default async function webhook(req: BlitzApiRequest, res: BlitzApiRespons
 	}
 
 	const alertName = req.body.alert_name;
+	logger.info(`Received ${alertName} webhook`);
+	logger.info(req.body);
 	if (isSupportedWebhook(alertName)) {
 		return handlers[alertName](req, res);
 	}
