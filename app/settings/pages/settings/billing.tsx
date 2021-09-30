@@ -1,5 +1,7 @@
 import type { BlitzPage } from "blitz";
 import { GetServerSideProps, Link, Routes } from "blitz";
+import * as Panelbear from "@panelbear/panelbear-js";
+import clsx from "clsx";
 
 import useSubscription from "../../hooks/use-subscription";
 import useRequireOnboarding from "../../../core/hooks/use-require-onboarding";
@@ -7,10 +9,7 @@ import SettingsLayout from "../../components/settings-layout";
 import appLogger from "../../../../integrations/logger";
 import PaddleLink from "../../components/paddle-link";
 import SettingsSection from "../../components/settings-section";
-import Divider from "../../components/divider";
 import { HiCheck } from "react-icons/hi";
-import * as Panelbear from "@panelbear/panelbear-js";
-import clsx from "clsx";
 
 const logger = appLogger.child({ page: "/account/settings/billing" });
 
@@ -76,111 +75,91 @@ const Billing: BlitzPage = () => {
 
 	if (!subscription) {
 		return (
-			<section aria-labelledby="subscribe-heading">
-				<div className="shadow sm:rounded-md sm:overflow-hidden">
-					<div className="bg-white py-6 px-4 sm:p-6">
-						<div>
-							<h2 id="subscribe-heading" className="text-lg leading-6 font-medium text-gray-900">
-								Subscribe
-							</h2>
-							<p className="mt-1 text-sm text-gray-500">
-								Update your billing information. Please note that updating your location could affect
-								your tax rates.
-							</p>
-						</div>
-
-						<div className="mt-6 flex flex-row-reverse flex-wrap-reverse gap-x-4">
-							{pricing.tiers.map((tier) => (
-								<div
-									key={tier.title}
-									className="relative p-4 mb-4 bg-white border border-gray-200 rounded-xl shadow-sm flex flex-grow w-1/3 flex-col"
-								>
-									<div className="flex-1">
-										<h3 className="text-xl font-mackinac font-semibold text-gray-900">
-											{tier.title}
-										</h3>
-										{tier.yearly ? (
-											<p className="absolute top-0 py-1.5 px-4 bg-primary-500 rounded-full text-xs font-semibold uppercase tracking-wide text-white transform -translate-y-1/2">
-												Get 2 months free!
-											</p>
-										) : null}
-										<p className="mt-4 flex items-baseline text-gray-900">
-											<span className="text-2xl font-extrabold tracking-tight">
-												{tier.price}€
-											</span>
-											<span className="ml-1 text-lg font-semibold">{tier.frequency}</span>
-										</p>
-										{tier.yearly ? (
-											<p className="text-gray-500 text-sm">Billed yearly ({tier.price * 12}€)</p>
-										) : null}
-										<p className="mt-6 text-gray-500">{tier.description}</p>
-
-										<ul role="list" className="mt-6 space-y-6">
-											{tier.features.map((feature) => (
-												<li key={feature} className="flex">
-													<HiCheck
-														className="flex-shrink-0 w-6 h-6 text-[#0eb56f]"
-														aria-hidden="true"
-													/>
-													<span className="ml-3 text-gray-500">{feature}</span>
-												</li>
-											))}
-											{tier.unavailableFeatures.map((feature) => (
-												<li key={feature} className="flex">
-													<span className="ml-9 text-gray-400">
-														{~feature.indexOf("(coming soon)")
-															? feature.slice(0, feature.indexOf("(coming soon)"))
-															: feature}
-													</span>
-												</li>
-											))}
-										</ul>
-									</div>
-
-									<Link href={Routes.LandingPage({ join_waitlist: "" })}>
-										<a
-											onClick={() => Panelbear.track("redirect-to-join-waitlist")}
-											className={clsx(
-												tier.yearly
-													? "bg-primary-500 text-white hover:bg-primary-600"
-													: "bg-primary-50 text-primary-700 hover:bg-primary-100",
-												"mt-8 block w-full py-3 px-6 border border-transparent rounded-md text-center font-medium",
-											)}
-										>
-											{tier.cta}
-										</a>
-									</Link>
-								</div>
-							))}
-						</div>
-					</div>
+			<SettingsSection>
+				<div>
+					<h2 className="text-lg leading-6 font-medium text-gray-900">Subscribe</h2>
+					<p className="mt-1 text-sm text-gray-500">
+						Update your billing information. Please note that updating your location could affect your tax
+						rates.
+					</p>
 				</div>
-			</section>
+
+				<div className="mt-6 flex flex-row-reverse flex-wrap-reverse gap-x-4">
+					{pricing.tiers.map((tier) => (
+						<div
+							key={tier.title}
+							className="relative p-4 mb-4 bg-white border border-gray-200 rounded-xl shadow-sm flex flex-grow w-1/3 flex-col"
+						>
+							<div className="flex-1">
+								<h3 className="text-xl font-mackinac font-semibold text-gray-900">{tier.title}</h3>
+								{tier.yearly ? (
+									<p className="absolute top-0 py-1.5 px-4 bg-primary-500 rounded-full text-xs font-semibold uppercase tracking-wide text-white transform -translate-y-1/2">
+										Get 2 months free!
+									</p>
+								) : null}
+								<p className="mt-4 flex items-baseline text-gray-900">
+									<span className="text-2xl font-extrabold tracking-tight">{tier.price}€</span>
+									<span className="ml-1 text-lg font-semibold">{tier.frequency}</span>
+								</p>
+								{tier.yearly ? (
+									<p className="text-gray-500 text-sm">Billed yearly ({tier.price * 12}€)</p>
+								) : null}
+								<p className="mt-6 text-gray-500">{tier.description}</p>
+
+								<ul role="list" className="mt-6 space-y-6">
+									{tier.features.map((feature) => (
+										<li key={feature} className="flex">
+											<HiCheck
+												className="flex-shrink-0 w-6 h-6 text-[#0eb56f]"
+												aria-hidden="true"
+											/>
+											<span className="ml-3 text-gray-500">{feature}</span>
+										</li>
+									))}
+									{tier.unavailableFeatures.map((feature) => (
+										<li key={feature} className="flex">
+											<span className="ml-9 text-gray-400">
+												{~feature.indexOf("(coming soon)")
+													? feature.slice(0, feature.indexOf("(coming soon)"))
+													: feature}
+											</span>
+										</li>
+									))}
+								</ul>
+							</div>
+
+							<Link href={Routes.LandingPage({ join_waitlist: "" })}>
+								<a
+									onClick={() => Panelbear.track("redirect-to-join-waitlist")}
+									className={clsx(
+										tier.yearly
+											? "bg-primary-500 text-white hover:bg-primary-600"
+											: "bg-primary-50 text-primary-700 hover:bg-primary-100",
+										"mt-8 block w-full py-3 px-6 border border-transparent rounded-md text-center font-medium",
+									)}
+								>
+									{tier.cta}
+								</a>
+							</Link>
+						</div>
+					))}
+				</div>
+			</SettingsSection>
 		);
 	}
 
 	return (
 		<>
-			<SettingsSection title="Payment method">
+			<SettingsSection>
 				<PaddleLink
 					onClick={() => updatePaymentMethod({ updateUrl: subscription.updateUrl })}
 					text="Update payment method on Paddle"
 				/>
 			</SettingsSection>
 
-			<div className="hidden lg:block">
-				<Divider />
-			</div>
+			<SettingsSection>{/*<BillingPlans activePlanId={subscription.paddlePlanId} />*/}</SettingsSection>
 
-			<SettingsSection title="Plan">
-				{/*<BillingPlans activePlanId={subscription.paddlePlanId} />*/}
-			</SettingsSection>
-
-			<div className="hidden lg:block">
-				<Divider />
-			</div>
-
-			<SettingsSection title="Cancel subscription">
+			<SettingsSection>
 				<PaddleLink
 					onClick={() => cancelSubscription({ cancelUrl: subscription.cancelUrl })}
 					text="Cancel subscription on Paddle"
