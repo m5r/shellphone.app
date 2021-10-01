@@ -30,34 +30,27 @@ export const subscriptionCreatedQueue = Queue<Payload>("api/queue/subscription-c
 
 	const orgOwner = organization.memberships.find((membership) => membership.role === MembershipRole.OWNER);
 	const email = orgOwner!.user!.email;
-	const paddleCheckoutId = event.checkoutId;
-	const paddleSubscriptionId = event.subscriptionId;
-	const planId = event.productId;
-	const nextBillDate = event.nextPaymentDate;
-	const status = translateSubscriptionStatus(event.status);
-	const lastEventTime = event.eventTime;
-	const updateUrl = event.updateUrl;
-	const cancelUrl = event.cancelUrl;
-	const currency = event.currency;
-	const unitPrice = event.unitPrice;
+	await db.organization.update({
+		where: { id: organizationId },
+		data: {
+			subscription: {
+				create: {
+					paddleSubscriptionId: event.subscriptionId,
+					paddlePlanId: event.productId,
+					paddleCheckoutId: event.checkoutId,
+					nextBillDate: event.nextPaymentDate,
+					status: translateSubscriptionStatus(event.status),
+					lastEventTime: event.eventTime,
+					updateUrl: event.updateUrl,
+					cancelUrl: event.cancelUrl,
+					currency: event.currency,
+					unitPrice: event.unitPrice,
+				},
+			},
+		},
+	});
 
 	if (!!organization.subscription) {
-		await db.subscription.update({
-			where: { paddleSubscriptionId: organization.subscription.paddleSubscriptionId },
-			data: {
-				paddleSubscriptionId,
-				paddlePlanId: planId,
-				paddleCheckoutId,
-				nextBillDate,
-				status,
-				lastEventTime,
-				updateUrl,
-				cancelUrl,
-				currency,
-				unitPrice,
-			},
-		});
-
 		sendEmail({
 			subject: "Welcome back to Shellphone",
 			body: "Welcome back to Shellphone",
@@ -66,26 +59,6 @@ export const subscriptionCreatedQueue = Queue<Payload>("api/queue/subscription-c
 			logger.error(error);
 		});
 	} else {
-		await db.organization.update({
-			where: { id: organizationId },
-			data: {
-				subscription: {
-					create: {
-						paddleSubscriptionId,
-						paddlePlanId: planId,
-						paddleCheckoutId,
-						nextBillDate,
-						status,
-						lastEventTime,
-						updateUrl,
-						cancelUrl,
-						currency,
-						unitPrice,
-					},
-				},
-			},
-		});
-
 		sendEmail({
 			subject: "Welcome to Shellphone",
 			body: `Welcome to Shellphone`,

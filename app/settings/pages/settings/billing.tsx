@@ -31,37 +31,36 @@ const Billing: BlitzPage<Props> = (props) => {
 	*/
 
 	useRequireOnboarding();
-	const { subscription, cancelSubscription, updatePaymentMethod } = useSubscription({
+	const { subscription, cancelSubscription, updatePaymentMethod, payments } = useSubscription({
 		initialData: props.subscription,
 	});
 
-	if (!subscription) {
-		return (
-			<>
-				<Plans />
-				<p className="text-sm text-gray-500">Prices include all applicable sales taxes.</p>
-			</>
-		);
-	}
-
 	return (
 		<>
-			<SettingsSection>
-				<PaddleLink
-					onClick={() => updatePaymentMethod({ updateUrl: subscription.updateUrl })}
-					text="Update payment method"
-				/>
-				<PaddleLink
-					onClick={() => cancelSubscription({ cancelUrl: subscription.cancelUrl })}
-					text="Cancel subscription"
-				/>
-			</SettingsSection>
+			{subscription ? (
+				<SettingsSection>
+					<p>Current plan: {subscription.paddlePlanId}</p>
 
-			<BillingHistory />
+					<PaddleLink
+						onClick={() => updatePaymentMethod({ updateUrl: subscription.updateUrl })}
+						text="Update payment method"
+					/>
+					<PaddleLink
+						onClick={() => cancelSubscription({ cancelUrl: subscription.cancelUrl })}
+						text="Cancel subscription"
+					/>
+				</SettingsSection>
+			) : null}
 
-			<div className="hidden lg:block lg:py-3">
-				<Divider />
-			</div>
+			{payments.length > 0 ? (
+				<>
+					<BillingHistory />
+
+					<div className="hidden lg:block lg:py-3">
+						<Divider />
+					</div>
+				</>
+			) : null}
 
 			<Plans />
 			<p className="text-sm text-gray-500">Prices include all applicable sales taxes.</p>
