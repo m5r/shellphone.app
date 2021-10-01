@@ -37,7 +37,7 @@ export default function useSubscription({ initialData }: Params = {}) {
 	}, []);
 
 	type BuyParams = {
-		planId: string;
+		planId: number;
 		coupon?: string;
 	};
 
@@ -81,7 +81,7 @@ export default function useSubscription({ initialData }: Params = {}) {
 	}
 
 	type ChangePlanParams = {
-		planId: string;
+		planId: number;
 	};
 
 	async function changePlan({ planId }: ChangePlanParams) {
