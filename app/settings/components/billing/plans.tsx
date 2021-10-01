@@ -10,7 +10,10 @@ export default function Plans() {
 	return (
 		<div className="mt-6 flex flex-row-reverse flex-wrap-reverse gap-x-4">
 			{pricing.tiers.map((tier) => {
-				const isCurrentTier = subscription?.paddlePlanId === tier.planId;
+				const isCurrentTier =
+					!subscription?.paddlePlanId && tier.planId === "free"
+						? true
+						: subscription?.paddlePlanId === tier.planId;
 				const cta = isCurrentTier ? "Current plan" : !!subscription ? `Switch to ${tier.title}` : "Subscribe";
 
 				return (

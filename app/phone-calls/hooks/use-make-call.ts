@@ -86,6 +86,7 @@ export default function useMakeCall({ recipient, onHangUp }: Params) {
 			device?.destroy();
 			onHangUp?.();
 			router.replace(Routes.KeypadPage());
+			// TODO: outgoingConnection.off is not a function
 			outgoingConnection?.off("cancel", endCall);
 			outgoingConnection?.off("disconnect", endCall);
 		},
