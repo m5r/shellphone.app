@@ -26,7 +26,7 @@ export default function App({ Component, pageProps }: AppProps) {
 	useEffect(() => {
 		if (session.userId) {
 			Sentry.setUser({
-				id: session.userId.toString(),
+				id: session.userId,
 				orgId: session.orgId,
 			});
 		}

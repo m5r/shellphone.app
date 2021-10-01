@@ -78,7 +78,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res }
 	const subscription = await db.subscription.findFirst({
 		where: {
 			organizationId: session.orgId,
-			status: SubscriptionStatus.active,
+			status: { not: SubscriptionStatus.deleted },
 		},
 	});
 	if (!subscription) {
