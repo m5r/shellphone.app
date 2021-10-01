@@ -54,6 +54,7 @@ export default function useDevice() {
 		device.on("incoming", onDeviceIncoming);
 
 		return () => {
+			// TODO: device.off is not a function
 			device.off("registered", onDeviceRegistered);
 			device.off("unregistered", onDeviceUnregistered);
 			device.off("error", onDeviceError);

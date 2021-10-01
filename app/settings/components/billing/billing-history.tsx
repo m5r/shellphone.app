@@ -53,7 +53,7 @@ export default function BillingHistory() {
 															{payment.amount} {payment.currency}
 														</td>
 														<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-															{payment.is_paid === 1 ? "Paid" : "Not paid yet"}
+															{payment.is_paid === 1 ? "Paid" : "Upcoming"}
 														</td>
 														<td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
 															{typeof payment.receipt_url !== "undefined" ? (
