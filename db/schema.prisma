@@ -39,14 +39,14 @@ model Subscription {
   createdAt DateTime @default(now()) @db.Timestamptz
   updatedAt DateTime @updatedAt @db.Timestamptz
 
-  paddleSubscriptionId String             @id @unique
-  paddlePlanId         String
+  paddleSubscriptionId Int                @id @unique
+  paddlePlanId         Int
   paddleCheckoutId     String
   status               SubscriptionStatus
   updateUrl            String
   cancelUrl            String
   currency             String
-  unitPrice            String
+  unitPrice            Int
   nextBillDate         DateTime           @db.Date
   lastEventTime        DateTime           @db.Timestamp
 

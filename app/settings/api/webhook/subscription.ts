@@ -1,47 +1,39 @@
-import type { BlitzApiHandler, BlitzApiRequest, BlitzApiResponse } from "blitz";
-import { getConfig } from "blitz";
-import { PaddleSdk, stringifyMetadata } from "@devoxa/paddle-sdk";
+import type { BlitzApiHandler } from "blitz";
+import type { Queue } from "quirrel/blitz";
+import type {
+	PaddleSdkSubscriptionCancelledEvent,
+	PaddleSdkSubscriptionCreatedEvent,
+	PaddleSdkSubscriptionPaymentSucceededEvent,
+	PaddleSdkSubscriptionUpdatedEvent,
+} from "@devoxa/paddle-sdk";
+import { PaddleSdkWebhookEventType } from "@devoxa/paddle-sdk";
 
-import type { ApiError } from "../../../core/types";
-import { subscriptionCreatedHandler } from "../../webhook-handlers/subscription-created";
-import { subscriptionPaymentSucceededHandler } from "../../webhook-handlers/subscription-payment-succeeded";
-import { subscriptionCancelled } from "../../webhook-handlers/subscription-cancelled";
-import { subscriptionUpdated } from "../../webhook-handlers/subscription-updated";
-import appLogger from "../../../../integrations/logger";
+import type { ApiError } from "app/core/types";
+import subscriptionCreatedQueue from "../queue/subscription-created";
+import subscriptionPaymentSucceededQueue from "../queue/subscription-payment-succeeded";
+import subscriptionCancelledQueue from "../queue/subscription-cancelled";
+import subscriptionUpdatedQueue from "../queue/subscription-updated";
+import appLogger from "integrations/logger";
+import { paddleSdk } from "integrations/paddle";
 
-type SupportedWebhook =
-	| "subscription_created"
-	| "subscription_cancelled"
-	| "subscription_payment_succeeded"
-	| "subscription_updated";
-const supportedWebhooks: SupportedWebhook[] = [
-	"subscription_created",
-	"subscription_cancelled",
-	"subscription_payment_succeeded",
-	"subscription_updated",
-];
+type Events<TMetadata = { organizationId: string }> =
+	| PaddleSdkSubscriptionCreatedEvent<TMetadata>
+	| PaddleSdkSubscriptionUpdatedEvent<TMetadata>
+	| PaddleSdkSubscriptionCancelledEvent<TMetadata>
+	| PaddleSdkSubscriptionPaymentSucceededEvent<TMetadata>;
 
-const handlers: Record<SupportedWebhook, BlitzApiHandler> = {
-	subscription_created: subscriptionCreatedHandler,
-	subscription_payment_succeeded: subscriptionPaymentSucceededHandler,
-	subscription_cancelled: subscriptionCancelled,
-	subscription_updated: subscriptionUpdated,
+type SupportedEventType = Events["eventType"];
+
+const queues: Record<SupportedEventType, Queue<{ event: Events }>> = {
+	[PaddleSdkWebhookEventType.SUBSCRIPTION_CREATED]: subscriptionCreatedQueue,
+	[PaddleSdkWebhookEventType.SUBSCRIPTION_PAYMENT_SUCCEEDED]: subscriptionPaymentSucceededQueue,
+	[PaddleSdkWebhookEventType.SUBSCRIPTION_CANCELLED]: subscriptionCancelledQueue,
+	[PaddleSdkWebhookEventType.SUBSCRIPTION_UPDATED]: subscriptionUpdatedQueue,
 };
 
-function isSupportedWebhook(webhook: any): webhook is SupportedWebhook {
-	return supportedWebhooks.includes(webhook);
-}
-
 const logger = appLogger.child({ route: "/api/subscription/webhook" });
-const { publicRuntimeConfig, serverRuntimeConfig } = getConfig();
-const paddleSdk = new PaddleSdk({
-	publicKey: serverRuntimeConfig.paddle.publicKey,
-	vendorId: publicRuntimeConfig.paddle.vendorId,
-	vendorAuthCode: serverRuntimeConfig.paddle.apiKey,
-	metadataCodec: stringifyMetadata(),
-});
 
-export default async function webhook(req: BlitzApiRequest, res: BlitzApiResponse) {
+const webhook: BlitzApiHandler = async (req, res) => {
 	if (req.method !== "POST") {
 		const statusCode = 405;
 		const apiError: ApiError = {
@@ -55,23 +47,21 @@ export default async function webhook(req: BlitzApiRequest, res: BlitzApiRespons
 		return;
 	}
 
-	if (!paddleSdk.verifyWebhookEvent(req.body)) {
-		const statusCode = 500;
-		const apiError: ApiError = {
-			statusCode,
-			errorMessage: "Webhook event is invalid",
-		};
-		logger.error(apiError);
-
-		return res.status(statusCode).send(apiError);
-	}
-
-	const alertName = req.body.alert_name;
+	const event = paddleSdk.parseWebhookEvent(req.body);
+	const alertName = event.eventType;
 	logger.info(`Received ${alertName} webhook`);
-	logger.info(req.body);
+	logger.info(event);
 	if (isSupportedWebhook(alertName)) {
-		return handlers[alertName](req, res);
+		await queues[alertName].enqueue({ event: event as Events }, { id: event.eventId.toString() });
+
+		return res.status(200).end();
 	}
 
 	return res.status(400).end();
+};
+
+export default webhook;
+
+function isSupportedWebhook(eventType: PaddleSdkWebhookEventType): eventType is SupportedEventType {
+	return Object.keys(queues).includes(eventType);
 }

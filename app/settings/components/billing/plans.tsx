@@ -11,7 +11,7 @@ export default function Plans() {
 		<div className="mt-6 flex flex-row-reverse flex-wrap-reverse gap-x-4">
 			{pricing.tiers.map((tier) => {
 				const isCurrentTier =
-					!subscription?.paddlePlanId && tier.planId === "free"
+					!subscription?.paddlePlanId && tier.planId === -1
 						? true
 						: subscription?.paddlePlanId === tier.planId;
 				const cta = isCurrentTier ? "Current plan" : !!subscription ? `Switch to ${tier.title}` : "Subscribe";
@@ -94,7 +94,7 @@ const pricing = {
 	tiers: [
 		{
 			title: "Free",
-			planId: "free",
+			planId: -1,
 			price: 0,
 			frequency: "",
 			description: "The essentials to let you try Shellphone.",
@@ -105,7 +105,7 @@ const pricing = {
 		},
 		{
 			title: "Monthly",
-			planId: "727540",
+			planId: 727540,
 			price: 15,
 			frequency: "/month",
 			description: "Text and call anyone, anywhere in the world.",
@@ -116,7 +116,7 @@ const pricing = {
 		},
 		{
 			title: "Yearly",
-			planId: "727544",
+			planId: 727544,
 			price: 12.5,
 			frequency: "/month",
 			description: "Text and call anyone, anywhere in the world, all year long.",

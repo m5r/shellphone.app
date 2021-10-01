@@ -1,11 +1,11 @@
 import { NotFoundError, resolver } from "blitz";
 import { z } from "zod";
 
-import { updateSubscriptionPlan } from "../../../integrations/paddle";
-import db from "../../../db";
+import db from "db";
+import { updateSubscriptionPlan } from "integrations/paddle";
 
 const Body = z.object({
-	planId: z.string(),
+	planId: z.number(),
 });
 
 export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ planId }, ctx) => {
