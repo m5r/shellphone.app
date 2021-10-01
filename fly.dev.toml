@@ -9,7 +9,7 @@ processes = []
 
 [build.args]
   QUIRREL_BASE_URL = "dev.shellphone.app"
-  HUSKY_SKIP_INSTALL = 1
+  HUSKY = 0
 
 [env]
   NODE_ENV = "production"
