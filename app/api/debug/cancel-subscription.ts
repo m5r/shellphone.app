@@ -1,7 +1,7 @@
 import type { BlitzApiHandler } from "blitz";
 
-import { cancelPaddleSubscription } from "../../../integrations/paddle";
-import appLogger from "../../../integrations/logger";
+import { cancelPaddleSubscription } from "integrations/paddle";
+import appLogger from "integrations/logger";
 
 const logger = appLogger.child({ route: "/api/debug/cancel-subscription" });
 
