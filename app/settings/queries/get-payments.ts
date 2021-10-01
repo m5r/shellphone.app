@@ -1,6 +1,6 @@
 import { resolver } from "blitz";
 
-import db, { SubscriptionStatus } from "db";
+import db from "db";
 import { getPayments } from "integrations/paddle";
 
 export default resolver.pipe(resolver.authorize(), async (_ = null, { session }) => {
@@ -8,13 +8,14 @@ export default resolver.pipe(resolver.authorize(), async (_ = null, { session })
 		return [];
 	}
 
-	const subscription = await db.subscription.findFirst({
-		where: { organizationId: session.orgId, status: SubscriptionStatus.active },
-	});
-	if (!subscription) {
+	const subscriptions = await db.subscription.findMany({ where: { organizationId: session.orgId } });
+	if (subscriptions.length === 0) {
 		return [];
 	}
 
-	const payments = await getPayments({ subscriptionId: subscription.paddleSubscriptionId });
+	const paymentsBySubscription = await Promise.all(
+		subscriptions.map((subscription) => getPayments({ subscriptionId: subscription.paddleSubscriptionId })),
+	);
+	const payments = paymentsBySubscription.flat();
 	return payments.sort((a, b) => b.payout_date.localeCompare(a.payout_date));
 });
