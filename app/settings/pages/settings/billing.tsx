@@ -24,7 +24,8 @@ const Billing: BlitzPage<Props> = (props) => {
 	TODO: I want to be able to
 		- upgrade to yearly
 		- downgrade to monthly
-		- resubscribe (after pause/cancel for example) (message like "your subscription expired, would you like to renew ?")
+		- know how much time I have left until my cancelled subscription runs out --- DONE
+		- resubscribe (message like "your subscription expired, would you like to renew ?")
 	*/
 
 	useRequireOnboarding();
@@ -37,16 +38,24 @@ const Billing: BlitzPage<Props> = (props) => {
 		<>
 			{subscription ? (
 				<SettingsSection>
-					<p>Current plan: {subscription.paddlePlanId}</p>
-
-					<PaddleLink
-						onClick={() => updatePaymentMethod({ updateUrl: subscription.updateUrl })}
-						text="Update payment method"
-					/>
-					<PaddleLink
-						onClick={() => cancelSubscription({ cancelUrl: subscription.cancelUrl })}
-						text="Cancel subscription"
-					/>
+					{subscription.status === SubscriptionStatus.deleted ? (
+						<p>
+							Your {subscription.paddlePlanId} subscription is cancelled and will expire on{" "}
+							{subscription.cancellationEffectiveDate!.toLocaleDateString()}.
+						</p>
+					) : (
+						<>
+							<p>Current plan: {subscription.paddlePlanId}</p>
+							<PaddleLink
+								onClick={() => updatePaymentMethod({ updateUrl: subscription.updateUrl })}
+								text="Update payment method"
+							/>
+							<PaddleLink
+								onClick={() => cancelSubscription({ cancelUrl: subscription.cancelUrl })}
+								text="Cancel subscription"
+							/>
+						</>
+					)}
 				</SettingsSection>
 			) : null}
 

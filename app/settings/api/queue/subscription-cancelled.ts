@@ -4,12 +4,13 @@ import type { PaddleSdkSubscriptionCancelledEvent } from "@devoxa/paddle-sdk";
 
 import db from "db";
 import appLogger from "integrations/logger";
+import type { Metadata } from "integrations/paddle";
 import { translateSubscriptionStatus } from "integrations/paddle";
 
 const logger = appLogger.child({ queue: "subscription-cancelled" });
 
 type Payload = {
-	event: PaddleSdkSubscriptionCancelledEvent<{ organizationId: string }>;
+	event: PaddleSdkSubscriptionCancelledEvent<Metadata>;
 };
 
 export const subscriptionCancelledQueue = Queue<Payload>("api/queue/subscription-cancelled", async ({ event }) => {
@@ -35,6 +36,7 @@ export const subscriptionCancelledQueue = Queue<Payload>("api/queue/subscription
 			lastEventTime,
 			currency: event.currency,
 			unitPrice: event.unitPrice,
+			cancellationEffectiveDate: event.cancelledFrom,
 		},
 	});
 });

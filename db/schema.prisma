@@ -39,16 +39,17 @@ model Subscription {
   createdAt DateTime @default(now()) @db.Timestamptz
   updatedAt DateTime @updatedAt @db.Timestamptz
 
-  paddleSubscriptionId Int                @id @unique
-  paddlePlanId         Int
-  paddleCheckoutId     String
-  status               SubscriptionStatus
-  updateUrl            String
-  cancelUrl            String
-  currency             String
-  unitPrice            Int
-  nextBillDate         DateTime           @db.Date
-  lastEventTime        DateTime           @db.Timestamp
+  paddleSubscriptionId      Int                @id @unique
+  paddlePlanId              Int
+  paddleCheckoutId          String
+  status                    SubscriptionStatus
+  updateUrl                 String
+  cancelUrl                 String
+  currency                  String
+  unitPrice                 Int
+  nextBillDate              DateTime           @db.Date
+  lastEventTime             DateTime           @db.Timestamp
+  cancellationEffectiveDate DateTime?          @db.Date
 
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String
