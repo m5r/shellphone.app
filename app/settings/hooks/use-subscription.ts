@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { useQuery, useMutation, useRouter, useSession } from "blitz";
+import { useEffect, useRef, useState } from "react";
+import { useQuery, useMutation, useSession } from "blitz";
 
 import type { Subscription } from "db";
 import getSubscription from "../queries/get-subscription";
@@ -15,11 +15,14 @@ type Params = {
 export default function useSubscription({ initialData }: Params = {}) {
 	const session = useSession();
 	const { user } = useCurrentUser();
-	const [subscription] = useQuery(getSubscription, null, { initialData });
+	const [isWaitingForSubChange, setIsWaitingForSubChange] = useState(false);
+	const [subscription] = useQuery(getSubscription, null, {
+		initialData,
+		refetchInterval: isWaitingForSubChange ? 1500 : false,
+	});
 	const [payments] = useQuery(getPayments, null);
 	const [updateSubscriptionMutation] = useMutation(updateSubscription);
 
-	const router = useRouter();
 	const resolve = useRef<() => void>();
 	const promise = useRef<Promise<void>>();
 
@@ -31,6 +34,9 @@ export default function useSubscription({ initialData }: Params = {}) {
 			}
 		},
 	});
+
+	// cancel subscription polling when we get a new subscription
+	useEffect(() => setIsWaitingForSubChange(false), [subscription?.paddleSubscriptionId]);
 
 	useEffect(() => {
 		promise.current = new Promise((r) => (resolve.current = r));
@@ -60,6 +66,7 @@ export default function useSubscription({ initialData }: Params = {}) {
 		}
 
 		Paddle.Checkout.open(checkoutOpenParams);
+		setIsWaitingForSubChange(true);
 
 		return promise.current;
 	}
@@ -68,6 +75,7 @@ export default function useSubscription({ initialData }: Params = {}) {
 		const checkoutOpenParams = { override: updateUrl };
 
 		Paddle.Checkout.open(checkoutOpenParams);
+		setIsWaitingForSubChange(true);
 
 		return promise.current;
 	}
@@ -76,6 +84,7 @@ export default function useSubscription({ initialData }: Params = {}) {
 		const checkoutOpenParams = { override: cancelUrl };
 
 		Paddle.Checkout.open(checkoutOpenParams);
+		setIsWaitingForSubChange(true);
 
 		return promise.current;
 	}
@@ -85,9 +94,12 @@ export default function useSubscription({ initialData }: Params = {}) {
 	};
 
 	async function changePlan({ planId }: ChangePlanParams) {
+		if (planId === -1) {
+			return cancelSubscription({ cancelUrl: subscription!.cancelUrl });
+		}
+
 		try {
 			await updateSubscriptionMutation({ planId });
-			router.reload();
 		} catch (error) {
 			console.log("error", error);
 		}
