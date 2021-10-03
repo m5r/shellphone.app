@@ -46,33 +46,35 @@ export default function BillingHistory() {
 									</tr>
 								</thead>
 								<tbody className="bg-white divide-y divide-gray-200">
-									{typeof payments !== "undefined"
-										? payments.map((payment) => (
-												<tr key={payment.id}>
-													<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-														<time>{new Date(payment.payout_date).toDateString()}</time>
-													</td>
-													<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-														{payment.amount} {payment.currency}
-													</td>
-													<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-														{payment.is_paid === 1 ? "Paid" : "Upcoming"}
-													</td>
-													<td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-														{typeof payment.receipt_url !== "undefined" ? (
-															<a
-																href={payment.receipt_url}
-																target="_blank"
-																rel="noopener noreferrer"
-																className="text-primary-600 hover:text-primary-900"
-															>
-																View receipt
-															</a>
-														) : null}
-													</td>
-												</tr>
-										  ))
-										: null}
+									{payments.map((payment) => (
+										<tr key={payment.id}>
+											<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+												<time>{new Date(payment.payout_date).toDateString()}</time>
+											</td>
+											<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+												{Intl.NumberFormat(undefined, {
+													style: "currency",
+													currency: payment.currency,
+													currencyDisplay: "narrowSymbol",
+												}).format(payment.amount)}
+											</td>
+											<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+												{payment.is_paid === 1 ? "Paid" : "Upcoming"}
+											</td>
+											<td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+												{typeof payment.receipt_url !== "undefined" ? (
+													<a
+														href={payment.receipt_url}
+														target="_blank"
+														rel="noopener noreferrer"
+														className="text-primary-600 hover:text-primary-900"
+													>
+														View receipt
+													</a>
+												) : null}
+											</td>
+										</tr>
+									))}
 								</tbody>
 							</table>
 						</div>
