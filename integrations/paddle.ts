@@ -1,19 +1,23 @@
 import { getConfig } from "blitz";
 import got from "got";
-import type { PaddleSdkSubscriptionCreatedEvent } from "@devoxa/paddle-sdk";
+import type {
+	PaddleSdkSubscriptionCreatedEvent,
+	PaddleSdkCancelSubscriptionRequest,
+	PaddleSdkUpdateSubscriptionRequest,
+} from "@devoxa/paddle-sdk";
 import { PaddleSdk, PaddleSdkSubscriptionStatus, stringifyMetadata } from "@devoxa/paddle-sdk";
 
 import { SubscriptionStatus } from "db";
 
 const { publicRuntimeConfig, serverRuntimeConfig } = getConfig();
 
-const vendor_id = publicRuntimeConfig.paddle.vendorId;
-const vendor_auth_code = serverRuntimeConfig.paddle.apiKey;
+const vendorId = publicRuntimeConfig.paddle.vendorId;
+const vendorAuthCode = serverRuntimeConfig.paddle.apiKey;
 
 export const paddleSdk = new PaddleSdk({
 	publicKey: serverRuntimeConfig.paddle.publicKey,
-	vendorId: vendor_id,
-	vendorAuthCode: vendor_auth_code,
+	vendorId,
+	vendorAuthCode,
 	metadataCodec: stringifyMetadata(),
 });
 
@@ -36,21 +40,6 @@ export function translateSubscriptionStatus(
 		default:
 			throw new Error("unreachable");
 	}
-}
-
-const client = got.extend({
-	prefixUrl: "https://vendors.paddle.com/api/2.0",
-});
-
-async function request<T>(path: string, data: any) {
-	return client.post<T>(path, {
-		json: {
-			...data,
-			vendor_id,
-			vendor_auth_code,
-		},
-		responseType: "json",
-	});
 }
 
 type GetPaymentsParams = {
@@ -84,8 +73,14 @@ export async function getPayments({ subscriptionId }: GetPaymentsParams) {
 
 	type PaymentsResponse = PaymentsSuccessResponse | PaymentsErrorResponse;
 
-	const { body } = await request<PaymentsResponse>("subscription/payments", { subscription_id: subscriptionId });
-	console.log("body", typeof body);
+	const { body } = await got.post<PaymentsResponse>("https://vendors.paddle.com/api/2.0/subscription/payments", {
+		json: {
+			subscription_id: subscriptionId,
+			vendor_id: vendorId,
+			vendor_auth_code: vendorAuthCode,
+		},
+		responseType: "json",
+	});
 	if (!body.success) {
 		throw new Error(body.error.message);
 	}
@@ -93,24 +88,18 @@ export async function getPayments({ subscriptionId }: GetPaymentsParams) {
 	return body.response;
 }
 
-type UpdateSubscriptionPlanParams = {
-	subscriptionId: number;
-	planId: number;
-	prorate?: boolean;
-};
-
-export async function updateSubscriptionPlan({ subscriptionId, planId, prorate = true }: UpdateSubscriptionPlanParams) {
-	const { body } = await request("subscription/users/update", {
-		subscription_id: subscriptionId,
-		plan_id: planId,
-		prorate,
+export async function updateSubscriptionPlan({
+	subscriptionId,
+	productId,
+	shouldProrate = true,
+}: PaddleSdkUpdateSubscriptionRequest<Metadata>) {
+	return paddleSdk.updateSubscription({
+		subscriptionId,
+		productId,
+		shouldProrate,
 	});
-
-	return body;
 }
 
-export async function cancelPaddleSubscription({ subscriptionId }: { subscriptionId: number }) {
-	const { body } = await request("subscription/users_cancel", { subscription_id: subscriptionId });
-
-	return body;
+export async function cancelPaddleSubscription({ subscriptionId }: PaddleSdkCancelSubscriptionRequest) {
+	return paddleSdk.cancelSubscription({ subscriptionId });
 }

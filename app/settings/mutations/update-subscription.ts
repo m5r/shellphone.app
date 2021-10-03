@@ -15,6 +15,5 @@ export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ 
 	}
 
 	const subscriptionId = subscription.paddleSubscriptionId;
-	const result = await updateSubscriptionPlan({ planId, subscriptionId });
-	console.log("result", result);
+	await updateSubscriptionPlan({ productId: planId, subscriptionId });
 });
