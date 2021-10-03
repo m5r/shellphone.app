@@ -4,13 +4,14 @@ import { GetServerSideProps, getSession, Routes } from "blitz";
 import db, { Subscription, SubscriptionStatus } from "db";
 import useSubscription from "../../hooks/use-subscription";
 import useRequireOnboarding from "../../../core/hooks/use-require-onboarding";
+import usePaymentsHistory from "../../hooks/use-payments-history";
 import SettingsLayout from "../../components/settings-layout";
 import SettingsSection from "../../components/settings-section";
 import Divider from "../../components/divider";
 import PaddleLink from "../../components/billing/paddle-link";
 import Plans from "../../components/billing/plans";
 import BillingHistory from "../../components/billing/billing-history";
-import appLogger from "../../../../integrations/logger";
+import appLogger from "integrations/logger";
 
 const logger = appLogger.child({ page: "/account/settings/billing" });
 
@@ -27,7 +28,8 @@ const Billing: BlitzPage<Props> = (props) => {
 	*/
 
 	useRequireOnboarding();
-	const { subscription, cancelSubscription, updatePaymentMethod, payments } = useSubscription({
+	const { count: paymentsCount } = usePaymentsHistory();
+	const { subscription, cancelSubscription, updatePaymentMethod } = useSubscription({
 		initialData: props.subscription,
 	});
 
@@ -48,7 +50,7 @@ const Billing: BlitzPage<Props> = (props) => {
 				</SettingsSection>
 			) : null}
 
-			{payments.length > 0 ? (
+			{paymentsCount > 0 ? (
 				<>
 					<BillingHistory />
 

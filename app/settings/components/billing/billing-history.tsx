@@ -1,7 +1,21 @@
-import useSubscription from "../../hooks/use-subscription";
+import { IoChevronBack, IoChevronForward } from "react-icons/io5";
+import clsx from "clsx";
+
+import usePaymentsHistory from "../../hooks/use-payments-history";
 
 export default function BillingHistory() {
-	const { payments } = useSubscription();
+	const {
+		payments,
+		count,
+		skip,
+		pagesNumber,
+		currentPage,
+		goToPreviousPage,
+		hasPreviousPage,
+		goToNextPage,
+		hasNextPage,
+		setPage,
+	} = usePaymentsHistory();
 
 	if (payments.length === 0) {
 		return null;
@@ -77,6 +91,77 @@ export default function BillingHistory() {
 									))}
 								</tbody>
 							</table>
+
+							<div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+								<div className="flex-1 flex justify-between sm:hidden">
+									<button
+										onClick={goToPreviousPage}
+										className={clsx(
+											"relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50",
+											!hasPreviousPage && "invisible",
+										)}
+									>
+										Previous
+									</button>
+									<p className="text-sm text-gray-700 self-center">
+										Page <span className="font-medium">1</span> of{" "}
+										<span className="font-medium">4</span>
+									</p>
+									<button
+										onClick={goToNextPage}
+										className={clsx(
+											"ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50",
+											!hasNextPage && "invisible",
+										)}
+									>
+										Next
+									</button>
+								</div>
+								<div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+									<div>
+										<p className="text-sm text-gray-700">
+											Showing <span className="font-medium">{skip + 1}</span> to{" "}
+											<span className="font-medium">{skip + payments.length}</span> of{" "}
+											<span className="font-medium">{count}</span> results
+										</p>
+									</div>
+									<div>
+										<nav
+											className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+											aria-label="Pagination"
+										>
+											<button
+												onClick={goToPreviousPage}
+												className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+											>
+												<span className="sr-only">Previous</span>
+												<IoChevronBack className="h-5 w-5" aria-hidden="true" />
+											</button>
+											{pagesNumber.map((pageNumber) => (
+												<button
+													key={`billing-history-button-page-${pageNumber}`}
+													onClick={() => setPage(pageNumber)}
+													className={clsx(
+														"relative inline-flex items-center px-4 py-2 border text-sm font-medium",
+														pageNumber === currentPage
+															? "z-10 bg-indigo-50 border-indigo-500 text-indigo-600"
+															: "bg-white border-gray-300 text-gray-500 hover:bg-gray-50",
+													)}
+												>
+													{pageNumber}
+												</button>
+											))}
+											<button
+												onClick={goToNextPage}
+												className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+											>
+												<span className="sr-only">Next</span>
+												<IoChevronForward className="h-5 w-5" aria-hidden="true" />
+											</button>
+										</nav>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
