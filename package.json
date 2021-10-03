@@ -71,7 +71,7 @@
 		"remark": "14.0.1",
 		"remark-html": "14.0.1",
 		"tailwindcss": "2.2.15",
-		"twilio": "3.67.2",
+		"twilio": "3.68.0",
 		"web-push": "3.4.5",
 		"zod": "3.8.2"
 	},

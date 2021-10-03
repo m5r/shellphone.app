@@ -28,7 +28,7 @@ const fetchCallsQueue = Queue<Payload>("api/queue/fetch-calls", async ({ organiz
 		twilioClient.calls.list({ from: phoneNumber.number }),
 		twilioClient.calls.list({ to: phoneNumber.number }),
 	]);
-	const calls = [...callsSent, ...callsReceived].sort((a, b) => a.dateCreated.getTime() - b.dateCreated.getTime());
+	const calls = [...callsSent, ...callsReceived];
 
 	await insertCallsQueue.enqueue(
 		{
