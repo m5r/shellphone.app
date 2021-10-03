@@ -83,8 +83,12 @@ const roadmap: RoadmapItem[] = [
 		doneDate: new Date("2021-09-04T16:29:00"),
 	},
 	{
-		name: "Receive a phone call",
+		name: "Payments integration",
 		status: "in-progress",
+	},
+	{
+		name: "Receive a phone call",
+		status: "to-do",
 	},
 	{
 		name: "Get notified of incoming messages and calls",
