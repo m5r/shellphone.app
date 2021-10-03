@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useRouter, getConfig } from "blitz";
+import { getConfig } from "blitz";
 
 declare global {
 	interface Window {
@@ -12,8 +12,6 @@ const { publicRuntimeConfig } = getConfig();
 const vendor = parseInt(publicRuntimeConfig.paddle.vendorId, 10);
 
 export default function usePaddle({ eventCallback }: { eventCallback: (data: any) => void }) {
-	const router = useRouter();
-
 	useEffect(() => {
 		if (!window.Paddle) {
 			const script = document.createElement("script");
@@ -22,10 +20,6 @@ export default function usePaddle({ eventCallback }: { eventCallback: (data: any
 					vendor,
 					eventCallback(data: any) {
 						eventCallback(data);
-
-						if (data.event === "Checkout.Complete") {
-							setTimeout(() => router.reload(), 1000);
-						}
 					},
 				});
 			};
