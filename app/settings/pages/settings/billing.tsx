@@ -21,13 +21,9 @@ type Props = {
 const Billing: BlitzPage<Props> = (props) => {
 	/*
 	TODO: I want to be able to
-		- subscribe
-		- cancel my sub
 		- upgrade to yearly
 		- downgrade to monthly
 		- resubscribe (after pause/cancel for example) (message like "your subscription expired, would you like to renew ?")
-		- know when is the next time I will pay and for how much
-		- have access to my past invoices
 	*/
 
 	useRequireOnboarding();
