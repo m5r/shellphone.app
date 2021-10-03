@@ -5,7 +5,8 @@ import clsx from "clsx";
 import useSubscription from "../../hooks/use-subscription";
 
 export default function Plans() {
-	const { subscription, subscribe } = useSubscription();
+	const { subscription, subscribe, changePlan } = useSubscription();
+	const hasSubscription = Boolean(subscription);
 
 	return (
 		<div className="mt-6 flex flex-row-reverse flex-wrap-reverse gap-x-4">
@@ -62,8 +63,13 @@ export default function Plans() {
 						<button
 							disabled={isCurrentTier}
 							onClick={() => {
-								subscribe({ planId: tier.planId });
-								Panelbear.track(`Subscribe to ${tier.title}`);
+								if (hasSubscription) {
+									changePlan({ planId: tier.planId });
+									Panelbear.track(`Subscribe to ${tier.title}`);
+								} else {
+									subscribe({ planId: tier.planId, coupon: "groot429" });
+									Panelbear.track(`Subscribe to ${tier.title}`);
+								}
 							}}
 							className={clsx(
 								!isCurrentTier

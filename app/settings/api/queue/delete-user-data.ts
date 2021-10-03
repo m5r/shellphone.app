@@ -1,6 +1,6 @@
 import { Queue } from "quirrel/blitz";
 
-import db, { MembershipRole } from "../../../../db";
+import db, { MembershipRole, SubscriptionStatus } from "../../../../db";
 import appLogger from "../../../../integrations/logger";
 import { cancelPaddleSubscription } from "../../../../integrations/paddle";
 
@@ -17,7 +17,11 @@ const deleteUserData = Queue<Payload>("api/queue/delete-user-data", async ({ use
 			memberships: {
 				include: {
 					organization: {
-						include: { subscription: true },
+						include: {
+							subscriptions: {
+								where: { status: { not: SubscriptionStatus.deleted } },
+							},
+						},
 					},
 				},
 			},
@@ -33,8 +37,12 @@ const deleteUserData = Queue<Payload>("api/queue/delete-user-data", async ({ use
 			await db.organization.delete({ where: { id: organization.id } });
 			await db.user.delete({ where: { id: user.id } });
 
-			if (organization.subscription) {
-				await cancelPaddleSubscription({ subscriptionId: organization.subscription.paddleSubscriptionId });
+			if (organization.subscriptions.length > 0) {
+				await Promise.all(
+					organization.subscriptions.map((subscription) =>
+						cancelPaddleSubscription({ subscriptionId: subscription.paddleSubscriptionId }),
+					),
+				);
 			}
 
 			break;
