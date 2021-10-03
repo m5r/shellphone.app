@@ -18,7 +18,7 @@ export const subscriptionCreatedQueue = Queue<Payload>("api/queue/subscription-c
 	const organization = await db.organization.findFirst({
 		where: { id: organizationId },
 		include: {
-			subscription: true,
+			subscriptions: true,
 			memberships: {
 				include: { user: true },
 			},
@@ -28,29 +28,26 @@ export const subscriptionCreatedQueue = Queue<Payload>("api/queue/subscription-c
 		throw new NotFoundError();
 	}
 
+	const isReturningSubscriber = organization.subscriptions.length > 0;
 	const orgOwner = organization.memberships.find((membership) => membership.role === MembershipRole.OWNER);
 	const email = orgOwner!.user!.email;
-	await db.organization.update({
-		where: { id: organizationId },
+	await db.subscription.create({
 		data: {
-			subscription: {
-				create: {
-					paddleSubscriptionId: event.subscriptionId,
-					paddlePlanId: event.productId,
-					paddleCheckoutId: event.checkoutId,
-					nextBillDate: event.nextPaymentDate,
-					status: translateSubscriptionStatus(event.status),
-					lastEventTime: event.eventTime,
-					updateUrl: event.updateUrl,
-					cancelUrl: event.cancelUrl,
-					currency: event.currency,
-					unitPrice: event.unitPrice,
-				},
-			},
+			organizationId,
+			paddleSubscriptionId: event.subscriptionId,
+			paddlePlanId: event.productId,
+			paddleCheckoutId: event.checkoutId,
+			nextBillDate: event.nextPaymentDate,
+			status: translateSubscriptionStatus(event.status),
+			lastEventTime: event.eventTime,
+			updateUrl: event.updateUrl,
+			cancelUrl: event.cancelUrl,
+			currency: event.currency,
+			unitPrice: event.unitPrice,
 		},
 	});
 
-	if (!!organization.subscription) {
+	if (isReturningSubscriber) {
 		sendEmail({
 			subject: "Welcome back to Shellphone",
 			body: "Welcome back to Shellphone",
@@ -58,15 +55,17 @@ export const subscriptionCreatedQueue = Queue<Payload>("api/queue/subscription-c
 		}).catch((error) => {
 			logger.error(error);
 		});
-	} else {
-		sendEmail({
-			subject: "Welcome to Shellphone",
-			body: `Welcome to Shellphone`,
-			recipients: [email],
-		}).catch((error) => {
-			logger.error(error);
-		});
+
+		return;
 	}
+
+	sendEmail({
+		subject: "Welcome to Shellphone",
+		body: `Welcome to Shellphone`,
+		recipients: [email],
+	}).catch((error) => {
+		logger.error(error);
+	});
 });
 
 export default subscriptionCreatedQueue;

@@ -30,7 +30,7 @@ model Organization {
   messages                  Message[]
   phoneCalls                PhoneCall[]
   processingPhoneNumbers    ProcessingPhoneNumber[]
-  subscription              Subscription?
+  subscriptions             Subscription[]
 
   @@unique([id, twilioAccountSid])
 }
@@ -50,8 +50,8 @@ model Subscription {
   nextBillDate         DateTime           @db.Date
   lastEventTime        DateTime           @db.Timestamp
 
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  organizationId String?
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
 }
 
 enum SubscriptionStatus {
@@ -95,7 +95,7 @@ model User {
   id             String     @id @default(uuid())
   createdAt      DateTime   @default(now()) @db.Timestamptz
   updatedAt      DateTime   @updatedAt @db.Timestamptz
-  fullName       String     @default("")
+  fullName       String
   email          String     @unique
   hashedPassword String?
   role           GlobalRole @default(CUSTOMER)

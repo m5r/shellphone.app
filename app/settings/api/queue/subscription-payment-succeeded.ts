@@ -42,6 +42,7 @@ export const subscriptionPaymentSucceededQueue = Queue<Payload>(
 			},
 		});
 	},
+	{ retry: ["30s", "1m", "5m"] },
 );
 
 export default subscriptionPaymentSucceededQueue;
