@@ -61,7 +61,7 @@ export default function Conversation() {
 								>
 									<span
 										className={clsx(
-											"inline-block text-left w-[fit-content] p-2 rounded-lg text-white",
+											"inline-block whitespace-pre-line text-left w-[fit-content] p-2 rounded-lg text-white",
 											isOutbound ? "bg-[#3194ff] rounded-br-none" : "bg-black rounded-bl-none",
 										)}
 									>

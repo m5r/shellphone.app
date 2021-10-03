@@ -33,7 +33,7 @@ const insertIncomingMessageQueue = Queue<Payload>(
 				from: message.from,
 				status: translateMessageStatus(message.status),
 				direction: translateMessageDirection(message.direction),
-				sentAt: message.dateCreated,
+				sentAt: new Date(message.dateCreated),
 				content: encrypt(message.body, organization.encryptionKey),
 			},
 		});

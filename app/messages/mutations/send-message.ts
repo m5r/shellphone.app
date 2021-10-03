@@ -1,7 +1,7 @@
 import { NotFoundError, resolver } from "blitz";
 import { z } from "zod";
 
-import db, { Direction, MessageStatus } from "../../../db";
+import db, { Direction, MessageStatus, SubscriptionStatus } from "../../../db";
 import { encrypt } from "../../../db/_encryption";
 import sendMessageQueue from "../../messages/api/queue/send-message";
 import appLogger from "../../../integrations/logger";
@@ -34,9 +34,23 @@ export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ 
 
 	const phoneNumber = organization.phoneNumbers[0];
 	if (!phoneNumber) {
-		return;
+		throw new NotFoundError();
 	}
 
+	const subscription = await db.subscription.findFirst({
+		where: {
+			organizationId,
+			OR: [
+				{ status: { not: SubscriptionStatus.deleted } },
+				{ status: SubscriptionStatus.deleted, cancellationEffectiveDate: { gt: new Date() } },
+			],
+		},
+	});
+
+	const isFreeSubscription = !subscription;
+	const messageBody = isFreeSubscription
+		? content + "\n\nSent from Shellphone (https://www.shellphone.app)"
+		: content;
 	const phoneNumberId = phoneNumber.id;
 	const message = await db.message.create({
 		data: {
@@ -46,7 +60,7 @@ export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ 
 			from: phoneNumber.number,
 			direction: Direction.Outbound,
 			status: MessageStatus.Queued,
-			content: encrypt(content, organization.encryptionKey),
+			content: encrypt(messageBody, organization.encryptionKey),
 			sentAt: new Date(),
 		},
 	});
@@ -57,7 +71,7 @@ export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ 
 			organizationId,
 			phoneNumberId,
 			to,
-			content,
+			content: messageBody,
 		},
 		{
 			id: `insert-${message.id}-${organizationId}-${phoneNumberId}`,

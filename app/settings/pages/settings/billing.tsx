@@ -24,7 +24,6 @@ const Billing: BlitzPage<Props> = (props) => {
 	TODO: I want to be able to
 		- upgrade to yearly
 		- downgrade to monthly
-		- know how much time I have left until my cancelled subscription runs out --- DONE
 		- resubscribe (message like "your subscription expired, would you like to renew ?")
 	*/
 

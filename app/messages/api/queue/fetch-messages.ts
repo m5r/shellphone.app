@@ -1,4 +1,5 @@
 import { Queue } from "quirrel/blitz";
+import type { MessageInstance } from "twilio/lib/rest/api/v2010/account/message";
 
 import db from "../../../../db";
 import insertMessagesQueue from "./insert-messages";
@@ -26,9 +27,7 @@ const fetchMessagesQueue = Queue<Payload>("api/queue/fetch-messages", async ({ o
 	]);
 	const messagesSent = sent.filter((message) => message.direction.startsWith("outbound"));
 	const messagesReceived = received.filter((message) => message.direction === "inbound");
-	const messages = [...messagesSent, ...messagesReceived].sort(
-		(a, b) => a.dateCreated.getTime() - b.dateCreated.getTime(),
-	);
+	const messages = [...messagesSent, ...messagesReceived];
 
 	await insertMessagesQueue.enqueue(
 		{
