@@ -3,7 +3,6 @@ import { useQuery, useMutation, useSession } from "blitz";
 
 import type { Subscription } from "db";
 import getSubscription from "../queries/get-subscription";
-import getPayments from "../queries/get-payments";
 import usePaddle from "./use-paddle";
 import useCurrentUser from "../../core/hooks/use-current-user";
 import updateSubscription from "../mutations/update-subscription";
@@ -20,7 +19,6 @@ export default function useSubscription({ initialData }: Params = {}) {
 		initialData,
 		refetchInterval: isWaitingForSubChange ? 1500 : false,
 	});
-	const [payments] = useQuery(getPayments, null);
 	const [updateSubscriptionMutation] = useMutation(updateSubscription);
 
 	const resolve = useRef<() => void>();
@@ -107,7 +105,6 @@ export default function useSubscription({ initialData }: Params = {}) {
 
 	return {
 		subscription,
-		payments,
 		subscribe,
 		updatePaymentMethod,
 		cancelSubscription,
