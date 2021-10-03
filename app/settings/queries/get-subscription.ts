@@ -8,7 +8,7 @@ export default resolver.pipe(resolver.authorize(), async (_ = null, { session })
 	return db.subscription.findFirst({
 		where: {
 			organizationId: session.orgId,
-			status: { not: SubscriptionStatus.deleted },
+			OR: [{ status: { not: SubscriptionStatus.deleted } }, { cancellationEffectiveDate: { gt: new Date() } }],
 		},
 	});
 });

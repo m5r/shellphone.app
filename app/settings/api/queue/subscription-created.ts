@@ -5,12 +5,13 @@ import type { PaddleSdkSubscriptionCreatedEvent } from "@devoxa/paddle-sdk";
 import db, { MembershipRole } from "db";
 import appLogger from "integrations/logger";
 import { sendEmail } from "integrations/ses";
+import type { Metadata } from "integrations/paddle";
 import { translateSubscriptionStatus } from "integrations/paddle";
 
 const logger = appLogger.child({ queue: "subscription-created" });
 
 type Payload = {
-	event: PaddleSdkSubscriptionCreatedEvent<{ organizationId: string }>;
+	event: PaddleSdkSubscriptionCreatedEvent<Metadata>;
 };
 
 export const subscriptionCreatedQueue = Queue<Payload>("api/queue/subscription-created", async ({ event }) => {

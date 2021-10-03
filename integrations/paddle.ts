@@ -24,7 +24,7 @@ export const paddleSdk = new PaddleSdk({
 export type Metadata = { organizationId: string };
 
 export function translateSubscriptionStatus(
-	status: PaddleSdkSubscriptionCreatedEvent<unknown>["status"],
+	status: PaddleSdkSubscriptionCreatedEvent<Metadata>["status"],
 ): SubscriptionStatus {
 	switch (status) {
 		case PaddleSdkSubscriptionStatus.ACTIVE:
