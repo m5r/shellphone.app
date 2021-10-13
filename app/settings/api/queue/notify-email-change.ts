@@ -1,7 +1,7 @@
 import { Queue } from "quirrel/blitz";
 
-import appLogger from "../../../../integrations/logger";
-import { sendEmail } from "../../../../integrations/ses";
+import appLogger from "integrations/logger";
+import { sendEmail } from "integrations/aws-ses";
 
 const logger = appLogger.child({ queue: "notify-email-change" });
 

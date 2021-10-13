@@ -2,19 +2,9 @@ import url from "url";
 import querystring from "querystring";
 import { spawn } from "child_process";
 import { PassThrough } from "stream";
-import { getConfig } from "blitz";
-import AWS from "aws-sdk";
-import { sendEmail } from "../integrations/ses";
 
-const { serverRuntimeConfig } = getConfig();
-
-const s3 = new AWS.S3({
-	credentials: new AWS.Credentials({
-		accessKeyId: serverRuntimeConfig.awsS3.accessKeyId,
-		secretAccessKey: serverRuntimeConfig.awsS3.secretAccessKey,
-	}),
-	region: serverRuntimeConfig.awsS3.region,
-});
+import { sendEmail } from "integrations/aws-ses";
+import { s3 } from "integrations/aws-s3";
 
 export default async function backup(schedule: "daily" | "weekly" | "monthly") {
 	const s3Bucket = `shellphone-${schedule}-backup`;
