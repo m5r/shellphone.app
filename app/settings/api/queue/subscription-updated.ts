@@ -4,7 +4,7 @@ import { PaddleSdkSubscriptionUpdatedEvent } from "@devoxa/paddle-sdk";
 
 import db, { MembershipRole } from "db";
 import appLogger from "integrations/logger";
-import { sendEmail } from "integrations/ses";
+import { sendEmail } from "integrations/aws-ses";
 import type { Metadata } from "integrations/paddle";
 import { translateSubscriptionStatus } from "integrations/paddle";
 
