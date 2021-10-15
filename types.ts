@@ -15,7 +15,7 @@ declare module "blitz" {
 			userId: User["id"];
 			roles: Role[];
 			orgId: Organization["id"];
-			hasCompletedOnboarding?: true;
+			shouldShowWelcomeMessage?: true;
 		};
 	}
 }

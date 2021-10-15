@@ -22,12 +22,11 @@ export default resolver.pipe(
 			where: { id: organizationId },
 			include: { phoneNumbers: true },
 		});
-		if (!organization) {
+		if (!organization || !organization.phoneNumbers[0]) {
 			throw new NotFoundError();
 		}
 
-		const phoneNumberId = organization.phoneNumbers[0]!.id;
-
+		const phoneNumberId = organization.phoneNumbers[0].id;
 		const processingState = await db.processingPhoneNumber.findFirst({ where: { organizationId, phoneNumberId } });
 		if (processingState && !processingState.hasFetchedMessages) {
 			return;

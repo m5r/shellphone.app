@@ -3,7 +3,6 @@ import { GetServerSideProps, getSession, Routes } from "blitz";
 
 import db, { Subscription, SubscriptionStatus } from "db";
 import useSubscription from "../../hooks/use-subscription";
-import useRequireOnboarding from "../../../core/hooks/use-require-onboarding";
 import usePaymentsHistory from "../../hooks/use-payments-history";
 import SettingsLayout from "../../components/settings-layout";
 import SettingsSection from "../../components/settings-section";
@@ -27,7 +26,6 @@ const Billing: BlitzPage<Props> = (props) => {
 		- resubscribe (message like "your subscription expired, would you like to renew ?")
 	*/
 
-	useRequireOnboarding();
 	const { count: paymentsCount } = usePaymentsHistory();
 	const { subscription, cancelSubscription, updatePaymentMethod } = useSubscription({
 		initialData: props.subscription,

@@ -2,18 +2,27 @@ import { Suspense } from "react";
 import type { BlitzPage } from "blitz";
 import { Routes } from "blitz";
 
-import Layout from "../../core/layouts/layout";
+import Layout from "app/core/layouts/layout";
 import PhoneCallsList from "../components/phone-calls-list";
-import useRequireOnboarding from "../../core/hooks/use-require-onboarding";
+import MissingTwilioCredentials from "app/core/components/missing-twilio-credentials";
+import useCurrentUser from "app/core/hooks/use-current-user";
+import PageTitle from "../../core/components/page-title";
 
 const PhoneCalls: BlitzPage = () => {
-	useRequireOnboarding();
+	const { hasFilledTwilioCredentials } = useCurrentUser();
+
+	if (!hasFilledTwilioCredentials) {
+		return (
+			<>
+				<MissingTwilioCredentials />
+				<PageTitle className="filter blur-sm absolute top-0" title="Calls" />
+			</>
+		);
+	}
 
 	return (
 		<>
-			<div className="flex flex-col space-y-6 py-3 pl-12">
-				<h2 className="text-3xl font-bold">Calls</h2>
-			</div>
+			<PageTitle className="pl-12" title="Calls" />
 			<section className="flex flex-grow flex-col">
 				<Suspense fallback="Loading...">
 					<PhoneCallsList />

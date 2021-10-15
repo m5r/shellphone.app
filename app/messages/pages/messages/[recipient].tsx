@@ -5,12 +5,9 @@ import { IoChevronBack, IoInformationCircle, IoCall } from "react-icons/io5";
 
 import Layout from "../../../core/layouts/layout";
 import Conversation from "../../components/conversation";
-import useRequireOnboarding from "../../../core/hooks/use-require-onboarding";
 import useConversation from "../../hooks/use-conversation";
 
 const ConversationPage: BlitzPage = () => {
-	useRequireOnboarding();
-
 	const router = useRouter();
 	const recipient = decodeURIComponent(router.params.recipient);
 	const pageTitle = `Messages with ${recipient}`;

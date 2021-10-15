@@ -32,7 +32,7 @@ function NavLink({ path, label, icon }: NavLinkProps) {
 			<Link href={path}>
 				<a
 					className={clsx("flex flex-col items-center", {
-						"text-[#007AFF]": isActiveRoute,
+						"text-primary-500": isActiveRoute,
 						"text-[#959595]": !isActiveRoute,
 					})}
 				>

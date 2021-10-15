@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
-import { useMutation } from "blitz";
+import { NotFoundError, Routes, useMutation, useRouter } from "blitz";
 import type { TwilioError } from "@twilio/voice-sdk";
 import { Call, Device } from "@twilio/voice-sdk";
 
 import getToken from "../mutations/get-token";
-import appLogger from "../../../integrations/logger";
+import appLogger from "integrations/logger";
 
 const logger = appLogger.child({ module: "use-device" });
 
 export default function useDevice() {
+	const router = useRouter();
 	const [device, setDevice] = useState<Device | null>(null);
 	const [isDeviceReady, setIsDeviceReady] = useState(() => device?.state === Device.State.Registered);
 	const [getTokenMutation] = useMutation(getToken);
@@ -18,9 +19,17 @@ export default function useDevice() {
 			return;
 		}
 
-		const token = await getTokenMutation();
-		device.updateToken(token);
-	}, [device, getTokenMutation]);
+		try {
+			const token = await getTokenMutation();
+			device.updateToken(token);
+		} catch (error) {
+			if (error instanceof NotFoundError) {
+				throw router.push(Routes.KeypadPage());
+			}
+
+			throw error;
+		}
+	}, [device, getTokenMutation, router]);
 
 	useEffect(() => {
 		const intervalId = setInterval(() => {
@@ -31,17 +40,25 @@ export default function useDevice() {
 
 	useEffect(() => {
 		(async () => {
-			const token = await getTokenMutation();
-			const device = new Device(token, {
-				codecPreferences: [Call.Codec.Opus, Call.Codec.PCMU],
-				sounds: {
-					[Device.SoundName.Disconnect]: undefined, // TODO
-				},
-			});
-			device.register();
-			setDevice(device);
+			try {
+				const token = await getTokenMutation();
+				const device = new Device(token, {
+					codecPreferences: [Call.Codec.Opus, Call.Codec.PCMU],
+					sounds: {
+						[Device.SoundName.Disconnect]: undefined, // TODO
+					},
+				});
+				device.register();
+				setDevice(device);
+			} catch (error) {
+				if (error instanceof NotFoundError) {
+					throw router.push(Routes.KeypadPage());
+				}
+
+				throw error;
+			}
 		})();
-	}, [getTokenMutation, setDevice]);
+	}, [getTokenMutation, setDevice, router]);
 
 	useEffect(() => {
 		if (!device) {

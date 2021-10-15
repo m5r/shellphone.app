@@ -40,16 +40,9 @@ export default resolver.pipe(resolver.zod(Login), async ({ email, password }, ct
 	const user = await authenticateUser(email, password);
 
 	const organization = user.memberships[0]!.organization;
-	const hasCompletedOnboarding =
-		Boolean(organization.twilioAccountSid) &&
-		Boolean(organization.twilioAuthToken) &&
-		Boolean(organization.twilioApiKey) &&
-		Boolean(organization.twilioApiSecret) &&
-		Boolean(organization.phoneNumbers.length > 1);
 	await ctx.session.$create({
 		userId: user.id,
 		roles: [user.role, user.memberships[0]!.role],
-		hasCompletedOnboarding: hasCompletedOnboarding || undefined,
 		orgId: organization.id,
 	});
 

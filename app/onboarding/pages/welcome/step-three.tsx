@@ -102,7 +102,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res }
 
 	const phoneNumber = await db.phoneNumber.findFirst({ where: { organizationId: session.orgId } });
 	if (phoneNumber) {
-		await session.$setPublicData({ hasCompletedOnboarding: true });
 		return {
 			redirect: {
 				destination: Routes.Messages().pathname,
