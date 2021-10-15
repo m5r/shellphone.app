@@ -96,7 +96,15 @@ export default async function incomingCallHandler(req: BlitzApiRequest, res: Bli
 	} else {
 		const phoneNumbers = await db.phoneNumber.findMany({
 			where: { number: req.body.To },
-			include: { organization: true },
+			include: {
+				organization: {
+					include: {
+						subscriptions: {
+							where: { status: SubscriptionStatus.active },
+						},
+					},
+				},
+			},
 		});
 		if (phoneNumbers.length === 0) {
 			// phone number is not registered by any organization
@@ -104,10 +112,23 @@ export default async function incomingCallHandler(req: BlitzApiRequest, res: Bli
 			return;
 		}
 
-		const phoneNumber = phoneNumbers.find((phoneNumber) => {
+		const phoneNumbersWithActiveSub = phoneNumbers.filter(
+			(phoneNumber) => phoneNumber.organization.subscriptions.length > 0,
+		);
+		if (phoneNumbersWithActiveSub.length === 0) {
+			// accept the webhook but reject incoming call
+			// because the organization is on the free plan
+			const voiceResponse = new twilio.twiml.VoiceResponse();
+			voiceResponse.reject();
+
+			console.log("twiml voiceResponse", voiceResponse);
+			res.setHeader("content-type", "text/xml");
+			res.status(200).send(voiceResponse.toString());
+		}
+		const phoneNumber = phoneNumbersWithActiveSub.find((phoneNumber) => {
 			// if multiple organizations have the same number
 			// find the organization currently using that phone number
-			// maybe we shouldn't let multiple organizations use the same phone number
+			// maybe we shouldn't let that happen by restricting a phone number to one org?
 			const authToken = phoneNumber.organization.twilioAuthToken ?? "";
 			return twilio.validateRequest(authToken, twilioSignature, voiceUrl, req.body);
 		});
