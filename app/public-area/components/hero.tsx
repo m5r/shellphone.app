@@ -23,6 +23,18 @@ export default function Hero() {
 								</p>
 
 								<CTAForm />
+
+								<div className="max-w-lg mx-auto md:mx-0">
+									<span className="block md:inline mx-2">
+										<em>✓ </em>Free trial
+									</span>
+									<span className="block md:inline mx-2">
+										<em>✓ </em>No credit card required
+									</span>
+									<span className="block md:inline mx-2">
+										<em>✓ </em>Cancel anytime
+									</span>
+								</div>
 							</div>
 						</div>
 					</div>
