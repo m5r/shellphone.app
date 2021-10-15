@@ -4,8 +4,6 @@ import twilio from "twilio";
 
 import db from "../../../db";
 import getCurrentUser from "../../users/queries/get-current-user";
-import fetchMessagesQueue from "../../messages/api/queue/fetch-messages";
-import fetchCallsQueue from "../../phone-calls/api/queue/fetch-calls";
 import setTwilioWebhooks from "../api/queue/set-twilio-webhooks";
 
 const Body = z.object({
@@ -46,22 +44,6 @@ export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ 
 
 	const phoneNumberId = phoneNumberSid;
 	await Promise.all([
-		db.processingPhoneNumber.create({
-			data: {
-				organizationId,
-				phoneNumberId,
-				hasFetchedMessages: false,
-				hasFetchedCalls: false,
-			},
-		}),
-		fetchMessagesQueue.enqueue(
-			{ organizationId, phoneNumberId },
-			{ id: `fetch-messages-${organizationId}-${phoneNumberId}` },
-		),
-		fetchCallsQueue.enqueue(
-			{ organizationId, phoneNumberId },
-			{ id: `fetch-messages-${organizationId}-${phoneNumberId}` },
-		),
 		setTwilioWebhooks.enqueue(
 			{ organizationId, phoneNumberId },
 			{ id: `set-twilio-webhooks-${organizationId}-${phoneNumberId}` },
