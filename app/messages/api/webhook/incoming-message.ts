@@ -2,7 +2,7 @@ import type { BlitzApiRequest, BlitzApiResponse } from "blitz";
 import twilio from "twilio";
 
 import appLogger from "../../../../integrations/logger";
-import db from "../../../../db";
+import db, { SubscriptionStatus } from "../../../../db";
 import insertIncomingMessageQueue from "../queue/insert-incoming-message";
 import { smsUrl } from "../../../../integrations/twilio";
 import type { ApiError } from "../../../core/types";
@@ -40,7 +40,15 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 	try {
 		const phoneNumbers = await db.phoneNumber.findMany({
 			where: { number: body.To },
-			include: { organization: true },
+			include: {
+				organization: {
+					include: {
+						subscriptions: {
+							where: { status: SubscriptionStatus.active },
+						},
+					},
+				},
+			},
 		});
 		if (phoneNumbers.length === 0) {
 			// phone number is not registered by any organization
@@ -48,10 +56,19 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 			return;
 		}
 
-		const phoneNumber = phoneNumbers.find((phoneNumber) => {
+		const phoneNumbersWithActiveSub = phoneNumbers.filter(
+			(phoneNumber) => phoneNumber.organization.subscriptions.length > 0,
+		);
+		if (phoneNumbersWithActiveSub.length === 0) {
+			// accept the webhook but don't store incoming message
+			// because the organization is on the free plan
+			res.status(200).end();
+		}
+
+		const phoneNumber = phoneNumbersWithActiveSub.find((phoneNumber) => {
 			// if multiple organizations have the same number
 			// find the organization currently using that phone number
-			// maybe we shouldn't let multiple organizations use the same phone number
+			// maybe we shouldn't let that happen by restricting a phone number to one org?
 			const authToken = phoneNumber.organization.twilioAuthToken ?? "";
 			return twilio.validateRequest(authToken, twilioSignature, smsUrl, req.body);
 		});
