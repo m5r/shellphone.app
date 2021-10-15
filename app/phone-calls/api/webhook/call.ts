@@ -1,11 +1,11 @@
 import type { BlitzApiRequest, BlitzApiResponse } from "blitz";
 import twilio from "twilio";
 
-import db, { Direction } from "../../../../db";
-import appLogger from "../../../../integrations/logger";
-import { translateCallStatus, voiceUrl } from "../../../../integrations/twilio";
+import type { ApiError } from "app/core/types";
+import db, { Direction, SubscriptionStatus } from "db";
+import appLogger from "integrations/logger";
+import { translateCallStatus, voiceUrl } from "integrations/twilio";
 import updateCallDurationQueue from "../queue/update-call-duration";
-import type { ApiError } from "../../../core/types";
 
 const logger = appLogger.child({ route: "/api/webhook/call" });
 
@@ -31,8 +31,22 @@ export default async function incomingCallHandler(req: BlitzApiRequest, res: Bli
 		const organizationId = req.body.From.slice("client:".length).split("__")[0];
 		const phoneNumber = await db.phoneNumber.findFirst({
 			where: { organizationId },
-			include: { organization: true },
+			include: {
+				organization: {
+					include: {
+						subscriptions: {
+							where: { status: SubscriptionStatus.active },
+						},
+					},
+				},
+			},
 		});
+		if (phoneNumber?.organization.subscriptions.length === 0) {
+			// decline the outgoing call because
+			// the organization is on the free plan
+			res.status(402).end();
+		}
+
 		if (
 			!phoneNumber ||
 			!phoneNumber.organization.twilioAuthToken ||
@@ -69,16 +83,16 @@ export default async function incomingCallHandler(req: BlitzApiRequest, res: Bli
 			{ delay: "30s" },
 		);
 
-		const twiml = new twilio.twiml.VoiceResponse();
-		const dial = twiml.dial({
+		const voiceResponse = new twilio.twiml.VoiceResponse();
+		const dial = voiceResponse.dial({
 			answerOnBridge: true,
 			callerId: phoneNumber!.number,
 		});
 		dial.number(recipient);
-		console.log("twiml", twiml.toString());
+		console.log("twiml voiceResponse", voiceResponse.toString());
 
 		res.setHeader("content-type", "text/xml");
-		return res.status(200).send(twiml.toString());
+		return res.status(200).send(voiceResponse.toString());
 	} else {
 		const phoneNumbers = await db.phoneNumber.findMany({
 			where: { number: req.body.To },
