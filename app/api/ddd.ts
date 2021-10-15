@@ -2,7 +2,9 @@ import { BlitzApiRequest, BlitzApiResponse } from "blitz";
 
 import db from "db";
 import twilio from "twilio";
-import setTwilioWebhooks from "../onboarding/api/queue/set-twilio-webhooks";
+import setTwilioWebhooks from "../settings/api/queue/set-twilio-webhooks";
+import backup from "../../db/backup";
+import { sendEmail } from "../../integrations/aws-ses";
 
 export default async function ddd(req: BlitzApiRequest, res: BlitzApiResponse) {
 	/*await Promise.all([
@@ -54,6 +56,14 @@ export default async function ddd(req: BlitzApiRequest, res: BlitzApiResponse) {
 		phoneNumberId: "PNb77c9690c394368bdbaf20ea6fe5e9fc",
 		organizationId: "95267d60-3d35-4c36-9905-8543ecb4f174",
 	});*/
+	/*try {
+		const before = Date.now();
+		await backup("daily");
+		console.log(`took ${Date.now() - before}ms`);
+	} catch (error) {
+		console.error("dddd error", error);
+		res.status(500).end();
+	}*/
 
 	// setTimeout(() => {
 	res.status(200).end();
