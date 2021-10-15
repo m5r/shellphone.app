@@ -7,6 +7,9 @@ import appLogger from "integrations/logger";
 import { sendEmail } from "integrations/aws-ses";
 import type { Metadata } from "integrations/paddle";
 import { translateSubscriptionStatus } from "integrations/paddle";
+import fetchMessagesQueue from "../../../messages/api/queue/fetch-messages";
+import fetchCallsQueue from "../../../phone-calls/api/queue/fetch-calls";
+import setTwilioWebhooks from "../../../onboarding/api/queue/set-twilio-webhooks";
 
 const logger = appLogger.child({ queue: "subscription-created" });
 
@@ -19,6 +22,7 @@ export const subscriptionCreatedQueue = Queue<Payload>("api/queue/subscription-c
 	const organization = await db.organization.findFirst({
 		where: { id: organizationId },
 		include: {
+			phoneNumbers: true,
 			subscriptions: true,
 			memberships: {
 				include: { user: true },
@@ -47,6 +51,30 @@ export const subscriptionCreatedQueue = Queue<Payload>("api/queue/subscription-c
 			unitPrice: event.unitPrice,
 		},
 	});
+
+	const phoneNumberId = organization.phoneNumbers[0]!.id;
+	await Promise.all([
+		db.processingPhoneNumber.create({
+			data: {
+				organizationId,
+				phoneNumberId,
+				hasFetchedMessages: false,
+				hasFetchedCalls: false,
+			},
+		}),
+		fetchMessagesQueue.enqueue(
+			{ organizationId, phoneNumberId },
+			{ id: `fetch-messages-${organizationId}-${phoneNumberId}` },
+		),
+		fetchCallsQueue.enqueue(
+			{ organizationId, phoneNumberId },
+			{ id: `fetch-messages-${organizationId}-${phoneNumberId}` },
+		),
+		setTwilioWebhooks.enqueue(
+			{ organizationId, phoneNumberId },
+			{ id: `set-twilio-webhooks-${organizationId}-${phoneNumberId}` },
+		),
+	]);
 
 	if (isReturningSubscriber) {
 		sendEmail({
