@@ -22,7 +22,7 @@ export default function EmptyMessages() {
 			<p className="mt-1 text-sm text-gray-500">Get started by calling someone you know.</p>
 			<div className="mt-6">
 				<Link href={Routes.KeypadPage()}>
-					<a className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#007AFF] focus:outline-none focus:ring-2 focus:ring-offset-2">
+					<a className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2">
 						<IoKeypad className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
 						Open keypad
 					</a>

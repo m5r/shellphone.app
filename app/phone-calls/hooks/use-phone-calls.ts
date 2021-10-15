@@ -5,9 +5,6 @@ import getPhoneCalls from "../queries/get-phone-calls";
 
 export default function usePhoneCalls() {
 	const phoneNumber = useCurrentPhoneNumber();
-	if (!phoneNumber) {
-		throw new NotFoundError();
-	}
 
-	return useQuery(getPhoneCalls, { phoneNumberId: phoneNumber.id });
+	return useQuery(getPhoneCalls, { phoneNumberId: phoneNumber?.id as string }, { enabled: Boolean(phoneNumber) });
 }

@@ -5,14 +5,12 @@ import type { TwilioError } from "@twilio/voice-sdk";
 import { atom, useAtom } from "jotai";
 import { IoCall } from "react-icons/io5";
 
-import useRequireOnboarding from "../../../core/hooks/use-require-onboarding";
 import useMakeCall from "../../hooks/use-make-call";
 import useDevice from "../../hooks/use-device";
 
 import Keypad from "../../components/keypad";
 
 const OutgoingCall: BlitzPage = () => {
-	useRequireOnboarding();
 	const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
 	const router = useRouter();
 	const recipient = decodeURIComponent(router.params.recipient);

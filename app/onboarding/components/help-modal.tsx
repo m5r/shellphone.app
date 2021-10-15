@@ -1,7 +1,7 @@
 import type { FunctionComponent } from "react";
 import { useRef } from "react";
 
-import Modal, { ModalTitle } from "../../settings/components/modal";
+import Modal, { ModalTitle } from "app/core/components/modal";
 
 type Props = {
 	isHelpModalOpen: boolean;

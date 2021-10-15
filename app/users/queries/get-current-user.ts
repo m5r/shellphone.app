@@ -1,6 +1,6 @@
 import type { Ctx } from "blitz";
 
-import db from "db";
+import db, { SubscriptionStatus } from "db";
 
 export default async function getCurrentUser(_ = null, { session }: Ctx) {
 	if (!session.userId) return null;
@@ -15,14 +15,10 @@ export default async function getCurrentUser(_ = null, { session }: Ctx) {
 			memberships: {
 				include: {
 					organization: {
-						select: {
-							id: true,
-							encryptionKey: true,
-							twilioAccountSid: true,
-							twilioAuthToken: true,
-							twilioApiKey: true,
-							twilioApiSecret: true,
-							twimlAppSid: true,
+						include: {
+							subscriptions: {
+								where: { status: SubscriptionStatus.active },
+							},
 						},
 					},
 				},

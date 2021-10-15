@@ -30,7 +30,6 @@ export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ 
 			number: phoneNumber.phoneNumber,
 		},
 	});
-	context.session.$setPrivateData({ hasCompletedOnboarding: true });
 
 	const mainTwilioClient = twilio(organization.twilioAccountSid, organization.twilioAuthToken);
 	const apiKey = await mainTwilioClient.newKeys.create({ friendlyName: "Shellphone API key" });

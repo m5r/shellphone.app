@@ -9,7 +9,9 @@ export default function useCurrentUser() {
 	return {
 		user,
 		organization,
-		hasFilledTwilioCredentials: Boolean(user && organization?.twilioAccountSid && organization?.twilioAuthToken),
-		hasCompletedOnboarding: session.hasCompletedOnboarding,
+		hasFilledTwilioCredentials: Boolean(
+			organization && organization.twilioAccountSid && organization.twilioAuthToken,
+		),
+		hasActiveSubscription: organization && organization.subscriptions.length > 0,
 	};
 }

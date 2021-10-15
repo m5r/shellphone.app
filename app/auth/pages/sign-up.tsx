@@ -29,7 +29,7 @@ const SignUp: BlitzPage = () => {
 			onSubmit={async (values) => {
 				try {
 					await signupMutation(values);
-					router.push(Routes.StepOne());
+					await router.push(Routes.Welcome());
 				} catch (error: any) {
 					if (error.code === "P2002" && error.meta?.target?.includes("email")) {
 						// This error comes from Prisma
@@ -47,7 +47,13 @@ const SignUp: BlitzPage = () => {
 	);
 };
 
-SignUp.redirectAuthenticatedTo = Routes.StepOne();
+SignUp.redirectAuthenticatedTo = ({ session }) => {
+	if (session.shouldShowWelcomeMessage) {
+		return Routes.Welcome();
+	}
+
+	return Routes.Messages();
+};
 
 SignUp.getLayout = (page) => <BaseLayout title="Sign Up">{page}</BaseLayout>;
 

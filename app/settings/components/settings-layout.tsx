@@ -6,6 +6,7 @@ import {
 	IoLogOutOutline,
 	IoNotificationsOutline,
 	IoCardOutline,
+	IoCallOutline,
 	IoPersonCircleOutline,
 } from "react-icons/io5";
 
@@ -15,6 +16,7 @@ import Divider from "./divider";
 
 const subNavigation = [
 	{ name: "Account", href: Routes.Account(), icon: IoPersonCircleOutline },
+	{ name: "Phone", href: Routes.PhoneSettings(), icon: IoCallOutline },
 	{ name: "Billing", href: Routes.Billing(), icon: IoCardOutline },
 	{ name: "Notifications", href: Routes.Notifications(), icon: IoNotificationsOutline },
 ];
@@ -36,7 +38,7 @@ const SettingsLayout: FunctionComponent = ({ children }) => {
 			<main className="flex flex-col flex-grow mx-auto w-full max-w-7xl pb-10 lg:py-12 lg:px-8">
 				<div className="flex flex-col flex-grow lg:grid lg:grid-cols-12 lg:gap-x-5">
 					<aside className="py-6 px-2 sm:px-6 lg:py-0 lg:px-0 lg:col-span-3">
-						<nav className="h-full flex flex-col">
+						<nav className="space-y-1 h-full flex flex-col">
 							{subNavigation.map((item) => {
 								const isCurrentPage = item.href.pathname === router.pathname;
 
@@ -47,7 +49,7 @@ const SettingsLayout: FunctionComponent = ({ children }) => {
 												isCurrentPage
 													? "bg-gray-50 text-primary-600 hover:bg-white"
 													: "text-gray-900 hover:text-gray-900 hover:bg-gray-50",
-												"mb-1 group rounded-md px-3 py-2 flex items-center text-sm font-medium",
+												"group rounded-md px-3 py-2 flex items-center text-sm font-medium",
 											)}
 											aria-current={isCurrentPage ? "page" : undefined}
 										>
@@ -66,7 +68,7 @@ const SettingsLayout: FunctionComponent = ({ children }) => {
 								);
 							})}
 
-							<Divider className="mt-auto mb-1" />
+							<Divider />
 							<button
 								onClick={() => logoutMutation()}
 								className="group text-gray-900 hover:text-gray-900 hover:bg-gray-50 rounded-md px-3 py-2 flex items-center text-sm font-medium"

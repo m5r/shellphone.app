@@ -1,4 +1,4 @@
-import { Fragment, useRef } from "react";
+import { Fragment, useRef, useState } from "react";
 import type { BlitzPage } from "blitz";
 import { Routes, useRouter } from "blitz";
 import { atom, useAtom } from "jotai";
@@ -7,15 +7,17 @@ import { Transition } from "@headlessui/react";
 import { IoBackspace, IoCall } from "react-icons/io5";
 
 import { Direction } from "db";
-import Layout from "../../core/layouts/layout";
+import Layout from "app/core/layouts/layout";
 import Keypad from "../components/keypad";
-import useRequireOnboarding from "../../core/hooks/use-require-onboarding";
 import usePhoneCalls from "../hooks/use-phone-calls";
 import useKeyPress from "../hooks/use-key-press";
+import useCurrentUser from "app/core/hooks/use-current-user";
+import KeypadErrorModal from "../components/keypad-error-modal";
 
 const KeypadPage: BlitzPage = () => {
-	useRequireOnboarding();
+	const { hasFilledTwilioCredentials, hasActiveSubscription } = useCurrentUser();
 	const router = useRouter();
+	const [isKeypadErrorModalOpen, setIsKeypadErrorModalOpen] = useState(false);
 	const [phoneCalls] = usePhoneCalls();
 	const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
 	const removeDigit = useAtom(pressBackspaceAtom)[1];
@@ -74,49 +76,61 @@ const KeypadPage: BlitzPage = () => {
 	});
 
 	return (
-		<div className="w-96 h-full flex flex-col justify-around py-5 mx-auto text-center text-black">
-			<div className="h-16 text-3xl text-gray-700">
-				<span>{phoneNumber}</span>
-			</div>
+		<>
+			<div className="w-96 h-full flex flex-col justify-around py-5 mx-auto text-center text-black">
+				<div className="h-16 text-3xl text-gray-700">
+					<span>{phoneNumber}</span>
+				</div>
 
-			<Keypad onDigitPressProps={onDigitPressProps} onZeroPressProps={onZeroPressProps}>
-				<button
-					onClick={async () => {
-						if (phoneNumber === "") {
-							const lastCall = phoneCalls?.[0];
-							if (lastCall) {
-								const lastCallRecipient =
-									lastCall.direction === Direction.Inbound ? lastCall.from : lastCall.to;
-								setPhoneNumber(lastCallRecipient);
+				<Keypad onDigitPressProps={onDigitPressProps} onZeroPressProps={onZeroPressProps}>
+					<button
+						onClick={async () => {
+							if (!hasFilledTwilioCredentials) {
+								setIsKeypadErrorModalOpen(true);
+								return;
 							}
 
-							return;
-						}
+							if (!hasActiveSubscription) {
+								// TODO
+							}
 
-						await router.push(Routes.OutgoingCall({ recipient: encodeURI(phoneNumber) }));
-						setPhoneNumber("");
-					}}
-					className="cursor-pointer select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-green-800 rounded-full"
-				>
-					<IoCall className="w-6 h-6 text-white" />
-				</button>
+							if (phoneNumber === "") {
+								const lastCall = phoneCalls?.[0];
+								if (lastCall) {
+									const lastCallRecipient =
+										lastCall.direction === Direction.Inbound ? lastCall.from : lastCall.to;
+									setPhoneNumber(lastCallRecipient);
+								}
 
-				<Transition
-					as={Fragment}
-					show={phoneNumber.length > 0}
-					enter="transition duration-300 ease-in-out"
-					enterFrom="transform scale-95 opacity-0"
-					enterTo="transform scale-100 opacity-100"
-					leave="transition duration-100 ease-out"
-					leaveFrom="transform scale-100 opacity-100"
-					leaveTo="transform scale-95 opacity-0"
-				>
-					<div {...onBackspacePress} className="cursor-pointer select-none m-auto">
-						<IoBackspace className="w-6 h-6" />
-					</div>
-				</Transition>
-			</Keypad>
-		</div>
+								return;
+							}
+
+							await router.push(Routes.OutgoingCall({ recipient: encodeURI(phoneNumber) }));
+							setPhoneNumber("");
+						}}
+						className="cursor-pointer select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-green-800 rounded-full"
+					>
+						<IoCall className="w-6 h-6 text-white" />
+					</button>
+
+					<Transition
+						as={Fragment}
+						show={phoneNumber.length > 0}
+						enter="transition duration-300 ease-in-out"
+						enterFrom="transform scale-95 opacity-0"
+						enterTo="transform scale-100 opacity-100"
+						leave="transition duration-100 ease-out"
+						leaveFrom="transform scale-100 opacity-100"
+						leaveTo="transform scale-95 opacity-0"
+					>
+						<div {...onBackspacePress} className="cursor-pointer select-none m-auto">
+							<IoBackspace className="w-6 h-6" />
+						</div>
+					</Transition>
+				</Keypad>
+			</div>
+			<KeypadErrorModal closeModal={() => setIsKeypadErrorModalOpen(false)} isOpen={isKeypadErrorModalOpen} />
+		</>
 	);
 };
 

@@ -4,7 +4,7 @@ import clsx from "clsx";
 
 import Button from "../button";
 import SettingsSection from "../settings-section";
-import Modal, { ModalTitle } from "../modal";
+import Modal, { ModalTitle } from "app/core/components/modal";
 import deleteUser from "../../mutations/delete-user";
 
 export default function DangerZone() {

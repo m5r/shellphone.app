@@ -31,6 +31,7 @@ export default resolver.pipe(resolver.zod(Signup), async ({ email, password, ful
 		userId: user.id,
 		roles: [user.role, user.memberships[0]!.role],
 		orgId: user.memberships[0]!.organizationId,
+		shouldShowWelcomeMessage: true,
 	});
 	return user;
 });
