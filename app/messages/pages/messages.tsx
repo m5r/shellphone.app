@@ -1,7 +1,6 @@
 import { Suspense, useEffect } from "react";
-import dynamic from "next/dynamic";
 import type { BlitzPage } from "blitz";
-import { Routes } from "blitz";
+import { Routes, dynamic } from "blitz";
 import { atom, useAtom } from "jotai";
 
 import Layout from "app/core/layouts/layout";
@@ -13,7 +12,7 @@ import useCurrentUser from "app/core/hooks/use-current-user";
 import PageTitle from "../../core/components/page-title";
 
 const Messages: BlitzPage = () => {
-	const { hasFilledTwilioCredentials } = useCurrentUser();
+	const { hasFilledTwilioCredentials, hasPhoneNumber } = useCurrentUser();
 	const { subscription, subscribe } = useNotifications();
 	const setIsOpen = useAtom(bottomSheetOpenAtom)[1];
 
@@ -23,7 +22,7 @@ const Messages: BlitzPage = () => {
 		}
 	}, [subscribe, subscription]);
 
-	if (!hasFilledTwilioCredentials) {
+	if (!hasFilledTwilioCredentials || !hasPhoneNumber) {
 		return (
 			<>
 				<MissingTwilioCredentials />

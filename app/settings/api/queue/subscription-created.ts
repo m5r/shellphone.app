@@ -9,7 +9,7 @@ import type { Metadata } from "integrations/paddle";
 import { translateSubscriptionStatus } from "integrations/paddle";
 import fetchMessagesQueue from "../../../messages/api/queue/fetch-messages";
 import fetchCallsQueue from "../../../phone-calls/api/queue/fetch-calls";
-import setTwilioWebhooks from "../../../onboarding/api/queue/set-twilio-webhooks";
+import setTwilioWebhooks from "./set-twilio-webhooks";
 
 const logger = appLogger.child({ queue: "subscription-created" });
 
