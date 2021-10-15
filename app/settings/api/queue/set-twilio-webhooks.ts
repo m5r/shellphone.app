@@ -2,8 +2,8 @@ import { Queue } from "quirrel/blitz";
 import type twilio from "twilio";
 import type { ApplicationInstance } from "twilio/lib/rest/api/v2010/account/application";
 
-import db from "../../../../db";
-import getTwilioClient, { getTwiMLName, smsUrl, voiceUrl } from "../../../../integrations/twilio";
+import db from "db";
+import getTwilioClient, { getTwiMLName, smsUrl, voiceUrl } from "integrations/twilio";
 
 type Payload = {
 	organizationId: string;

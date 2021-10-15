@@ -15,7 +15,7 @@ import useCurrentUser from "app/core/hooks/use-current-user";
 import KeypadErrorModal from "../components/keypad-error-modal";
 
 const KeypadPage: BlitzPage = () => {
-	const { hasFilledTwilioCredentials, hasActiveSubscription } = useCurrentUser();
+	const { hasFilledTwilioCredentials, hasPhoneNumber, hasActiveSubscription } = useCurrentUser();
 	const router = useRouter();
 	const [isKeypadErrorModalOpen, setIsKeypadErrorModalOpen] = useState(false);
 	const [phoneCalls] = usePhoneCalls();
@@ -85,7 +85,7 @@ const KeypadPage: BlitzPage = () => {
 				<Keypad onDigitPressProps={onDigitPressProps} onZeroPressProps={onZeroPressProps}>
 					<button
 						onClick={async () => {
-							if (!hasFilledTwilioCredentials) {
+							if (!hasFilledTwilioCredentials || !hasPhoneNumber) {
 								setIsKeypadErrorModalOpen(true);
 								return;
 							}

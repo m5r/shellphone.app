@@ -9,9 +9,9 @@ import useCurrentUser from "app/core/hooks/use-current-user";
 import PageTitle from "../../core/components/page-title";
 
 const PhoneCalls: BlitzPage = () => {
-	const { hasFilledTwilioCredentials } = useCurrentUser();
+	const { hasFilledTwilioCredentials, hasPhoneNumber } = useCurrentUser();
 
-	if (!hasFilledTwilioCredentials) {
+	if (!hasFilledTwilioCredentials || !hasPhoneNumber) {
 		return (
 			<>
 				<MissingTwilioCredentials />

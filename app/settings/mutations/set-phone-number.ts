@@ -2,8 +2,8 @@ import { resolver } from "blitz";
 import { z } from "zod";
 import twilio from "twilio";
 
-import db from "../../../db";
-import getCurrentUser from "../../users/queries/get-current-user";
+import db from "db";
+import getCurrentUser from "app/users/queries/get-current-user";
 import setTwilioWebhooks from "../api/queue/set-twilio-webhooks";
 
 const Body = z.object({
