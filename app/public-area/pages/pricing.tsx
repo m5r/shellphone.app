@@ -19,16 +19,6 @@ const paidFeatures = [
 const pricing = {
 	tiers: [
 		{
-			title: "Free",
-			price: 0,
-			frequency: "",
-			description: "The essentials to let you try Shellphone.",
-			features: ["SMS (send only)"],
-			unavailableFeatures: paidFeatures.slice(1),
-			cta: "Join waitlist",
-			yearly: false,
-		},
-		{
 			title: "Yearly",
 			price: 12.5,
 			frequency: "/month",
@@ -54,15 +44,18 @@ const pricing = {
 const Pricing: BlitzPage = () => {
 	return (
 		<section className="pt-32 pb-10 px-4 sm:px-6 md:pt-34 md:pb-16">
-			<div className="bg-white">
-				<h2 className="text-3xl font-mackinac font-extrabold text-navy sm:text-5xl sm:leading-none sm:tracking-tight">
-					Simple no-tricks pricing
+			<div className="bg-white flex flex-col">
+				<h2 className="text-3xl font-mackinac font-extrabold text-navy sm:text-3xl sm:leading-none sm:tracking-tight">
+					Simple, no-tricks pricing
 				</h2>
-				<p className="mt-6 max-w-2xl text-xl text-gray-500">
-					One affordable and transparent plan that includes everything you need.
+				<p className="mt-4 max-w-2xl text-xl text-gray-500">
+					Our straightforward, <span className="border-b-4 border-primary-600">all-inclusive</span> pricing.
 				</p>
 
-				<div className="mt-24 space-y-12 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-x-8">
+				<p className="mt-8 text-lg text-gray-500 mx-auto">
+					Start a free trial with the essentials features to discover Shellphone — no credit card required
+				</p>
+				<div className="mt-4 mx-auto space-y-12 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-8">
 					{pricing.tiers.map((tier) => (
 						<div
 							key={tier.title}
@@ -76,7 +69,7 @@ const Pricing: BlitzPage = () => {
 									</p>
 								) : null}
 								<p className="mt-4 flex items-baseline text-gray-900">
-									<span className="text-4xl font-extrabold tracking-tight">{tier.price}€</span>
+									<span className="text-3xl font-extrabold tracking-tight">{tier.price}€</span>
 									<span className="ml-1 text-xl font-semibold">{tier.frequency}</span>
 								</p>
 								{tier.yearly ? (
@@ -94,27 +87,13 @@ const Pricing: BlitzPage = () => {
 											<span className="ml-3 text-gray-500">{feature}</span>
 										</li>
 									))}
-									{tier.unavailableFeatures.map((feature) => (
-										<li key={feature} className="flex">
-											<span className="ml-9 text-gray-400">
-												{~feature.indexOf("(coming soon)")
-													? feature.slice(0, feature.indexOf("(coming soon)"))
-													: feature}
-											</span>
-										</li>
-									))}
 								</ul>
 							</div>
 
 							<Link href={Routes.LandingPage({ join_waitlist: "" })}>
 								<a
 									onClick={() => Panelbear.track("redirect-to-join-waitlist")}
-									className={clsx(
-										tier.yearly
-											? "bg-rebeccapurple-500 text-white hover:bg-rebeccapurple-600"
-											: "bg-rebeccapurple-50 text-rebeccapurple-700 hover:bg-rebeccapurple-100",
-										"mt-8 block w-full py-3 px-6 border border-transparent rounded-md text-center font-medium",
-									)}
+									className="bg-rebeccapurple-500 text-white hover:bg-rebeccapurple-600 mt-8 block w-full py-3 px-6 border border-transparent rounded-md text-center font-medium"
 								>
 									{tier.cta}
 								</a>
