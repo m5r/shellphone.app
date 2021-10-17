@@ -7,7 +7,7 @@ import { Transition } from "@headlessui/react";
 import { IoBackspace, IoCall } from "react-icons/io5";
 
 import { Direction } from "db";
-import Layout from "app/core/layouts/layout";
+import AppLayout from "app/core/layouts/layout";
 import Keypad from "../components/keypad";
 import usePhoneCalls from "../hooks/use-phone-calls";
 import useKeyPress from "../hooks/use-key-press";
@@ -161,7 +161,7 @@ const pressBackspaceAtom = atom(null, (get, set) => {
 	set(phoneNumberAtom, (prevState) => prevState.slice(0, -1));
 });
 
-KeypadPage.getLayout = (page) => <Layout title="Keypad">{page}</Layout>;
+KeypadPage.getLayout = (page) => <AppLayout title="Keypad">{page}</AppLayout>;
 
 KeypadPage.authenticate = { redirectTo: Routes.SignIn() };
 

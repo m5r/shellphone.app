@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import type { BlitzPage } from "blitz";
 import { Routes, dynamic } from "blitz";
 
@@ -8,10 +7,8 @@ import PhoneNumberForm from "../../components/phone/phone-number-form";
 const PhoneSettings: BlitzPage = () => {
 	return (
 		<div className="flex flex-col space-y-6">
-			<Suspense fallback="Loading...">
-				<TwilioApiForm />
-				<PhoneNumberForm />
-			</Suspense>
+			<TwilioApiForm />
+			<PhoneNumberForm />
 		</div>
 	);
 };

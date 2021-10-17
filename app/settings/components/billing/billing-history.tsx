@@ -10,10 +10,11 @@ export default function BillingHistory() {
 		skip,
 		pagesNumber,
 		currentPage,
-		goToPreviousPage,
+		lastPage,
 		hasPreviousPage,
-		goToNextPage,
 		hasNextPage,
+		goToPreviousPage,
+		goToNextPage,
 		setPage,
 	} = usePaymentsHistory();
 
@@ -104,8 +105,8 @@ export default function BillingHistory() {
 										Previous
 									</button>
 									<p className="text-sm text-gray-700 self-center">
-										Page <span className="font-medium">1</span> of{" "}
-										<span className="font-medium">4</span>
+										Page <span className="font-medium">{currentPage}</span> of{" "}
+										<span className="font-medium">{lastPage}</span>
 									</p>
 									<button
 										onClick={goToNextPage}

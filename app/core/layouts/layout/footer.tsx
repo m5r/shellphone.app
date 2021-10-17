@@ -29,7 +29,7 @@ function NavLink({ path, label, icon }: NavLinkProps) {
 
 	return (
 		<div className="flex flex-col items-center justify-around h-full">
-			<Link href={path}>
+			<Link href={path} prefetch={false}>
 				<a
 					className={clsx("flex flex-col items-center", {
 						"text-primary-500": isActiveRoute,

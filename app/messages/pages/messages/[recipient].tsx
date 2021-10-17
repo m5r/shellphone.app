@@ -3,7 +3,7 @@ import type { BlitzPage } from "blitz";
 import { Routes, useRouter } from "blitz";
 import { IoChevronBack, IoInformationCircle, IoCall } from "react-icons/io5";
 
-import Layout from "../../../core/layouts/layout";
+import AppLayout from "../../../core/layouts/layout";
 import Conversation from "../../components/conversation";
 import useConversation from "../../hooks/use-conversation";
 
@@ -14,7 +14,7 @@ const ConversationPage: BlitzPage = () => {
 	const conversation = useConversation(recipient)[0];
 
 	return (
-		<Layout title={pageTitle} hideFooter>
+		<AppLayout title={pageTitle} hideFooter>
 			<header className="absolute top-0 w-screen h-12 backdrop-filter backdrop-blur-sm bg-white bg-opacity-75 border-b grid grid-cols-3 items-center">
 				<span className="col-start-1 col-span-1 pl-2 cursor-pointer" onClick={router.back}>
 					<IoChevronBack className="h-8 w-8" />
@@ -28,7 +28,7 @@ const ConversationPage: BlitzPage = () => {
 			<Suspense fallback={<div className="pt-12">Loading messages with {recipient}</div>}>
 				<Conversation />
 			</Suspense>
-		</Layout>
+		</AppLayout>
 	);
 };
 

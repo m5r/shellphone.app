@@ -14,6 +14,7 @@ export default function usePaymentsHistory() {
 		.fill(-1)
 		.map((_, i) => i + 1);
 	const currentPage = Math.floor((skip / count) * totalPages) + 1;
+	const lastPage = pagesNumber[pagesNumber.length - 1];
 	const hasPreviousPage = skip > 0;
 	const hasNextPage = hasMore && !!nextPage;
 	const goToPreviousPage = () => hasPreviousPage && setSkip(skip - itemsPerPage);
@@ -26,6 +27,7 @@ export default function usePaymentsHistory() {
 		skip,
 		pagesNumber,
 		currentPage,
+		lastPage,
 		hasPreviousPage,
 		hasNextPage,
 		goToPreviousPage,

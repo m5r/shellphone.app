@@ -1,4 +1,5 @@
 import type { FunctionComponent } from "react";
+import { Suspense } from "react";
 import { Link, Routes, useMutation, useRouter } from "blitz";
 import clsx from "clsx";
 import {
@@ -10,9 +11,10 @@ import {
 	IoPersonCircleOutline,
 } from "react-icons/io5";
 
-import Layout from "app/core/layouts/layout";
-import logout from "app/auth/mutations/logout";
+import AppLayout from "app/core/layouts/layout";
 import Divider from "./divider";
+import Spinner from "../../core/components/spinner";
+import logout from "app/auth/mutations/logout";
 
 const subNavigation = [
 	{ name: "Account", href: Routes.Account(), icon: IoPersonCircleOutline },
@@ -26,7 +28,7 @@ const SettingsLayout: FunctionComponent = ({ children }) => {
 	const [logoutMutation] = useMutation(logout);
 
 	return (
-		<Layout title="Settings">
+		<AppLayout title="Settings">
 			<header className="bg-gray-100 px-2 sm:px-6 lg:px-8">
 				<header className="flex">
 					<span className="flex items-center cursor-pointer" onClick={router.back}>
@@ -43,7 +45,7 @@ const SettingsLayout: FunctionComponent = ({ children }) => {
 								const isCurrentPage = item.href.pathname === router.pathname;
 
 								return (
-									<Link key={item.name} href={item.href}>
+									<Link key={item.name} href={item.href} prefetch>
 										<a
 											className={clsx(
 												isCurrentPage
@@ -79,10 +81,12 @@ const SettingsLayout: FunctionComponent = ({ children }) => {
 						</nav>
 					</aside>
 
-					<div className="flex-grow overflow-y-auto space-y-6 px-2 sm:px-6 lg:col-span-9">{children}</div>
+					<div className="flex-grow overflow-y-auto space-y-6 px-2 sm:px-6 lg:col-span-9">
+						<Suspense fallback={<Spinner />}>{children}</Suspense>
+					</div>
 				</div>
 			</main>
-		</Layout>
+		</AppLayout>
 	);
 };
 
