@@ -1,5 +1,5 @@
 import type { ErrorInfo, FunctionComponent } from "react";
-import { Component } from "react";
+import { Component, Suspense } from "react";
 import {
 	Head,
 	withRouter,
@@ -14,6 +14,7 @@ import type { WithRouterProps } from "next/dist/client/with-router";
 import appLogger from "../../../../integrations/logger";
 
 import Footer from "./footer";
+import Loader from "./loader";
 
 type Props = {
 	title: string;
@@ -23,7 +24,7 @@ type Props = {
 
 const logger = appLogger.child({ module: "Layout" });
 
-const Layout: FunctionComponent<Props> = ({ children, title, pageTitle = title, hideFooter = false }) => {
+const AppLayout: FunctionComponent<Props> = ({ children, title, pageTitle = title, hideFooter = false }) => {
 	return (
 		<>
 			{pageTitle ? (
@@ -32,16 +33,18 @@ const Layout: FunctionComponent<Props> = ({ children, title, pageTitle = title, 
 				</Head>
 			) : null}
 
-			<div className="h-full w-full overflow-hidden fixed bg-gray-100">
-				<div className="flex flex-col w-full h-full">
-					<div className="flex flex-col flex-1 w-full overflow-y-auto">
-						<main className="flex flex-col flex-1 my-0 h-full">
-							<ErrorBoundary>{children}</ErrorBoundary>
-						</main>
+			<Suspense fallback={<Loader />}>
+				<div className="h-full w-full overflow-hidden fixed bg-gray-100">
+					<div className="flex flex-col w-full h-full">
+						<div className="flex flex-col flex-1 w-full overflow-y-auto">
+							<main className="flex flex-col flex-1 my-0 h-full">
+								<ErrorBoundary>{children}</ErrorBoundary>
+							</main>
+						</div>
+						{!hideFooter ? <Footer /> : null}
 					</div>
-					{!hideFooter ? <Footer /> : null}
 				</div>
-			</div>
+			</Suspense>
 		</>
 	);
 };
@@ -109,4 +112,4 @@ const ErrorBoundary = withRouter(
 	},
 );
 
-export default Layout;
+export default AppLayout;

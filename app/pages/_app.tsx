@@ -21,7 +21,7 @@ import "app/core/styles/index.css";
 const { publicRuntimeConfig } = getConfig();
 
 export default function App({ Component, pageProps }: AppProps) {
-	const session = useSession();
+	const session = useSession({ suspense: false });
 	usePanelbear(publicRuntimeConfig.panelBear.siteId);
 	useEffect(() => {
 		if (session.userId) {
@@ -42,7 +42,8 @@ export default function App({ Component, pageProps }: AppProps) {
 			FallbackComponent={RootErrorFallback}
 			onReset={useQueryErrorResetBoundary().reset}
 		>
-			<Suspense fallback="Silence, ca pousse">{getLayout(<Component {...pageProps} />)}</Suspense>
+			{/* TODO: better default fallback */}
+			<Suspense fallback={null}>{getLayout(<Component {...pageProps} />)}</Suspense>
 		</ErrorBoundary>
 	);
 }

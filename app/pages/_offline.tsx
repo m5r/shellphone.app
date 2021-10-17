@@ -1,11 +1,11 @@
 import { useRouter } from "blitz";
 
-import Layout from "../core/layouts/layout";
+import AppLayout from "../core/layouts/layout";
 
 export default function Offline() {
 	const router = useRouter();
 	return (
-		<Layout title="App went offline">
+		<AppLayout title="App went offline">
 			<h2 className="mt-6 text-center text-3xl leading-9 font-extrabold text-gray-900">
 				Oops, looks like you went offline.
 			</h2>
@@ -17,6 +17,6 @@ export default function Offline() {
 					</span>
 				</button>
 			</p>
-		</Layout>
+		</AppLayout>
 	);
 }
