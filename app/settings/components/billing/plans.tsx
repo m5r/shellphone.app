@@ -5,17 +5,15 @@ import clsx from "clsx";
 import useSubscription from "../../hooks/use-subscription";
 
 export default function Plans() {
-	const { subscription, subscribe, changePlan } = useSubscription();
-	const hasSubscription = Boolean(subscription);
+	const { hasActiveSubscription, subscription, subscribe, changePlan } = useSubscription();
 
 	return (
 		<div className="mt-6 flex flex-row-reverse flex-wrap-reverse gap-x-4">
 			{pricing.tiers.map((tier) => {
-				const isCurrentTier =
-					!subscription?.paddlePlanId && tier.planId === -1
-						? true
-						: subscription?.paddlePlanId === tier.planId;
-				const cta = isCurrentTier ? "Current plan" : !!subscription ? `Switch to ${tier.title}` : "Subscribe";
+				const isFreeTier = tier.planId === -1;
+				const isCurrentTier = subscription?.paddlePlanId === tier.planId;
+				const isActiveTier = (!hasActiveSubscription && isFreeTier) || (hasActiveSubscription && isCurrentTier);
+				const cta = isActiveTier ? "Current plan" : !!subscription ? `Switch to ${tier.title}` : "Subscribe";
 
 				return (
 					<div
@@ -61,9 +59,9 @@ export default function Plans() {
 						</div>
 
 						<button
-							disabled={isCurrentTier}
+							disabled={isActiveTier}
 							onClick={() => {
-								if (hasSubscription) {
+								if (hasActiveSubscription) {
 									changePlan({ planId: tier.planId });
 									Panelbear.track(`Subscribe to ${tier.title}`);
 								} else {
@@ -72,7 +70,7 @@ export default function Plans() {
 								}
 							}}
 							className={clsx(
-								!isCurrentTier
+								!isActiveTier
 									? "bg-primary-500 text-white hover:bg-primary-600"
 									: "bg-primary-50 text-primary-700 cursor-not-allowed",
 								"mt-8 block w-full py-3 px-6 border border-transparent rounded-md text-center font-medium",
