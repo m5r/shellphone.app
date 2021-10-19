@@ -8,6 +8,7 @@ import useCurrentUser from "app/core/hooks/use-current-user";
 import useUserPhoneNumber from "app/core/hooks/use-current-phone-number";
 import Button from "../button";
 import SettingsSection from "../settings-section";
+import Alert from "app/core/components/alert";
 
 type Form = {
 	phoneNumberSid: string;
@@ -22,7 +23,7 @@ export default function PhoneNumberForm() {
 		setValue,
 		formState: { isSubmitting },
 	} = useForm<Form>();
-	const [setPhoneNumberMutation] = useMutation(setPhoneNumber);
+	const [setPhoneNumberMutation, { error, isError, isSuccess }] = useMutation(setPhoneNumber);
 	const [availablePhoneNumbers] = useQuery(getAvailablePhoneNumbers, {}, { enabled: hasFilledTwilioCredentials });
 
 	useEffect(() => {
@@ -55,6 +56,22 @@ export default function PhoneNumberForm() {
 					</div>
 				}
 			>
+				{isError ? (
+					<div className="mb-8">
+						<Alert
+							title="Oops, there was an issue"
+							message={parseErrorMessage(error as Error | null)}
+							variant="error"
+						/>
+					</div>
+				) : null}
+
+				{isSuccess ? (
+					<div className="mb-8">
+						<Alert title="Saved successfully" message="Your changes have been saved." variant="success" />
+					</div>
+				) : null}
+
 				<label htmlFor="phoneNumberSid" className="block text-sm font-medium text-gray-700">
 					Phone number
 				</label>
@@ -73,4 +90,16 @@ export default function PhoneNumberForm() {
 			</SettingsSection>
 		</form>
 	);
+}
+
+function parseErrorMessage(error: Error | null): string {
+	if (!error) {
+		return "";
+	}
+
+	if (error.name === "ZodError") {
+		return JSON.parse(error.message)[0].message;
+	}
+
+	return error.message;
 }
