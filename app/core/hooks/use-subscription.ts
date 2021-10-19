@@ -3,10 +3,10 @@ import { useQuery, useMutation, useSession } from "blitz";
 
 import type { Subscription } from "db";
 import { SubscriptionStatus } from "db";
-import getSubscription from "../queries/get-subscription";
-import usePaddle from "./use-paddle";
-import useCurrentUser from "../../core/hooks/use-current-user";
-import updateSubscription from "../mutations/update-subscription";
+import getSubscription from "app/settings/queries/get-subscription";
+import updateSubscription from "app/settings/mutations/update-subscription";
+import usePaddle from "app/settings/hooks/use-paddle";
+import useCurrentUser from "app/core/hooks/use-current-user";
 
 type Params = {
 	initialData?: Subscription;
