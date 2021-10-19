@@ -12,7 +12,7 @@
 		"prepare": "husky install"
 	},
 	"engines": {
-		"node": ">=16"
+		"node": "16"
 	},
 	"prisma": {
 		"schema": "db/schema.prisma"
@@ -48,10 +48,9 @@
 		"@tailwindcss/line-clamp": "0.2.2",
 		"@tailwindcss/typography": "0.4.1",
 		"@twilio/voice-sdk": "2.0.1",
-		"@use-gesture/react": "10.1.0",
 		"awesome-phonenumber": "2.64.0",
 		"aws-sdk": "2.1009.0",
-		"blitz": "0.41.1",
+		"blitz": "0.40.0-canary.8",
 		"clsx": "1.1.1",
 		"got": "11.8.2",
 		"jotai": "1.4.0",
@@ -66,7 +65,6 @@
 		"react-dom": "18.0.0-alpha-930c9e7ee-20211015",
 		"react-hook-form": "7.17.4",
 		"react-icons": "4.3.1",
-		"react-spring": "9.3.0",
 		"react-spring-bottom-sheet": "3.4.0",
 		"remark": "14.0.1",
 		"remark-html": "14.0.1",
