@@ -1,12 +1,12 @@
 import { useEffect } from "react";
-import { HiPhoneMissedCall, HiPhoneOutgoing } from "react-icons/hi";
+import { HiPhoneMissedCall, HiPhoneIncoming, HiPhoneOutgoing } from "react-icons/hi";
 import clsx from "clsx";
 
-import { Direction } from "../../../db";
-import PhoneInitLoader from "../../core/components/phone-init-loader";
+import { Direction, CallStatus } from "db";
+import PhoneInitLoader from "app/core/components/phone-init-loader";
 import EmptyCalls from "../components/empty-calls";
 import usePhoneCalls from "../hooks/use-phone-calls";
-import { formatRelativeDate } from "../../core/helpers/date-formatter";
+import { formatRelativeDate } from "app/core/helpers/date-formatter";
 
 export default function PhoneCallsList() {
 	const [phoneCalls, query] = usePhoneCalls();
@@ -30,7 +30,8 @@ export default function PhoneCallsList() {
 		<ul className="divide-y">
 			{phoneCalls.map((phoneCall) => {
 				const isOutboundCall = phoneCall.direction === Direction.Outbound;
-				const isMissedCall = !isOutboundCall && phoneCall.duration === "0"; // TODO
+				const isInboundCall = phoneCall.direction === Direction.Inbound;
+				const isMissedCall = isInboundCall && phoneCall.status === CallStatus.NoAnswer;
 				const recipient = isOutboundCall
 					? phoneCall.toMeta.formattedPhoneNumber
 					: phoneCall.fromMeta.formattedPhoneNumber;
@@ -38,10 +39,12 @@ export default function PhoneCallsList() {
 					<li key={phoneCall.id} className="flex flex-row py-2 px-4 ml-12">
 						<div className="h-4 w-4 mt-1 -ml-12">
 							{isOutboundCall ? <HiPhoneOutgoing className="text-[#C4C4C6]" /> : null}
+							{isInboundCall && !isMissedCall ? <HiPhoneIncoming className="text-[#C4C4C6]" /> : null}
+							{isInboundCall && isMissedCall ? <HiPhoneMissedCall className="text-[#C4C4C6]" /> : null}
 						</div>
 
 						<div className="flex flex-col items-start justify-center ml-4">
-							<strong className={clsx(isMissedCall && "text-[#FF362A]")}>{recipient}</strong>
+							<span className={clsx("font-medium", isMissedCall && "text-[#FF362A]")}>{recipient}</span>
 							<span className="text-[#89898C] text-sm">
 								{isOutboundCall ? phoneCall.toMeta.country : phoneCall.fromMeta.country}
 							</span>
