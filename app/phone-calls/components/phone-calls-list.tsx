@@ -7,8 +7,10 @@ import PhoneInitLoader from "app/core/components/phone-init-loader";
 import EmptyCalls from "../components/empty-calls";
 import usePhoneCalls from "../hooks/use-phone-calls";
 import { formatRelativeDate } from "app/core/helpers/date-formatter";
+import useCurrentUser from "app/core/hooks/use-current-user";
 
 export default function PhoneCallsList() {
+	const { hasActiveSubscription } = useCurrentUser();
 	const [phoneCalls, query] = usePhoneCalls();
 
 	useEffect(() => {
@@ -23,7 +25,7 @@ export default function PhoneCallsList() {
 	}
 
 	if (phoneCalls.length === 0) {
-		return <EmptyCalls />;
+		return hasActiveSubscription ? <EmptyCalls /> : null;
 	}
 
 	return (

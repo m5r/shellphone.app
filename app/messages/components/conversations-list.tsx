@@ -35,7 +35,7 @@ export default function ConversationsList() {
 						<Link href={Routes.ConversationPage({ recipient })}>
 							<a className="flex flex-col">
 								<div className="flex flex-row justify-between">
-									<strong>{formattedPhoneNumber}</strong>
+									<span className="font-medium">{formattedPhoneNumber}</span>
 									<div className="text-gray-700 flex flex-row gap-x-1">
 										{formatRelativeDate(lastMessage.sentAt)}
 										<IoChevronForward className="w-4 h-4 my-auto" />
