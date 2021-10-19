@@ -1,4 +1,4 @@
-import { resolver } from "blitz";
+import { NotFoundError, resolver } from "blitz";
 import { z } from "zod";
 import twilio from "twilio";
 import RestException from "twilio/lib/base/RestException";
@@ -24,15 +24,35 @@ export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ 
 		organization.twilioAccountSid,
 		organization.twilioAuthToken,
 	).incomingPhoneNumbers.list();
-	const phoneNumber = phoneNumbers.find((phoneNumber) => phoneNumber.sid === phoneNumberSid)!;
+	const twilioPhoneNumber = phoneNumbers.find((phoneNumber) => phoneNumber.sid === phoneNumberSid);
+	if (!twilioPhoneNumber) {
+		throw new NotFoundError();
+	}
+
 	const organizationId = organization.id;
-	await db.phoneNumber.create({
-		data: {
-			organizationId,
-			id: phoneNumberSid,
-			number: phoneNumber.phoneNumber,
-		},
-	});
+	const orgCurrentlyActivePhoneNumber = await db.phoneNumber.findFirst({ where: { organizationId } });
+	if (orgCurrentlyActivePhoneNumber) {
+		// TODO: delete this and allow switching phone numbers easily
+		await db.phoneNumber.delete({
+			where: {
+				organizationId_id: {
+					organizationId,
+					id: orgCurrentlyActivePhoneNumber.id,
+				},
+			},
+		});
+	}
+
+	const phoneNumber = await db.phoneNumber.findFirst({ where: { id: phoneNumberSid } });
+	if (!phoneNumber) {
+		await db.phoneNumber.create({
+			data: {
+				organizationId,
+				id: phoneNumberSid,
+				number: twilioPhoneNumber.phoneNumber,
+			},
+		});
+	}
 
 	let newApiKey;
 	const mainTwilioClient = twilio(organization.twilioAccountSid, organization.twilioAuthToken);
@@ -61,7 +81,7 @@ export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ 
 	}
 
 	const phoneNumberId = phoneNumberSid;
-	let promises = [
+	let promises: Promise<any>[] = [
 		setTwilioWebhooks.enqueue(
 			{ organizationId, phoneNumberId },
 			{ id: `set-twilio-webhooks-${organizationId}-${phoneNumberId}` },
@@ -71,6 +91,14 @@ export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ 
 	const hasActiveSubscription = organization.subscriptions.length > 0;
 	if (hasActiveSubscription) {
 		promises.push(
+			db.processingPhoneNumber.create({
+				data: {
+					organizationId,
+					phoneNumberId,
+					hasFetchedMessages: false,
+					hasFetchedCalls: false,
+				},
+			}),
 			fetchMessagesQueue.enqueue(
 				{ organizationId, phoneNumberId },
 				{ id: `fetch-messages-${organizationId}-${phoneNumberId}` },

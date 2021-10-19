@@ -26,17 +26,5 @@ export default resolver.pipe(
 				twilioAuthToken: twilioAuthToken,
 			},
 		});
-
-		const phoneNumber = await db.phoneNumber.findFirst({ where: { organizationId } });
-		if (phoneNumber) {
-			await db.phoneNumber.delete({
-				where: {
-					organizationId_id: {
-						organizationId,
-						id: phoneNumber.id,
-					},
-				},
-			});
-		}
 	},
 );
