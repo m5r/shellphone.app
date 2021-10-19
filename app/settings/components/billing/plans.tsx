@@ -2,7 +2,7 @@ import { HiCheck } from "react-icons/hi";
 import * as Panelbear from "@panelbear/panelbear-js";
 import clsx from "clsx";
 
-import useSubscription from "../../hooks/use-subscription";
+import useSubscription from "app/core/hooks/use-subscription";
 
 export default function Plans() {
 	const { hasActiveSubscription, subscription, subscribe, changePlan } = useSubscription();

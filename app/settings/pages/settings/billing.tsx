@@ -2,7 +2,7 @@ import type { BlitzPage } from "blitz";
 import { GetServerSideProps, getSession, Routes } from "blitz";
 
 import db, { Subscription, SubscriptionStatus } from "db";
-import useSubscription from "../../hooks/use-subscription";
+import useSubscription from "app/core/hooks/use-subscription";
 import usePaymentsHistory from "../../hooks/use-payments-history";
 import SettingsLayout from "../../components/settings-layout";
 import SettingsSection from "../../components/settings-section";
