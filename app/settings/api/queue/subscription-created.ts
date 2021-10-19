@@ -70,10 +70,6 @@ export const subscriptionCreatedQueue = Queue<Payload>("api/queue/subscription-c
 			{ organizationId, phoneNumberId },
 			{ id: `fetch-messages-${organizationId}-${phoneNumberId}` },
 		),
-		setTwilioWebhooks.enqueue(
-			{ organizationId, phoneNumberId },
-			{ id: `set-twilio-webhooks-${organizationId}-${phoneNumberId}` },
-		),
 	]);
 
 	if (isReturningSubscriber) {
