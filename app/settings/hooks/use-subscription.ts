@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useSession } from "blitz";
 
 import type { Subscription } from "db";
+import { SubscriptionStatus } from "db";
 import getSubscription from "../queries/get-subscription";
 import usePaddle from "./use-paddle";
 import useCurrentUser from "../../core/hooks/use-current-user";
@@ -34,7 +35,7 @@ export default function useSubscription({ initialData }: Params = {}) {
 	});
 
 	// cancel subscription polling when we get a new subscription
-	useEffect(() => setIsWaitingForSubChange(false), [subscription?.paddleSubscriptionId]);
+	useEffect(() => setIsWaitingForSubChange(false), [subscription?.paddleSubscriptionId, subscription?.status]);
 
 	useEffect(() => {
 		promise.current = new Promise((r) => (resolve.current = r));
@@ -103,8 +104,11 @@ export default function useSubscription({ initialData }: Params = {}) {
 		}
 	}
 
+	const hasActiveSubscription = Boolean(subscription && subscription?.status !== SubscriptionStatus.deleted);
+
 	return {
 		subscription,
+		hasActiveSubscription,
 		subscribe,
 		updatePaymentMethod,
 		cancelSubscription,
