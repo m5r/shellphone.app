@@ -9,7 +9,6 @@ import type { Metadata } from "integrations/paddle";
 import { translateSubscriptionStatus } from "integrations/paddle";
 import fetchMessagesQueue from "../../../messages/api/queue/fetch-messages";
 import fetchCallsQueue from "../../../phone-calls/api/queue/fetch-calls";
-import setTwilioWebhooks from "./set-twilio-webhooks";
 
 const logger = appLogger.child({ queue: "subscription-created" });
 
@@ -52,25 +51,28 @@ export const subscriptionCreatedQueue = Queue<Payload>("api/queue/subscription-c
 		},
 	});
 
-	const phoneNumberId = organization.phoneNumbers[0]!.id;
-	await Promise.all([
-		db.processingPhoneNumber.create({
-			data: {
-				organizationId,
-				phoneNumberId,
-				hasFetchedMessages: false,
-				hasFetchedCalls: false,
-			},
-		}),
-		fetchMessagesQueue.enqueue(
-			{ organizationId, phoneNumberId },
-			{ id: `fetch-messages-${organizationId}-${phoneNumberId}` },
-		),
-		fetchCallsQueue.enqueue(
-			{ organizationId, phoneNumberId },
-			{ id: `fetch-messages-${organizationId}-${phoneNumberId}` },
-		),
-	]);
+	const phoneNumber = organization.phoneNumbers[0];
+	if (phoneNumber) {
+		const phoneNumberId = phoneNumber.id;
+		await Promise.all([
+			db.processingPhoneNumber.create({
+				data: {
+					organizationId,
+					phoneNumberId,
+					hasFetchedMessages: false,
+					hasFetchedCalls: false,
+				},
+			}),
+			fetchMessagesQueue.enqueue(
+				{ organizationId, phoneNumberId },
+				{ id: `fetch-messages-${organizationId}-${phoneNumberId}` },
+			),
+			fetchCallsQueue.enqueue(
+				{ organizationId, phoneNumberId },
+				{ id: `fetch-messages-${organizationId}-${phoneNumberId}` },
+			),
+		]);
+	}
 
 	if (isReturningSubscriber) {
 		sendEmail({

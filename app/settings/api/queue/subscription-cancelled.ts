@@ -1,4 +1,3 @@
-import { NotFoundError } from "blitz";
 import { Queue } from "quirrel/blitz";
 import type { PaddleSdkSubscriptionCancelledEvent } from "@devoxa/paddle-sdk";
 
@@ -17,7 +16,8 @@ export const subscriptionCancelledQueue = Queue<Payload>("api/queue/subscription
 	const paddleSubscriptionId = event.subscriptionId;
 	const subscription = await db.subscription.findFirst({ where: { paddleSubscriptionId } });
 	if (!subscription) {
-		throw new NotFoundError();
+		// user deleted their account, no need to update their subscription
+		return;
 	}
 
 	const lastEventTime = event.eventTime;
