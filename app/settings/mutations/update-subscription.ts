@@ -1,7 +1,7 @@
 import { NotFoundError, resolver } from "blitz";
 import { z } from "zod";
 
-import db from "db";
+import db, { Prisma, SubscriptionStatus } from "db";
 import { updateSubscriptionPlan } from "integrations/paddle";
 
 const Body = z.object({
@@ -9,7 +9,13 @@ const Body = z.object({
 });
 
 export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ planId }, ctx) => {
-	const subscription = await db.subscription.findFirst({ where: { organizationId: ctx.session.orgId } });
+	const subscription = await db.subscription.findFirst({
+		where: {
+			organizationId: ctx.session.orgId,
+			status: { not: SubscriptionStatus.deleted },
+		},
+		orderBy: { lastEventTime: Prisma.SortOrder.desc },
+	});
 	if (!subscription) {
 		throw new NotFoundError();
 	}

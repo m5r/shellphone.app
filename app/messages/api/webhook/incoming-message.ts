@@ -2,7 +2,7 @@ import type { BlitzApiRequest, BlitzApiResponse } from "blitz";
 import twilio from "twilio";
 
 import appLogger from "../../../../integrations/logger";
-import db, { SubscriptionStatus } from "../../../../db";
+import db, { Prisma, SubscriptionStatus } from "../../../../db";
 import insertIncomingMessageQueue from "../queue/insert-incoming-message";
 import { smsUrl } from "../../../../integrations/twilio";
 import type { ApiError } from "../../../core/types";
@@ -44,7 +44,16 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 				organization: {
 					include: {
 						subscriptions: {
-							where: { status: SubscriptionStatus.active },
+							where: {
+								OR: [
+									{ status: { not: SubscriptionStatus.deleted } },
+									{
+										status: SubscriptionStatus.deleted,
+										cancellationEffectiveDate: { gt: new Date() },
+									},
+								],
+							},
+							orderBy: { lastEventTime: Prisma.SortOrder.desc },
 						},
 					},
 				},
