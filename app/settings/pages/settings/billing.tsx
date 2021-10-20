@@ -23,7 +23,6 @@ const Billing: BlitzPage<Props> = (props) => {
 	TODO: I want to be able to
 		- upgrade to yearly
 		- downgrade to monthly
-		- resubscribe (message like "your subscription expired, would you like to renew ?")
 	*/
 
 	const { count: paymentsCount } = usePaymentsHistory();

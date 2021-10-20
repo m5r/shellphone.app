@@ -91,7 +91,7 @@ const Pricing: BlitzPage = () => {
 
 							<Link href={Routes.LandingPage({ join_waitlist: "" })}>
 								<a
-									onClick={() => Panelbear.track("redirect-to-join-waitlist")}
+									onClick={() => Panelbear.track("Redirect to join waitlist")}
 									className="bg-rebeccapurple-500 text-white hover:bg-rebeccapurple-600 mt-8 block w-full py-3 px-6 border border-transparent rounded-md text-center font-medium"
 								>
 									{tier.cta}
