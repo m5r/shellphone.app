@@ -31,7 +31,7 @@ export default function CTAForm() {
 			return;
 		}
 
-		Panelbear.track("join-waitlist");
+		Panelbear.track("Join waitlist");
 		return joinWaitlistMutation({ email });
 	});
 
