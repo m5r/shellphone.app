@@ -21,7 +21,7 @@ export default function PhoneCallsList() {
 	}, [phoneCalls, query]);
 
 	if (!phoneCalls) {
-		return <PhoneInitLoader />;
+		return hasOngoingSubscription ? <PhoneInitLoader /> : null;
 	}
 
 	if (phoneCalls.length === 0) {
