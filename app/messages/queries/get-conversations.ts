@@ -26,7 +26,7 @@ export default resolver.pipe(
 			throw new NotFoundError();
 		}
 
-		const phoneNumberId = organization.phoneNumbers[0].id;
+		const phoneNumberId = organization.phoneNumbers[0].id; // TODO: use the active number, not the first one
 		const processingState = await db.processingPhoneNumber.findFirst({ where: { organizationId, phoneNumberId } });
 		if (processingState && !processingState.hasFetchedMessages) {
 			return;

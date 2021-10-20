@@ -32,7 +32,7 @@ export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ 
 		return;
 	}
 
-	const phoneNumber = organization.phoneNumbers[0];
+	const phoneNumber = organization.phoneNumbers[0]; // TODO: use the active number, not the first one
 	if (!phoneNumber) {
 		throw new NotFoundError();
 	}

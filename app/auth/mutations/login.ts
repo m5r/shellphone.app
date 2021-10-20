@@ -10,11 +10,7 @@ export const authenticateUser = async (rawEmail: string, rawPassword: string) =>
 		where: { email },
 		include: {
 			memberships: {
-				include: {
-					organization: {
-						include: { phoneNumbers: true },
-					},
-				},
+				include: { organization: true },
 			},
 		},
 	});

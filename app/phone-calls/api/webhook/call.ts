@@ -30,6 +30,7 @@ export default async function incomingCallHandler(req: BlitzApiRequest, res: Bli
 		const recipient = req.body.To;
 		const organizationId = req.body.From.slice("client:".length).split("__")[0];
 		const phoneNumber = await db.phoneNumber.findFirst({
+			// TODO: use the active number, not the first one
 			where: { organizationId },
 			include: {
 				organization: {
