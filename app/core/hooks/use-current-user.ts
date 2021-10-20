@@ -15,7 +15,7 @@ export default function useCurrentUser() {
 		organization,
 		hasFilledTwilioCredentials,
 		hasPhoneNumber: Boolean(phoneNumber),
-		hasActiveSubscription: organization && organization.subscriptions.length > 0,
+		hasOngoingSubscription: organization && organization.subscriptions.length > 0,
 		refetch: userQuery.refetch,
 	};
 }

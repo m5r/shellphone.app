@@ -17,7 +17,15 @@ export default async function getCurrentUser(_ = null, { session }: Ctx) {
 					organization: {
 						include: {
 							subscriptions: {
-								where: { status: SubscriptionStatus.active },
+								where: {
+									OR: [
+										{ status: { not: SubscriptionStatus.deleted } },
+										{
+											status: SubscriptionStatus.deleted,
+											cancellationEffectiveDate: { gt: new Date() },
+										},
+									],
+								},
 							},
 						},
 					},

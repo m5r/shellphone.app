@@ -1,6 +1,6 @@
 import { useQuery } from "blitz";
 
-import getCurrentPhoneNumber from "../../phone-numbers/queries/get-current-phone-number";
+import getCurrentPhoneNumber from "app/phone-numbers/queries/get-current-phone-number";
 import useCurrentUser from "./use-current-user";
 
 export default function useUserPhoneNumber() {

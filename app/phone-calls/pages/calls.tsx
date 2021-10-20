@@ -11,7 +11,7 @@ import InactiveSubscription from "app/core/components/inactive-subscription";
 import PhoneCallsList from "../components/phone-calls-list";
 
 const PhoneCalls: BlitzPage = () => {
-	const { hasFilledTwilioCredentials, hasPhoneNumber, hasActiveSubscription } = useCurrentUser();
+	const { hasFilledTwilioCredentials, hasPhoneNumber, hasOngoingSubscription } = useCurrentUser();
 
 	if (!hasFilledTwilioCredentials || !hasPhoneNumber) {
 		return (
@@ -22,7 +22,7 @@ const PhoneCalls: BlitzPage = () => {
 		);
 	}
 
-	if (!hasActiveSubscription) {
+	if (!hasOngoingSubscription) {
 		return (
 			<>
 				<InactiveSubscription />
