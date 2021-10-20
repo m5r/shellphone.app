@@ -3,7 +3,8 @@ import { resolver } from "blitz";
 import db from "../../../db";
 
 export default resolver.pipe(async () => {
-	const [phoneNumbers, smsExchanged, allPhoneCalls] = await Promise.all([
+	const [users, phoneNumbers, smsExchanged, allPhoneCalls] = await Promise.all([
+		db.user.count(),
 		db.phoneNumber.count(),
 		db.message.count(),
 		db.phoneCall.findMany(),
@@ -16,10 +17,13 @@ export default resolver.pipe(async () => {
 		return seconds + Number.parseInt(phoneCall.duration);
 	}, 0);
 	const minutesCalled = Math.round(secondsCalled / 60);
+	const averageMinutesCalled = (minutesCalled / allPhoneCalls.length).toFixed(2);
 
 	return {
+		users,
 		phoneNumbers,
 		smsExchanged,
 		minutesCalled,
+		averageMinutesCalled,
 	};
 });
