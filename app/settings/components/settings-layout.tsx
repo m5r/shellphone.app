@@ -81,7 +81,7 @@ const SettingsLayout: FunctionComponent = ({ children }) => {
 						</nav>
 					</aside>
 
-					<div className="flex-grow overflow-y-auto space-y-6 px-2 sm:px-6 lg:col-span-9">
+					<div className="flex-grow space-y-6 px-2 sm:px-6 lg:col-span-9">
 						<Suspense fallback={<Spinner />}>{children}</Suspense>
 					</div>
 				</div>
