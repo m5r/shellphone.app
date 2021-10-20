@@ -11,6 +11,7 @@ export default resolver.pipe(
 	enforceSuperAdminIfNotCurrentOrganization,
 	async ({ organizationId }) => {
 		return db.phoneNumber.findFirst({
+			// TODO: use the active number, not the first one
 			where: { organizationId },
 			select: {
 				id: true,
