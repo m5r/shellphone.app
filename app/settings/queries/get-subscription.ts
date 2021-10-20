@@ -1,6 +1,6 @@
 import { resolver } from "blitz";
 
-import db, { SubscriptionStatus } from "db";
+import db, { Prisma, SubscriptionStatus } from "db";
 
 export default resolver.pipe(resolver.authorize(), async (_ = null, { session }) => {
 	if (!session.orgId) return null;
@@ -8,7 +8,14 @@ export default resolver.pipe(resolver.authorize(), async (_ = null, { session })
 	return db.subscription.findFirst({
 		where: {
 			organizationId: session.orgId,
-			OR: [{ status: { not: SubscriptionStatus.deleted } }, { cancellationEffectiveDate: { gt: new Date() } }],
+			OR: [
+				{ status: { not: SubscriptionStatus.deleted } },
+				{
+					status: SubscriptionStatus.deleted,
+					cancellationEffectiveDate: { gt: new Date() },
+				},
+			],
 		},
+		orderBy: { lastEventTime: Prisma.SortOrder.desc },
 	});
 });

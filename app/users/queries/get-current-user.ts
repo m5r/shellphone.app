@@ -1,6 +1,6 @@
 import type { Ctx } from "blitz";
 
-import db, { SubscriptionStatus } from "db";
+import db, { Prisma, SubscriptionStatus } from "db";
 
 export default async function getCurrentUser(_ = null, { session }: Ctx) {
 	if (!session.userId) return null;
@@ -26,6 +26,7 @@ export default async function getCurrentUser(_ = null, { session }: Ctx) {
 										},
 									],
 								},
+								orderBy: { lastEventTime: Prisma.SortOrder.desc },
 							},
 						},
 					},

@@ -2,7 +2,7 @@ import type { BlitzApiRequest, BlitzApiResponse } from "blitz";
 import twilio from "twilio";
 
 import type { ApiError } from "app/core/types";
-import db, { Direction, SubscriptionStatus } from "db";
+import db, { Direction, Prisma, SubscriptionStatus } from "db";
 import appLogger from "integrations/logger";
 import { translateCallStatus, voiceUrl } from "integrations/twilio";
 import updateCallDurationQueue from "../queue/update-call-duration";
@@ -36,7 +36,16 @@ export default async function incomingCallHandler(req: BlitzApiRequest, res: Bli
 				organization: {
 					include: {
 						subscriptions: {
-							where: { status: SubscriptionStatus.active },
+							where: {
+								OR: [
+									{ status: { not: SubscriptionStatus.deleted } },
+									{
+										status: SubscriptionStatus.deleted,
+										cancellationEffectiveDate: { gt: new Date() },
+									},
+								],
+							},
+							orderBy: { lastEventTime: Prisma.SortOrder.desc },
 						},
 					},
 				},
@@ -101,7 +110,16 @@ export default async function incomingCallHandler(req: BlitzApiRequest, res: Bli
 				organization: {
 					include: {
 						subscriptions: {
-							where: { status: SubscriptionStatus.active },
+							where: {
+								OR: [
+									{ status: { not: SubscriptionStatus.deleted } },
+									{
+										status: SubscriptionStatus.deleted,
+										cancellationEffectiveDate: { gt: new Date() },
+									},
+								],
+							},
+							orderBy: { lastEventTime: Prisma.SortOrder.desc },
 						},
 					},
 				},
