@@ -19,7 +19,7 @@ type Props = {
 };
 
 const NewMessageArea: FunctionComponent<Props> = ({ recipient, onSend }) => {
-	const { organization } = useCurrentUser();
+	const { organization, hasOngoingSubscription } = useCurrentUser();
 	const phoneNumber = useCurrentPhoneNumber();
 	const sendMessageMutation = useMutation(sendMessage)[0];
 	const { setQueryData: setConversationsQueryData, refetch: refetchConversations } = useQuery(
@@ -48,7 +48,9 @@ const NewMessageArea: FunctionComponent<Props> = ({ recipient, onSend }) => {
 			phoneNumberId: phoneNumber!.id,
 			from: phoneNumber!.number,
 			to: recipient,
-			content: content,
+			content: hasOngoingSubscription
+				? content
+				: content + "\n\nSent from Shellphone (https://www.shellphone.app)",
 			direction: Direction.Outbound,
 			status: MessageStatus.Queued,
 			sentAt: new Date(),
