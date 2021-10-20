@@ -47,10 +47,10 @@ export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ 
 		},
 	});
 
-	const isFreeSubscription = !subscription;
-	const messageBody = isFreeSubscription
-		? content + "\n\nSent from Shellphone (https://www.shellphone.app)"
-		: content;
+	const hasOngoingSubscription = Boolean(subscription);
+	const messageBody = hasOngoingSubscription
+		? content
+		: content + "\n\nSent from Shellphone (https://www.shellphone.app)";
 	const phoneNumberId = phoneNumber.id;
 	const message = await db.message.create({
 		data: {
