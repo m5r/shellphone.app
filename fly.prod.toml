@@ -15,7 +15,7 @@ processes = []
   NODE_ENV = "production"
   AWS_S3_REGION = "eu-west-3"
   AWS_SES_REGION = "eu-central-1"
-  AWS_SES_FROM_EMAIL = "mokhtar@fss.dev"
+  AWS_SES_FROM_EMAIL = """"Mokhtar from Shellphone" <mokhtar@shellphone.app>"""
   QUIRREL_API_URL = "https://queue.mokhtar.dev"
   QUIRREL_BASE_URL = "www.shellphone.app"
   APP_BASE_URL = "www.shellphone.app"
@@ -23,7 +23,7 @@ processes = []
   SENTRY_PROJECT = "shellphone"
 
 [deploy]
-  release_command = "/app/node_modules/.bin/blitz prisma migrate deploy"
+  release_command = "sh /app/release.sh"
 
 [experimental]
   allowed_public_ports = []
