@@ -6,8 +6,8 @@ import RestException from "twilio/lib/base/RestException";
 import db from "db";
 import getCurrentUser from "app/users/queries/get-current-user";
 import setTwilioWebhooks from "../api/queue/set-twilio-webhooks";
-import fetchMessagesQueue from "../../messages/api/queue/fetch-messages";
-import fetchCallsQueue from "../../phone-calls/api/queue/fetch-calls";
+import fetchMessagesQueue from "app/messages/api/queue/fetch-messages";
+import fetchCallsQueue from "app/phone-calls/api/queue/fetch-calls";
 
 const Body = z.object({
 	phoneNumberSid: z.string(),
@@ -81,34 +81,26 @@ export default resolver.pipe(resolver.zod(Body), resolver.authorize(), async ({ 
 	}
 
 	const phoneNumberId = phoneNumberSid;
-	let promises: Promise<any>[] = [
+	await Promise.all([
 		setTwilioWebhooks.enqueue(
 			{ organizationId, phoneNumberId },
 			{ id: `set-twilio-webhooks-${organizationId}-${phoneNumberId}` },
 		),
-	];
-
-	const hasActiveSubscription = organization.subscriptions.length > 0;
-	if (hasActiveSubscription) {
-		promises.push(
-			db.processingPhoneNumber.create({
-				data: {
-					organizationId,
-					phoneNumberId,
-					hasFetchedMessages: false,
-					hasFetchedCalls: false,
-				},
-			}),
-			fetchMessagesQueue.enqueue(
-				{ organizationId, phoneNumberId },
-				{ id: `fetch-messages-${organizationId}-${phoneNumberId}` },
-			),
-			fetchCallsQueue.enqueue(
-				{ organizationId, phoneNumberId },
-				{ id: `fetch-messages-${organizationId}-${phoneNumberId}` },
-			),
-		);
-	}
-
-	await Promise.all(promises);
+		db.processingPhoneNumber.create({
+			data: {
+				organizationId,
+				phoneNumberId,
+				hasFetchedMessages: false,
+				hasFetchedCalls: false,
+			},
+		}),
+		fetchMessagesQueue.enqueue(
+			{ organizationId, phoneNumberId },
+			{ id: `fetch-messages-${organizationId}-${phoneNumberId}` },
+		),
+		fetchCallsQueue.enqueue(
+			{ organizationId, phoneNumberId },
+			{ id: `fetch-messages-${organizationId}-${phoneNumberId}` },
+		),
+	]);
 });
