@@ -63,6 +63,7 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 			// accept the webhook but don't store incoming message
 			// because the organization is on the free plan
 			res.status(200).end();
+			return;
 		}
 
 		const phoneNumber = phoneNumbersWithActiveSub.find((phoneNumber) => {
