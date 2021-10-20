@@ -10,7 +10,7 @@ import { formatRelativeDate } from "app/core/helpers/date-formatter";
 import useCurrentUser from "app/core/hooks/use-current-user";
 
 export default function PhoneCallsList() {
-	const { hasActiveSubscription } = useCurrentUser();
+	const { hasOngoingSubscription } = useCurrentUser();
 	const [phoneCalls, query] = usePhoneCalls();
 
 	useEffect(() => {
@@ -25,7 +25,7 @@ export default function PhoneCallsList() {
 	}
 
 	if (phoneCalls.length === 0) {
-		return hasActiveSubscription ? <EmptyCalls /> : null;
+		return hasOngoingSubscription ? <EmptyCalls /> : null;
 	}
 
 	return (
