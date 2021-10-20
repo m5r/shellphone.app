@@ -7,6 +7,8 @@ import appLogger from "integrations/logger";
 import { sendEmail } from "integrations/aws-ses";
 import type { Metadata } from "integrations/paddle";
 import { translateSubscriptionStatus } from "integrations/paddle";
+import fetchMessagesQueue from "app/messages/api/queue/fetch-messages";
+import fetchCallsQueue from "app/phone-calls/api/queue/fetch-calls";
 
 const logger = appLogger.child({ queue: "subscription-created" });
 
@@ -48,6 +50,30 @@ export const subscriptionCreatedQueue = Queue<Payload>("api/queue/subscription-c
 			unitPrice: event.unitPrice,
 		},
 	});
+
+	// fetch dismissed messages and phone calls that might have happened while on free plan
+	const phoneNumber = organization.phoneNumbers[0];
+	if (phoneNumber) {
+		const phoneNumberId = phoneNumber.id;
+		await Promise.all([
+			db.processingPhoneNumber.create({
+				data: {
+					organizationId,
+					phoneNumberId,
+					hasFetchedMessages: false,
+					hasFetchedCalls: false,
+				},
+			}),
+			fetchMessagesQueue.enqueue(
+				{ organizationId, phoneNumberId },
+				{ id: `fetch-messages-${organizationId}-${phoneNumberId}` },
+			),
+			fetchCallsQueue.enqueue(
+				{ organizationId, phoneNumberId },
+				{ id: `fetch-messages-${organizationId}-${phoneNumberId}` },
+			),
+		]);
+	}
 
 	if (isReturningSubscriber) {
 		sendEmail({
