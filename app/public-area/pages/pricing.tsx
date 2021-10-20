@@ -1,7 +1,6 @@
 import type { BlitzPage } from "blitz";
 import { Link, Routes } from "blitz";
 import { HiCheck } from "react-icons/hi";
-import clsx from "clsx";
 import * as Panelbear from "@panelbear/panelbear-js";
 
 import BaseLayout from "../components/base-layout";

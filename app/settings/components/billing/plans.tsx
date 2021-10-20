@@ -1,29 +1,28 @@
-import { HiCheck } from "react-icons/hi";
 import * as Panelbear from "@panelbear/panelbear-js";
 import clsx from "clsx";
 
+import type { Subscription } from "db";
+import { SubscriptionStatus } from "db";
 import useSubscription from "app/core/hooks/use-subscription";
 
 export default function Plans() {
 	const { hasActiveSubscription, subscription, subscribe, changePlan } = useSubscription();
 
 	return (
-		<div className="mt-6 flex flex-row-reverse flex-wrap-reverse gap-x-4">
+		<div className="mt-6 flex flex-row flex-wrap gap-2">
 			{pricing.tiers.map((tier) => {
-				const isFreeTier = tier.planId === -1;
 				const isCurrentTier = subscription?.paddlePlanId === tier.planId;
-				const isActiveTier = (!hasActiveSubscription && isFreeTier) || (hasActiveSubscription && isCurrentTier);
-				const cta = isActiveTier ? "Current plan" : !!subscription ? `Switch to ${tier.title}` : "Subscribe";
+				const isActiveTier = hasActiveSubscription && isCurrentTier;
+				const cta = getCTA({ subscription, tier });
 
 				return (
 					<div
 						key={tier.title}
 						className={clsx(
-							tier.yearly && "mb-4",
-							"relative p-4 bg-white border border-gray-200 rounded-xl shadow-sm flex flex-grow w-1/3 flex-col",
+							"relative p-2 pt-4 bg-white border border-gray-200 rounded-xl shadow-sm flex flex-1 min-w-[250px] flex-col",
 						)}
 					>
-						<div className="flex-1">
+						<div className="flex-1 px-2">
 							<h3 className="text-xl font-mackinac font-semibold text-gray-900">{tier.title}</h3>
 							{tier.yearly ? (
 								<p className="absolute top-0 py-1.5 px-4 bg-primary-500 rounded-full text-xs font-semibold uppercase tracking-wide text-white transform -translate-y-1/2">
@@ -38,24 +37,6 @@ export default function Plans() {
 								<p className="text-gray-500 text-sm">Billed yearly ({tier.price * 12}€)</p>
 							) : null}
 							<p className="mt-6 text-gray-500">{tier.description}</p>
-
-							<ul role="list" className="mt-6 space-y-6">
-								{tier.features.map((feature) => (
-									<li key={feature} className="flex">
-										<HiCheck className="flex-shrink-0 w-6 h-6 text-[#0eb56f]" aria-hidden="true" />
-										<span className="ml-3 text-gray-500">{feature}</span>
-									</li>
-								))}
-								{tier.unavailableFeatures.map((feature) => (
-									<li key={feature} className="flex">
-										<span className="ml-9 text-gray-400">
-											{~feature.indexOf("(coming soon)")
-												? feature.slice(0, feature.indexOf("(coming soon)"))
-												: feature}
-										</span>
-									</li>
-								))}
-							</ul>
 						</div>
 
 						<button
@@ -85,27 +66,41 @@ export default function Plans() {
 	);
 }
 
-const paidFeatures = [
-	"SMS",
-	"MMS (coming soon)",
-	"Calls",
-	"SMS forwarding (coming soon)",
-	"Call forwarding (coming soon)",
-	"Voicemail (coming soon)",
-	"Call recording (coming soon)",
-];
+function getCTA({
+	subscription,
+	tier,
+}: {
+	subscription?: Subscription;
+	tier: typeof pricing["tiers"][number];
+}): string {
+	if (!subscription) {
+		return "Subscribe";
+	}
+
+	const isCancelling = subscription.status === SubscriptionStatus.deleted;
+	if (isCancelling) {
+		return "Resubscribe";
+	}
+
+	const isCurrentTier = subscription.paddlePlanId === tier.planId;
+	const hasActiveSubscription = subscription.status !== SubscriptionStatus.deleted;
+	const isActiveTier = hasActiveSubscription && isCurrentTier;
+	if (isActiveTier) {
+		return "Current plan";
+	}
+
+	return `Switch to ${tier.title}`;
+}
+
 const pricing = {
 	tiers: [
 		{
-			title: "Free",
-			planId: -1,
-			price: 0,
-			frequency: "",
-			description: "The essentials to let you try Shellphone.",
-			features: ["SMS (send only)"],
-			unavailableFeatures: paidFeatures.slice(1),
-			cta: "Subscribe",
-			yearly: false,
+			title: "Yearly",
+			planId: 727544,
+			price: 12.5,
+			frequency: "/month",
+			description: "Text and call anyone, anywhere in the world, all year long.",
+			yearly: true,
 		},
 		{
 			title: "Monthly",
@@ -113,21 +108,7 @@ const pricing = {
 			price: 15,
 			frequency: "/month",
 			description: "Text and call anyone, anywhere in the world.",
-			features: paidFeatures,
-			unavailableFeatures: [],
-			cta: "Subscribe",
 			yearly: false,
-		},
-		{
-			title: "Yearly",
-			planId: 727544,
-			price: 12.5,
-			frequency: "/month",
-			description: "Text and call anyone, anywhere in the world, all year long.",
-			features: paidFeatures,
-			unavailableFeatures: [],
-			cta: "Subscribe",
-			yearly: true,
 		},
 	],
 };
