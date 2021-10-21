@@ -23,7 +23,7 @@
 		"tabWidth": 4,
 		"printWidth": 120,
 		"trailingComma": "all",
-		"jsxBracketSameLine": false,
+		"bracketSameLine": false,
 		"quoteProps": "as-needed",
 		"singleQuote": false
 	},
@@ -50,7 +50,7 @@
 		"@twilio/voice-sdk": "2.0.1",
 		"awesome-phonenumber": "2.64.0",
 		"aws-sdk": "2.1009.0",
-		"blitz": "0.41.1",
+		"blitz": "0.41.2-canary.4",
 		"clsx": "1.1.1",
 		"got": "11.8.2",
 		"jotai": "1.4.0",
