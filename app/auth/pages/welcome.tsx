@@ -1,6 +1,8 @@
 import type { BlitzPage, GetServerSideProps } from "blitz";
 import { getSession, Routes, useRouter } from "blitz";
 
+// TODO: make this page feel more welcoming lol
+
 const Welcome: BlitzPage = () => {
 	const router = useRouter();
 
@@ -13,8 +15,6 @@ const Welcome: BlitzPage = () => {
 		</div>
 	);
 };
-
-Welcome.authenticate = { redirectTo: Routes.SignIn() };
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 	const session = await getSession(req, res);

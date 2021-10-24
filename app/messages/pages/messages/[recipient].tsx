@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import type { BlitzPage } from "blitz";
-import { Routes, useParam, useRouter } from "blitz";
+import { useParam, useRouter } from "blitz";
 import { IoChevronBack, IoInformationCircle, IoCall } from "react-icons/io5";
 
 import AppLayout from "../../../core/layouts/layout";
@@ -31,7 +31,5 @@ const ConversationPage: BlitzPage = () => {
 		</AppLayout>
 	);
 };
-
-ConversationPage.authenticate = { redirectTo: Routes.SignIn() };
 
 export default ConversationPage;
