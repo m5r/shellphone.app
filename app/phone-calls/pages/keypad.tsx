@@ -1,4 +1,4 @@
-import { Fragment, useRef, useState } from "react";
+import { Fragment, Suspense, useRef, useState } from "react";
 import type { BlitzPage } from "blitz";
 import { Routes, useRouter } from "blitz";
 import { atom, useAtom } from "jotai";
@@ -13,6 +13,7 @@ import usePhoneCalls from "../hooks/use-phone-calls";
 import useKeyPress from "../hooks/use-key-press";
 import useCurrentUser from "app/core/hooks/use-current-user";
 import KeypadErrorModal from "../components/keypad-error-modal";
+import InactiveSubscription from "app/core/components/inactive-subscription";
 
 const KeypadPage: BlitzPage = () => {
 	const { hasFilledTwilioCredentials, hasPhoneNumber, hasOngoingSubscription } = useCurrentUser();
@@ -25,6 +26,10 @@ const KeypadPage: BlitzPage = () => {
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const pressDigit = useAtom(pressDigitAtom)[1];
 	useKeyPress((key) => {
+		if (!hasOngoingSubscription) {
+			return;
+		}
+
 		if (key === "Backspace") {
 			return removeDigit();
 		}
@@ -34,6 +39,10 @@ const KeypadPage: BlitzPage = () => {
 	const longPressDigit = useAtom(longPressDigitAtom)[1];
 	const onZeroPressProps = {
 		onPressStart() {
+			if (!hasOngoingSubscription) {
+				return;
+			}
+
 			pressDigit("0");
 			timeoutRef.current = setTimeout(() => {
 				longPressDigit("+");
@@ -49,6 +58,10 @@ const KeypadPage: BlitzPage = () => {
 	const onDigitPressProps = (digit: string) => ({
 		onPress() {
 			// navigator.vibrate(1); // removed in webkit
+			if (!hasOngoingSubscription) {
+				return;
+			}
+
 			pressDigit(digit);
 		},
 	});
@@ -75,6 +88,26 @@ const KeypadPage: BlitzPage = () => {
 		},
 	});
 
+	if (!hasOngoingSubscription) {
+		return (
+			<>
+				<InactiveSubscription />
+				<div className="filter blur-sm select-none absolute top-0 w-full h-full z-0">
+					<section className="relative w-96 h-full flex flex-col justify-around mx-auto py-5 text-center">
+						<div className="h-16 text-3xl text-gray-700">
+							<span>{phoneNumber}</span>
+						</div>
+						<Keypad onDigitPressProps={onDigitPressProps} onZeroPressProps={onZeroPressProps}>
+							<button className="cursor-pointer select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-green-800 rounded-full">
+								<IoCall className="w-6 h-6 text-white" />
+							</button>
+						</Keypad>
+					</section>
+				</div>
+			</>
+		);
+	}
+
 	return (
 		<>
 			<div className="w-96 h-full flex flex-col justify-around py-5 mx-auto text-center text-black">
@@ -91,8 +124,6 @@ const KeypadPage: BlitzPage = () => {
 							}
 
 							if (!hasOngoingSubscription) {
-								// TODO
-								setIsKeypadErrorModalOpen(true);
 								return;
 							}
 
