@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import type { BlitzPage } from "blitz";
-import { Routes, useRouter } from "blitz";
+import { Routes, useParam, useRouter } from "blitz";
 import { IoChevronBack, IoInformationCircle, IoCall } from "react-icons/io5";
 
 import AppLayout from "../../../core/layouts/layout";
@@ -9,7 +9,7 @@ import useConversation from "../../hooks/use-conversation";
 
 const ConversationPage: BlitzPage = () => {
 	const router = useRouter();
-	const recipient = decodeURIComponent(router.params.recipient);
+	const recipient = decodeURIComponent(useParam("recipient", "string") ?? "");
 	const pageTitle = `Messages with ${recipient}`;
 	const conversation = useConversation(recipient)[0];
 

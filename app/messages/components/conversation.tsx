@@ -1,15 +1,14 @@
 import { Suspense, useEffect, useMemo, useRef } from "react";
-import { useRouter } from "blitz";
+import { useParam } from "blitz";
 import clsx from "clsx";
 
-import { Direction } from "../../../db";
+import { Direction } from "db";
 import useConversation from "../hooks/use-conversation";
 import NewMessageArea from "./new-message-area";
-import { formatDate, formatTime } from "../../core/helpers/date-formatter";
+import { formatDate, formatTime } from "app/core/helpers/date-formatter";
 
 export default function Conversation() {
-	const router = useRouter();
-	const recipient = decodeURIComponent(router.params.recipient);
+	const recipient = decodeURIComponent(useParam("recipient", "string") ?? "");
 	const conversation = useConversation(recipient)[0];
 	const messages = useMemo(() => conversation?.messages ?? [], [conversation?.messages]);
 	const messagesListRef = useRef<HTMLUListElement>(null);

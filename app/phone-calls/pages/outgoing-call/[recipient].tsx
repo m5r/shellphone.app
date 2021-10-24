@@ -1,6 +1,7 @@
-import type { BlitzPage, ErrorFallbackProps, WithRouterProps } from "blitz";
-import { ErrorBoundary, Routes, useRouter, withRouter } from "blitz";
 import { useCallback, useEffect } from "react";
+import type { WithRouterProps } from "next/dist/client/with-router";
+import type { BlitzPage, ErrorFallbackProps } from "blitz";
+import { ErrorBoundary, Routes, useParam, withRouter } from "blitz";
 import type { TwilioError } from "@twilio/voice-sdk";
 import { atom, useAtom } from "jotai";
 import { IoCall } from "react-icons/io5";
@@ -12,8 +13,7 @@ import Keypad from "../../components/keypad";
 
 const OutgoingCall: BlitzPage = () => {
 	const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
-	const router = useRouter();
-	const recipient = decodeURIComponent(router.params.recipient);
+	const recipient = decodeURIComponent(useParam("recipient", "string") ?? "");
 	const onHangUp = useCallback(() => setPhoneNumber(""), [setPhoneNumber]);
 	const call = useMakeCall({ recipient, onHangUp });
 	const { isDeviceReady } = useDevice();
