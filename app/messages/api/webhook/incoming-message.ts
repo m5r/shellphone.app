@@ -71,7 +71,8 @@ export default async function incomingMessageHandler(req: BlitzApiRequest, res: 
 		if (phoneNumbersWithActiveSub.length === 0) {
 			// accept the webhook but don't store incoming message
 			// because the organization is on the free plan
-			res.status(200).end();
+			res.setHeader("content-type", "text/html");
+			res.status(200).send("<Response></Response>");
 			return;
 		}
 
