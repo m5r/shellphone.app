@@ -93,12 +93,9 @@ export default function useSubscription({ initialData }: Params = {}) {
 	};
 
 	async function changePlan({ planId }: ChangePlanParams) {
-		if (planId === -1) {
-			return cancelSubscription({ cancelUrl: subscription!.cancelUrl });
-		}
-
 		try {
 			await updateSubscriptionMutation({ planId });
+			setIsWaitingForSubChange(true);
 		} catch (error) {
 			console.log("error", error);
 		}

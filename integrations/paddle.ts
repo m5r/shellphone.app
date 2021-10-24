@@ -93,12 +93,14 @@ export async function updateSubscriptionPlan({
 	productId,
 	shouldProrate = true,
 	shouldKeepModifiers = true,
+	shouldMakeImmediatePayment = true,
 }: PaddleSdkUpdateSubscriptionRequest<Metadata>) {
 	return paddleSdk.updateSubscription({
 		subscriptionId,
 		productId,
 		shouldProrate,
 		shouldKeepModifiers,
+		shouldMakeImmediatePayment,
 	});
 }
 
