@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import type { BlitzPage } from "blitz";
-import { Routes } from "blitz";
 
 import AppLayout from "app/core/layouts/layout";
 import MissingTwilioCredentials from "app/core/components/missing-twilio-credentials";
@@ -52,7 +51,5 @@ const PhoneCalls: BlitzPage = () => {
 };
 
 PhoneCalls.getLayout = (page) => <AppLayout title="Calls">{page}</AppLayout>;
-
-PhoneCalls.authenticate = { redirectTo: Routes.SignIn() };
 
 export default PhoneCalls;

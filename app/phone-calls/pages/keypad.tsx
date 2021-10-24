@@ -165,6 +165,4 @@ const pressBackspaceAtom = atom(null, (get, set) => {
 
 KeypadPage.getLayout = (page) => <AppLayout title="Keypad">{page}</AppLayout>;
 
-KeypadPage.authenticate = { redirectTo: Routes.SignIn() };
-
 export default KeypadPage;

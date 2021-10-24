@@ -1,5 +1,6 @@
-import type { ErrorInfo, FunctionComponent } from "react";
+import type { ErrorInfo } from "react";
 import { Component, Suspense } from "react";
+import type { BlitzLayout } from "blitz";
 import {
 	Head,
 	withRouter,
@@ -8,10 +9,11 @@ import {
 	CSRFTokenMismatchError,
 	NotFoundError,
 	RedirectError,
+	Routes,
 } from "blitz";
 import type { WithRouterProps } from "next/dist/client/with-router";
 
-import appLogger from "../../../../integrations/logger";
+import appLogger from "integrations/logger";
 
 import Footer from "./footer";
 import Loader from "./loader";
@@ -24,7 +26,7 @@ type Props = {
 
 const logger = appLogger.child({ module: "Layout" });
 
-const AppLayout: FunctionComponent<Props> = ({ children, title, pageTitle = title, hideFooter = false }) => {
+const AppLayout: BlitzLayout<Props> = ({ children, title, pageTitle = title, hideFooter = false }) => {
 	return (
 		<>
 			{pageTitle ? (
@@ -48,6 +50,8 @@ const AppLayout: FunctionComponent<Props> = ({ children, title, pageTitle = titl
 		</>
 	);
 };
+
+AppLayout.authenticate = { redirectTo: Routes.SignIn() };
 
 type ErrorBoundaryState =
 	| {

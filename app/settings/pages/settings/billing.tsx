@@ -1,5 +1,6 @@
 import type { BlitzPage } from "blitz";
-import { GetServerSideProps, getSession, Routes } from "blitz";
+import type { GetServerSideProps } from "blitz";
+import { getSession } from "blitz";
 
 import db, { Subscription, SubscriptionStatus } from "db";
 import useSubscription from "app/core/hooks/use-subscription";
@@ -72,8 +73,6 @@ const Billing: BlitzPage<Props> = (props) => {
 };
 
 Billing.getLayout = (page) => <SettingsLayout>{page}</SettingsLayout>;
-
-Billing.authenticate = { redirectTo: Routes.SignIn() };
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req, res }) => {
 	const session = await getSession(req, res);

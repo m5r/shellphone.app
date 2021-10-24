@@ -1,5 +1,5 @@
 import type { BlitzPage } from "blitz";
-import { Routes, dynamic } from "blitz";
+import { dynamic } from "blitz";
 
 import SettingsLayout from "../../components/settings-layout";
 import PhoneNumberForm from "../../components/phone/phone-number-form";
@@ -19,7 +19,5 @@ const TwilioApiForm = dynamic(() => import("../../components/phone/twilio-api-fo
 });
 
 PhoneSettings.getLayout = (page) => <SettingsLayout>{page}</SettingsLayout>;
-
-PhoneSettings.authenticate = { redirectTo: Routes.SignIn() };
 
 export default PhoneSettings;

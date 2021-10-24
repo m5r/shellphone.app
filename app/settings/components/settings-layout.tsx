@@ -1,5 +1,5 @@
-import type { FunctionComponent } from "react";
 import { Suspense } from "react";
+import type { BlitzLayout } from "blitz";
 import { Link, Routes, useMutation, useRouter } from "blitz";
 import clsx from "clsx";
 import {
@@ -23,7 +23,7 @@ const subNavigation = [
 	{ name: "Notifications", href: Routes.Notifications(), icon: IoNotificationsOutline },
 ];
 
-const SettingsLayout: FunctionComponent = ({ children }) => {
+const SettingsLayout: BlitzLayout = ({ children }) => {
 	const router = useRouter();
 	const [logoutMutation] = useMutation(logout);
 
@@ -89,5 +89,7 @@ const SettingsLayout: FunctionComponent = ({ children }) => {
 		</AppLayout>
 	);
 };
+
+SettingsLayout.authenticate = { redirectTo: Routes.SignIn() };
 
 export default SettingsLayout;
