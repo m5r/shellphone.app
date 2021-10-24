@@ -46,7 +46,7 @@ model Subscription {
   updateUrl                 String
   cancelUrl                 String
   currency                  String
-  unitPrice                 Int
+  unitPrice                 Float
   nextBillDate              DateTime           @db.Date
   lastEventTime             DateTime           @db.Timestamp
   cancellationEffectiveDate DateTime?          @db.Date
