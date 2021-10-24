@@ -20,12 +20,6 @@ type Props = {
 };
 
 const Billing: BlitzPage<Props> = (props) => {
-	/*
-	TODO: I want to be able to
-		- upgrade to yearly
-		- downgrade to monthly
-	*/
-
 	const { count: paymentsCount } = usePaymentsHistory();
 	const { subscription, cancelSubscription, updatePaymentMethod } = useSubscription({
 		initialData: props.subscription,
@@ -37,8 +31,8 @@ const Billing: BlitzPage<Props> = (props) => {
 				<SettingsSection>
 					{subscription.status === SubscriptionStatus.deleted ? (
 						<p>
-							Your {subscription.paddlePlanId} subscription is cancelled and will expire on{" "}
-							{subscription.cancellationEffectiveDate!.toLocaleDateString()}.
+							Your {plansName[subscription.paddlePlanId]?.toLowerCase()} subscription is cancelled and
+							will expire on {subscription.cancellationEffectiveDate!.toLocaleDateString()}.
 						</p>
 					) : (
 						<>
@@ -70,6 +64,11 @@ const Billing: BlitzPage<Props> = (props) => {
 			<p className="text-sm text-gray-500">Prices include all applicable sales taxes.</p>
 		</>
 	);
+};
+
+const plansName: Record<number, string> = {
+	727544: "Yearly",
+	727540: "Monthly",
 };
 
 Billing.getLayout = (page) => <SettingsLayout>{page}</SettingsLayout>;
