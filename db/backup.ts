@@ -5,6 +5,9 @@ import { PassThrough } from "stream";
 
 import { sendEmail } from "integrations/aws-ses";
 import { s3 } from "integrations/aws-s3";
+import appLogger from "../integrations/logger";
+
+const logger = appLogger.child({ module: "backup" });
 
 export default async function backup(schedule: "daily" | "weekly" | "monthly") {
 	const s3Bucket = `shellphone-${schedule}-backup`;
@@ -61,13 +64,14 @@ export default async function backup(schedule: "daily" | "weekly" | "monthly") {
 
 		uploadPromise
 			.then(() => console.log(`Successfully uploaded "${fileName}"`))
-			.catch((error) =>
-				sendEmail({
+			.catch((error) => {
+				logger.error(error);
+				return sendEmail({
 					body: `${schedule} backup failed: ${error}`,
 					subject: `${schedule} backup failed: ${error}`,
 					recipients: ["error@shellphone.app"],
-				}),
-			);
+				});
+			});
 	});
 }
 
