@@ -6,7 +6,7 @@ import type {
 	PaddleSdkSubscriptionPaymentSucceededEvent,
 	PaddleSdkSubscriptionUpdatedEvent,
 } from "@devoxa/paddle-sdk";
-import { PaddleSdkWebhookEventType } from "@devoxa/paddle-sdk";
+import { PaddleSdkException, PaddleSdkWebhookEventType } from "@devoxa/paddle-sdk";
 
 import type { ApiError } from "app/core/types";
 import subscriptionCreatedQueue from "../queue/subscription-created";
@@ -47,17 +47,26 @@ const webhook: BlitzApiHandler = async (req, res) => {
 		return;
 	}
 
-	const event = paddleSdk.parseWebhookEvent(req.body);
-	const alertName = event.eventType;
-	logger.info(`Received ${alertName} webhook`);
-	logger.info(event);
-	if (isSupportedWebhook(alertName)) {
-		await queues[alertName].enqueue({ event: event as Events }, { id: event.eventId.toString() });
+	try {
+		const event = paddleSdk.parseWebhookEvent(req.body);
+		const alertName = event.eventType;
+		logger.info(`Received ${alertName} webhook`);
+		logger.info(event);
+		if (isSupportedWebhook(alertName)) {
+			await queues[alertName].enqueue({ event: event as Events }, { id: event.eventId.toString() });
 
-		return res.status(200).end();
+			return res.status(200).end();
+		}
+
+		return res.status(400).end();
+	} catch (error) {
+		if (error instanceof PaddleSdkException && error.message.includes(req.body.alert_name)) {
+			// event implementation is missing such as `subscription_payment_refunded`
+			return res.status(200).end();
+		}
+
+		throw error;
 	}
-
-	return res.status(400).end();
 };
 
 export default webhook;
