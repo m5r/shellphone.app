@@ -10,9 +10,9 @@ import appLogger from "../integrations/logger";
 const logger = appLogger.child({ module: "backup" });
 
 export default async function backup(schedule: "daily" | "weekly" | "monthly") {
-	const s3Bucket = `shellphone-${schedule}-backup`;
+	const s3Bucket = "shellphone-backups";
 	const { database, host, port, user, password } = parseDatabaseUrl(process.env.DATABASE_URL!);
-	const fileName = getFileName(database);
+	const fileName = `${schedule}-${database}.sql.gz`;
 
 	console.log(`Dumping database ${database}`);
 	const pgDumpChild = spawn("pg_dump", [`-U${user}`, `-d${database}`], {
@@ -73,22 +73,6 @@ export default async function backup(schedule: "daily" | "weekly" | "monthly") {
 				});
 			});
 	});
-}
-
-function pad(number: number) {
-	return number.toString().padStart(2, "0");
-}
-
-function getFileName(database: string) {
-	const now = new Date();
-	const year = now.getUTCFullYear();
-	const month = pad(now.getUTCMonth() + 1);
-	const day = pad(now.getUTCDate());
-	const hours = pad(now.getUTCHours());
-	const minutes = pad(now.getUTCMinutes());
-	const seconds = pad(now.getUTCSeconds());
-
-	return `${database}-${year}-${month}-${day}_${hours}-${minutes}-${seconds}.sql.gz`; // 2021-09-15_16-00-02.sql.gz
 }
 
 type DatabaseUrl = {
