@@ -48,7 +48,6 @@ const { SENTRY_DSN, SENTRY_ORG, SENTRY_PROJECT, SENTRY_AUTH_TOKEN, NODE_ENV, GIT
 		masterEncryptionKey: process.env.MASTER_ENCRYPTION_KEY,
 		paddle: {
 			apiKey: process.env.PADDLE_API_KEY,
-			publicKey: process.env.PADDLE_PUBLIC_KEY,
 		},
 		awsSes: {
 			awsRegion: process.env.AWS_SES_REGION,
