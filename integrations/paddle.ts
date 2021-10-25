@@ -15,7 +15,8 @@ const vendorId = publicRuntimeConfig.paddle.vendorId;
 const vendorAuthCode = serverRuntimeConfig.paddle.apiKey;
 
 export const paddleSdk = new PaddleSdk({
-	publicKey: serverRuntimeConfig.paddle.publicKey,
+	publicKey:
+		"-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAwUABB5uOIIAyJwrJfGIj\nOwueWs4itGIm/5om5HZhbgjGM0f7dnZVBQCCfE+1Dvi9IPkrQaPR83M84JYxRDOA\nbExyg79Lo5nrueinuKtkTOVOCKWmXgtBiuRHGYY90lMhg2I3qY3/DnZDyIyHuprT\n/WU5nVSXP2LLPbOqUjZJysOWIJ2IPbz9no5QdJyge5SudCBa58xa24Us3PiVpmsk\nJ8y0AGxF9AfxFJv/vcUJ0SMnzB6ddWOMcf/fHJwF2urOqU6c66IzJFKf7aytny4n\nqPpNPOkttazUV8ycCXjJAer9peIoTYYcSFqs2pWxg+YSP7EqSSOsqGCuux98q1m7\nBq+eojt9HFMG9ZNaE258gO7G9FhdnLPyMGZC0Q2EeTTohhRNzdzo0iI9BEbVVmLp\nefUZ33IuyDCxtYIiw5vhj/CUBsYhod16GAWLuuCoIfyaGPbaLGGWsecmIsbJx/je\n2MJuHD8PB1f5T9NSLC9MPlptoYlBJjhz7+qBPR8E13aKnRnu7OyDtQ4wi74zPxIr\n0DNcwlbWT3HL7CUDr40glLGx5OxFw4wdIUm6hLy1iC+8vHnY+fyQv+JtaDChP49i\nlSzPrswGaiU/rTkOB6HtGlOci5Skgr1ue1j/lO7y2NcLZMbwDRldGhYXpo0aLQvI\nPzcoXd4HrmEM2friEPLwcn8CAwEAAQ==\n-----END PUBLIC KEY-----",
 	vendorId,
 	vendorAuthCode,
 	metadataCodec: stringifyMetadata(),
