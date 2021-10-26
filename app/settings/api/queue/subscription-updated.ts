@@ -61,7 +61,8 @@ export const subscriptionUpdatedQueue = Queue<Payload>("api/queue/subscription-u
 
 	sendEmail({
 		subject: "Thanks for your purchase",
-		body: "Thanks for your purchase",
+		text: "Thanks for your purchase",
+		html: "Thanks for your purchase",
 		recipients: [email],
 	}).catch((error) => {
 		logger.error(error);

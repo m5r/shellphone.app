@@ -78,7 +78,8 @@ export const subscriptionCreatedQueue = Queue<Payload>("api/queue/subscription-c
 	if (isReturningSubscriber) {
 		sendEmail({
 			subject: "Welcome back to Shellphone",
-			body: "Welcome back to Shellphone",
+			text: "Welcome back to Shellphone",
+			html: "Welcome back to Shellphone",
 			recipients: [email],
 		}).catch((error) => {
 			logger.error(error);
@@ -89,7 +90,8 @@ export const subscriptionCreatedQueue = Queue<Payload>("api/queue/subscription-c
 
 	sendEmail({
 		subject: "Welcome to Shellphone",
-		body: `Welcome to Shellphone`,
+		text: `Welcome to Shellphone`,
+		html: `Welcome to Shellphone`,
 		recipients: [email],
 	}).catch((error) => {
 		logger.error(error);

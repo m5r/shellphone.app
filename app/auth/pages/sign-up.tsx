@@ -55,6 +55,6 @@ SignUp.redirectAuthenticatedTo = ({ session }) => {
 	return Routes.Messages();
 };
 
-SignUp.getLayout = (page) => <BaseLayout title="Sign Up">{page}</BaseLayout>;
+SignUp.getLayout = (page) => <BaseLayout title="Sign up">{page}</BaseLayout>;
 
 export default SignUp;
