@@ -15,12 +15,14 @@ const notifyEmailChangeQueue = Queue<Payload>("api/queue/notify-email-change", a
 		sendEmail({
 			recipients: [oldEmail],
 			subject: "",
-			body: "",
+			text: "",
+			html: "",
 		}),
 		sendEmail({
 			recipients: [newEmail],
 			subject: "",
-			body: "",
+			text: "",
+			html: "",
 		}),
 	]);
 });

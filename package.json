@@ -36,6 +36,7 @@
 		"@devoxa/paddle-sdk": "0.2.1",
 		"@headlessui/react": "1.4.1",
 		"@hookform/resolvers": "2.8.2",
+		"@maizzle/framework": "3.7.2",
 		"@panelbear/panelbear-js": "1.3.2",
 		"@prisma/client": "3.2.1",
 		"@react-aria/interactions": "3.6.0",

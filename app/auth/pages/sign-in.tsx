@@ -55,6 +55,6 @@ const SignIn: BlitzPage = () => {
 
 SignIn.redirectAuthenticatedTo = Routes.Messages();
 
-SignIn.getLayout = (page) => <BaseLayout title="Sign In">{page}</BaseLayout>;
+SignIn.getLayout = (page) => <BaseLayout title="Sign in">{page}</BaseLayout>;
 
 export default SignIn;

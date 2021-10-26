@@ -4,7 +4,7 @@ import db, { User } from "../../../db";
 import { forgotPasswordMailer } from "../../../mailers/forgot-password-mailer";
 import { ForgotPassword } from "../validations";
 
-const RESET_PASSWORD_TOKEN_EXPIRATION_IN_HOURS = 4;
+const RESET_PASSWORD_TOKEN_EXPIRATION_IN_HOURS = 24;
 
 export default resolver.pipe(resolver.zod(ForgotPassword), async ({ email }) => {
 	const user = await db.user.findFirst({ where: { email: email.toLowerCase() } });
@@ -36,5 +36,11 @@ async function updatePassword(user: User | null) {
 			sentTo: user.email,
 		},
 	});
-	await forgotPasswordMailer({ to: user.email, token }).send();
+	await (
+		await forgotPasswordMailer({
+			to: user.email,
+			token,
+			userName: user.fullName,
+		})
+	).send();
 }

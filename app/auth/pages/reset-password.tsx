@@ -56,7 +56,7 @@ const ResetPasswordPage: BlitzPage = () => {
 
 ResetPasswordPage.redirectAuthenticatedTo = Routes.Messages();
 
-ResetPasswordPage.getLayout = (page) => <BaseLayout title="Reset Your Password">{page}</BaseLayout>;
+ResetPasswordPage.getLayout = (page) => <BaseLayout title="Reset password">{page}</BaseLayout>;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	if (!context.query.token) {

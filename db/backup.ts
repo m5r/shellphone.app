@@ -31,7 +31,8 @@ export default async function backup(schedule: "daily" | "weekly" | "monthly") {
 	gzipChild.on("exit", (code) => {
 		if (code !== 0) {
 			return sendEmail({
-				body: `${schedule} backup failed: gzip: Bad exit code (${code})`,
+				text: `${schedule} backup failed: gzip: Bad exit code (${code})`,
+				html: `${schedule} backup failed: gzip: Bad exit code (${code})`,
 				subject: `${schedule} backup failed: gzip: Bad exit code (${code})`,
 				recipients: ["error@shellphone.app"],
 			});
@@ -44,7 +45,8 @@ export default async function backup(schedule: "daily" | "weekly" | "monthly") {
 		if (code !== 0) {
 			console.log("pg_dump failed, upload aborted");
 			return sendEmail({
-				body: `${schedule} backup failed: pg_dump: Bad exit code (${code})`,
+				text: `${schedule} backup failed: pg_dump: Bad exit code (${code})`,
+				html: `${schedule} backup failed: pg_dump: Bad exit code (${code})`,
 				subject: `${schedule} backup failed: pg_dump: Bad exit code (${code})`,
 				recipients: ["error@shellphone.app"],
 			});
@@ -67,7 +69,8 @@ export default async function backup(schedule: "daily" | "weekly" | "monthly") {
 			.catch((error) => {
 				logger.error(error);
 				return sendEmail({
-					body: `${schedule} backup failed: ${error}`,
+					text: `${schedule} backup failed: ${error}`,
+					html: `${schedule} backup failed: ${error}`,
 					subject: `${schedule} backup failed: ${error}`,
 					recipients: ["error@shellphone.app"],
 				});
