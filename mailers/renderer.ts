@@ -21,7 +21,7 @@ function getMaizzleParams(templateName: string, locals: Record<string, string>) 
 	const template = fs
 		.readFileSync(path.resolve(process.cwd(), "./mailers/templates", `${templateName}.html`))
 		.toString();
-	const tailwindCss = fs.readFileSync(path.resolve(process.cwd(), "./mailers/tailwind.css")).toString();
+	const tailwindCss = fs.readFileSync(path.resolve(process.cwd(), "./mailers/templates/tailwind.css")).toString();
 
 	const options = {
 		tailwind: {

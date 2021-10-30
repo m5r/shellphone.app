@@ -1,8 +1,8 @@
 import { resolver, SecurePassword } from "blitz";
 
-import db, { GlobalRole, MembershipRole } from "../../../db";
+import db, { GlobalRole, MembershipRole } from "db";
 import { Signup } from "../validations";
-import { computeEncryptionKey } from "../../../db/_encryption";
+import { computeEncryptionKey } from "db/_encryption";
 
 export default resolver.pipe(resolver.zod(Signup), async ({ email, password, fullName }, ctx) => {
 	const hashedPassword = await SecurePassword.hash(password.trim());
@@ -33,5 +33,8 @@ export default resolver.pipe(resolver.zod(Signup), async ({ email, password, ful
 		orgId: user.memberships[0]!.organizationId,
 		shouldShowWelcomeMessage: true,
 	});
+
+	// TODO: send welcome email
+
 	return user;
 });
