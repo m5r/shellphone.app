@@ -195,11 +195,9 @@ function getMaizzleParams(templateName: string, locals: Record<string, string>) 
 			},
 			company: {
 				name: "Capsule Corp. Dev Pte. Ltd.",
-				address: `
-    <br>39 Robinson Rd, #11-01
-    <br>Singapore 068911
-    `,
+				address: `<br>39 Robinson Rd, #11-01<br>Singapore 068911`,
 				product: "Shellphone",
+				sender: "Mokhtar",
 			},
 			googleFonts: "family=Nunito+Sans:wght@400;700",
 			year: () => new Date().getFullYear(),

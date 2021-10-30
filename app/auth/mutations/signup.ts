@@ -3,6 +3,7 @@ import { resolver, SecurePassword } from "blitz";
 import db, { GlobalRole, MembershipRole } from "db";
 import { Signup } from "../validations";
 import { computeEncryptionKey } from "db/_encryption";
+import { welcomeMailer } from "mailers/welcome-mailer";
 
 export default resolver.pipe(resolver.zod(Signup), async ({ email, password, fullName }, ctx) => {
 	const hashedPassword = await SecurePassword.hash(password.trim());
@@ -34,7 +35,12 @@ export default resolver.pipe(resolver.zod(Signup), async ({ email, password, ful
 		shouldShowWelcomeMessage: true,
 	});
 
-	// TODO: send welcome email
+	await (
+		await welcomeMailer({
+			to: user.email,
+			userName: user.fullName,
+		})
+	).send();
 
 	return user;
 });
