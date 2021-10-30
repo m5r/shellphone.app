@@ -10,13 +10,6 @@ export async function render(templateName: string, locals: Record<string, string
 	return html;
 }
 
-export async function plaintext(templateName: string, locals: Record<string, string> = {}) {
-	const { template, options } = getMaizzleParams(templateName, locals);
-	const { plaintext } = await Maizzle.plaintext(template, options);
-
-	return plaintext;
-}
-
 function getMaizzleParams(templateName: string, locals: Record<string, string>) {
 	const template = fs
 		.readFileSync(path.resolve(process.cwd(), "./mailers/templates", `${templateName}.html`))

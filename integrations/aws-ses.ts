@@ -11,7 +11,7 @@ const credentials = new Credentials({
 const ses = new SES({ region: serverRuntimeConfig.awsSes.awsRegion, credentials });
 
 type SendEmailParams = {
-	text: string;
+	text?: string;
 	html: string;
 	subject: string;
 	recipients: string[];
@@ -22,10 +22,12 @@ export async function sendEmail({ text, html, subject, recipients }: SendEmailPa
 		Destination: { ToAddresses: recipients },
 		Message: {
 			Body: {
-				Text: {
-					Charset: "UTF-8",
-					Data: text,
-				},
+				Text: text
+					? {
+							Charset: "UTF-8",
+							Data: text,
+					  }
+					: undefined,
 				Html: {
 					Charset: "UTF-8",
 					Data: html,
