@@ -22,12 +22,6 @@ export async function sendEmail({ text, html, subject, recipients }: SendEmailPa
 		Destination: { ToAddresses: recipients },
 		Message: {
 			Body: {
-				Text: text
-					? {
-							Charset: "UTF-8",
-							Data: text,
-					  }
-					: undefined,
 				Html: {
 					Charset: "UTF-8",
 					Data: html,
@@ -40,6 +34,13 @@ export async function sendEmail({ text, html, subject, recipients }: SendEmailPa
 		},
 		Source: serverRuntimeConfig.awsSes.fromEmail,
 	};
+
+	if (text) {
+		request.Message.Body.Text = {
+			Charset: "UTF-8",
+			Data: text,
+		};
+	}
 
 	await ses.sendEmail(request).promise();
 }

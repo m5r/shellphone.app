@@ -20,15 +20,14 @@ export async function welcomeMailer({ to, userName }: ResetPasswordMailer) {
 	return {
 		async send() {
 			if (process.env.NODE_ENV === "production") {
-				await sendEmail({
+				return sendEmail({
 					recipients: [msg.to],
 					subject: msg.subject,
 					html: msg.html,
 				});
-			} else {
-				// Preview email in the browser
-				return await previewEmail(msg);
 			}
+
+			return previewEmail(msg);
 		},
 	};
 }
