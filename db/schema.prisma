@@ -57,9 +57,9 @@ model Subscription {
 
 enum SubscriptionStatus {
   active
-  trialing
+  trialing // not used
   past_due
-  paused
+  paused // not used
   deleted
 }
 
