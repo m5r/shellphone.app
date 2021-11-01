@@ -9,6 +9,7 @@ import type { Metadata } from "integrations/paddle";
 import { translateSubscriptionStatus } from "integrations/paddle";
 import fetchMessagesQueue from "app/messages/api/queue/fetch-messages";
 import fetchCallsQueue from "app/phone-calls/api/queue/fetch-calls";
+import { subscribeNotificationMailer } from "../../../../mailers/subscribe-notification-mailer";
 
 const logger = appLogger.child({ queue: "subscription-created" });
 
@@ -33,8 +34,7 @@ export const subscriptionCreatedQueue = Queue<Payload>("api/queue/subscription-c
 	}
 
 	const isReturningSubscriber = organization.subscriptions.length > 0;
-	const orgOwner = organization.memberships.find((membership) => membership.role === MembershipRole.OWNER);
-	const email = orgOwner!.user!.email;
+	const orgOwner = organization.memberships.find((membership) => membership.role === MembershipRole.OWNER)!.user!;
 	await db.subscription.create({
 		data: {
 			organizationId,
@@ -80,7 +80,7 @@ export const subscriptionCreatedQueue = Queue<Payload>("api/queue/subscription-c
 			subject: "Welcome back to Shellphone",
 			text: "Welcome back to Shellphone",
 			html: "Welcome back to Shellphone",
-			recipients: [email],
+			recipients: [orgOwner.email],
 		}).catch((error) => {
 			logger.error(error);
 		});
@@ -88,14 +88,7 @@ export const subscriptionCreatedQueue = Queue<Payload>("api/queue/subscription-c
 		return;
 	}
 
-	sendEmail({
-		subject: "Welcome to Shellphone",
-		text: `Welcome to Shellphone`,
-		html: `Welcome to Shellphone`,
-		recipients: [email],
-	}).catch((error) => {
-		logger.error(error);
-	});
+	await (await subscribeNotificationMailer({ to: orgOwner.email, userName: orgOwner.fullName })).send();
 });
 
 export default subscriptionCreatedQueue;
