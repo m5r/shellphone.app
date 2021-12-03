@@ -36,12 +36,13 @@ const { SENTRY_DSN, SENTRY_ORG, SENTRY_PROJECT, SENTRY_AUTH_TOKEN, NODE_ENV, GIT
 			isAuthorized: simpleRolesIsAuthorized,
 		}),
 	],
+	// @ts-ignore
 	images: {
 		domains: ["www.datocms-assets.com"],
 	},
 	productionBrowserSourceMaps: true,
 	env: {
-		SENTRY_DSN: process.env.SENTRY_DSN,
+		SENTRY_DSN: process.env.SENTRY_DSN!,
 	},
 	serverRuntimeConfig: {
 		rootDir: __dirname,
