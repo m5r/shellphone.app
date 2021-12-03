@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import type { ReactElement, ReactChild } from "react";
 
 type AlertVariant = "error" | "success" | "info" | "warning";
 
@@ -10,8 +10,8 @@ type AlertVariantProps = {
 };
 
 type Props = {
-	title: string;
-	message: string;
+	title: ReactChild;
+	message: ReactChild;
 	variant: AlertVariant;
 };
 
