@@ -1,11 +1,30 @@
-import type { LoaderFunction } from "@remix-run/node";
+import { type LoaderFunction, json } from "@remix-run/node";
 import { Outlet, useCatch, useMatches } from "@remix-run/react";
 
-import { requireLoggedIn } from "~/utils/auth.server";
+import { type SessionData, type SessionOrganization, requireLoggedIn } from "~/utils/auth.server";
 import Footer from "~/features/core/components/footer";
+import db from "~/utils/db.server";
+
+export type AppLoaderData = SessionData
 
 export const loader:LoaderFunction = async ({ request }) => {
-	return requireLoggedIn(request);
+	const user = await requireLoggedIn(request);
+	const organization = await db.organization.findUnique({
+		where: { id: user.organizations[0].id },
+		include: {
+			memberships: {
+				where: { userId: user.id },
+				select: { role: true },
+			},
+		},
+	});
+	const currentOrganization: SessionOrganization = {
+		id: organization!.id,
+		twilioAccountSid: organization!.twilioAccountSid,
+		role: organization!.memberships[0].role,
+	};
+
+	return json<AppLoaderData>({ ...user, currentOrganization });
 }
 
 export default function __App() {
