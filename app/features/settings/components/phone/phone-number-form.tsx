@@ -1,20 +1,23 @@
-import { useActionData, useCatch, useTransition } from "@remix-run/react";
+import { useActionData, useCatch, useLoaderData, useTransition } from "@remix-run/react";
 
 import Button from "../button";
 import SettingsSection from "../settings-section";
 import Alert from "~/features/core/components/alert";
+import useSession from "~/features/core/hooks/use-session";
+import { PhoneSettingsLoaderData } from "~/routes/__app/settings/phone";
 
 export default function PhoneNumberForm() {
 	const transition = useTransition();
 	const actionData = useActionData();
+	const { currentOrganization } = useSession();
 
 	const isSubmitting = transition.state === "submitting";
 	const isSuccess = actionData?.submitted === true;
 	const error = actionData?.error;
 	const isError = !!error;
 
-	const hasFilledTwilioCredentials = false; // Boolean(currentOrganization?.twilioAccountSid && currentOrganization?.twilioAuthToken)
-	const availablePhoneNumbers: any[] = [];
+	const hasFilledTwilioCredentials = Boolean(currentOrganization.twilioAccountSid)
+	const availablePhoneNumbers = useLoaderData<PhoneSettingsLoaderData>().phoneNumbers;
 
 	const onSubmit = async () => {
 		// await setPhoneNumberMutation({ phoneNumberSid }); // TODO

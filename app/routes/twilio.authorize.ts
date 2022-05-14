@@ -2,18 +2,23 @@ import { type LoaderFunction, redirect } from "@remix-run/node";
 import { refreshSessionData, requireLoggedIn } from "~/utils/auth.server";
 import db from "~/utils/db.server";
 import { commitSession } from "~/utils/session.server";
+import twilio from "twilio";
+import serverConfig from "~/config/config.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
 	const user = await requireLoggedIn(request);
 	const url = new URL(request.url);
-	const twilioAccountSid = url.searchParams.get("AccountSid");
-	if (!twilioAccountSid) {
+	const twilioSubAccountSid = url.searchParams.get("AccountSid");
+	if (!twilioSubAccountSid) {
 		throw new Error("unreachable");
 	}
 
+	const twilioClient = twilio(twilioSubAccountSid, serverConfig.twilio.authToken);
+	const twilioSubAccount = await twilioClient.api.accounts(twilioSubAccountSid).fetch();
+	const twilioAccountSid = twilioSubAccount.ownerAccountSid;
 	await db.organization.update({
 		where: { id: user.organizations[0].id },
-		data: { twilioAccountSid },
+		data: { twilioSubAccountSid, twilioAccountSid },
 	});
 
 	const { session } = await refreshSessionData(request);
