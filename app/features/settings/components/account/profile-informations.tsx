@@ -1,47 +1,48 @@
 import type { FunctionComponent } from "react";
-import { useActionData, useTransition } from "@remix-run/react";
+import { Form, useActionData, useTransition } from "@remix-run/react";
 
-import Alert from "../../../core/components/alert";
+import type { UpdateUserActionData } from "~/features/settings/actions/account";
+import useSession from "~/features/core/hooks/use-session";
+import Alert from "~/features/core/components/alert";
 import Button from "../button";
 import SettingsSection from "../settings-section";
-import useSession from "~/features/core/hooks/use-session";
 
 const ProfileInformations: FunctionComponent = () => {
 	const user = useSession();
 	const transition = useTransition();
-	const actionData = useActionData();
+	const actionData = useActionData<UpdateUserActionData>()?.updateUser;
 
-	const isSubmitting = transition.state === "submitting";
-	const isSuccess = actionData?.submitted === true;
-	const error = actionData?.error;
-	const isError = !!error;
-
-	const onSubmit = async () => {
-		// await updateUserMutation({ email, fullName }); // TODO
-	};
+	const errors = actionData?.errors;
+	const topErrorMessage = errors?.general;
+	const isError = typeof topErrorMessage !== "undefined";
+	const isSuccess = actionData?.submitted;
+	const isCurrentFormTransition = transition.submission?.formData.get("_action") === "updateUser";
+	const isSubmitting = isCurrentFormTransition && transition.state === "submitting";
+	console.log("isSuccess", isSuccess, actionData);
 
 	return (
-		<form onSubmit={onSubmit}>
+		<Form method="post">
 			<SettingsSection
 				footer={
 					<div className="px-4 py-3 bg-gray-50 text-right text-sm font-medium sm:px-6">
 						<Button variant="default" type="submit" isDisabled={isSubmitting}>
-							{isSubmitting ? "Saving..." : "Save"}
+							Save
 						</Button>
 					</div>
 				}
 			>
 				{isError ? (
 					<div className="mb-8">
-						<Alert title="Oops, there was an issue" message={error} variant="error" />
+						<Alert title="Oops, there was an issue" message={topErrorMessage} variant="error" />
 					</div>
 				) : null}
 
-				{isSuccess ? (
+				{isSuccess && (
 					<div className="mb-8">
 						<Alert title="Saved successfully" message="Your changes have been saved." variant="success" />
 					</div>
-				) : null}
+				)}
+
 				<div className="col-span-3 sm:col-span-2">
 					<label htmlFor="fullName" className="block text-sm font-medium leading-5 text-gray-700">
 						Full name
@@ -75,8 +76,10 @@ const ProfileInformations: FunctionComponent = () => {
 						/>
 					</div>
 				</div>
+
+				<input type="hidden" name="_action" value="updateUser" />
 			</SettingsSection>
-		</form>
+		</Form>
 	);
 };
 

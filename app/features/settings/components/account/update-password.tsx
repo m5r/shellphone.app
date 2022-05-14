@@ -1,37 +1,36 @@
 import type { FunctionComponent } from "react";
+import { Form, useActionData, useTransition } from "@remix-run/react";
 
+import type { ChangePasswordActionData } from "~/features/settings/actions/account";
 import Alert from "~/features/core/components/alert";
+import LabeledTextField from "~/features/core/components/labeled-text-field";
 import Button from "../button";
 import SettingsSection from "../settings-section";
-import { useActionData, useTransition } from "@remix-run/react";
 
 const UpdatePassword: FunctionComponent = () => {
 	const transition = useTransition();
-	const actionData = useActionData();
+	const actionData = useActionData<ChangePasswordActionData>()?.changePassword;
 
-	const isSubmitting = transition.state === "submitting";
-	const isSuccess = actionData?.submitted === true;
-	const error = actionData?.error;
-	const isError = !!error;
-
-	const onSubmit = async () => {
-		// await changePasswordMutation({ currentPassword, newPassword }); // TODO
-	};
+	const topErrorMessage = actionData?.errors?.general;
+	const isError = typeof topErrorMessage !== "undefined";
+	const isSuccess = actionData?.submitted;
+	const isCurrentFormTransition = transition.submission?.formData.get("_action") === "changePassword";
+	const isSubmitting = isCurrentFormTransition && transition.state === "submitting";
 
 	return (
-		<form onSubmit={onSubmit}>
+		<Form method="post">
 			<SettingsSection
 				footer={
 					<div className="px-4 py-3 bg-gray-50 text-right text-sm font-medium sm:px-6">
 						<Button variant="default" type="submit" isDisabled={isSubmitting}>
-							{isSubmitting ? "Saving..." : "Save"}
+							Save
 						</Button>
 					</div>
 				}
 			>
 				{isError ? (
 					<div className="mb-8">
-						<Alert title="Oops, there was an issue" message={error} variant="error" />
+						<Alert title="Oops, there was an issue" message={topErrorMessage} variant="error" />
 					</div>
 				) : null}
 
@@ -40,45 +39,28 @@ const UpdatePassword: FunctionComponent = () => {
 						<Alert title="Saved successfully" message="Your changes have been saved." variant="success" />
 					</div>
 				) : null}
-				<div>
-					<label
-						htmlFor="currentPassword"
-						className="flex justify-between text-sm font-medium leading-5 text-gray-700"
-					>
-						<div>Current password</div>
-					</label>
-					<div className="mt-1 rounded-md shadow-sm">
-						<input
-							id="currentPassword"
-							name="currentPassword"
-							type="password"
-							tabIndex={3}
-							className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-primary focus:border-primary-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
-							required
-						/>
-					</div>
-				</div>
 
-				<div>
-					<label
-						htmlFor="newPassword"
-						className="flex justify-between text-sm font-medium leading-5 text-gray-700"
-					>
-						<div>New password</div>
-					</label>
-					<div className="mt-1 rounded-md shadow-sm">
-						<input
-							id="newPassword"
-							name="newPassword"
-							type="password"
-							tabIndex={4}
-							className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-primary focus:border-primary-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
-							required
-						/>
-					</div>
-				</div>
+				<LabeledTextField
+					name="currentPassword"
+					label="Current password"
+					type="password"
+					tabIndex={3}
+					error={actionData?.errors?.currentPassword}
+					disabled={isSubmitting}
+				/>
+
+				<LabeledTextField
+					name="newPassword"
+					label="New password"
+					type="password"
+					tabIndex={4}
+					error={actionData?.errors?.newPassword}
+					disabled={isSubmitting}
+				/>
+
+				<input type="hidden" name="_action" value="changePassword" />
 			</SettingsSection>
-		</form>
+		</Form>
 	);
 };
 

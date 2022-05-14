@@ -7,7 +7,7 @@ type Props = {
 	sideLabel?: ReactNode;
 	type?: "text" | "password" | "email";
 	error?: string;
-} & InputHTMLAttributes<HTMLInputElement>;
+} & Omit<InputHTMLAttributes<HTMLInputElement>, "name" | "type">;
 
 const LabeledTextField: FunctionComponent<Props> = ({ name, label, sideLabel, type = "text", error, ...props }) => {
 	const hasSideLabel = !!sideLabel;
@@ -19,6 +19,7 @@ const LabeledTextField: FunctionComponent<Props> = ({ name, label, sideLabel, ty
 				className={clsx("text-sm font-medium leading-5 text-gray-700", {
 					block: !hasSideLabel,
 					"flex justify-between": hasSideLabel,
+					// "text-red-600": !!error,
 				})}
 			>
 				{label}
@@ -29,7 +30,10 @@ const LabeledTextField: FunctionComponent<Props> = ({ name, label, sideLabel, ty
 					id={name}
 					name={name}
 					type={type}
-					className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-primary focus:border-primary-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+					className={clsx("appearance-none block w-full px-3 py-2 border rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-primary focus:border-primary-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5", {
+						"border-gray-300": !error,
+						"border-red-300": error,
+					})}
 					required
 					{...props}
 				/>

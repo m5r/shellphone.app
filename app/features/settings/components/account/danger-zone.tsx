@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useFetcher, useSubmit, useTransition } from "@remix-run/react";
 import clsx from "clsx";
 
 import Button from "../button";
@@ -6,9 +7,14 @@ import SettingsSection from "../settings-section";
 import Modal, { ModalTitle } from "~/features/core/components/modal";
 
 export default function DangerZone() {
-	const [isDeletingUser, setIsDeletingUser] = useState(false);
+	const transition = useTransition();
+	const isCurrentFormTransition = transition.submission?.formData.get("_action") === "deleteUser";
+	const isDeletingUser = isCurrentFormTransition && transition.state === "submitting";
 	const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
 	const modalCancelButtonRef = useRef<HTMLButtonElement>(null);
+	const fetcher = useFetcher();
+	const submit = useSubmit();
+	// TODO
 
 	const closeModal = () => {
 		if (isDeletingUser) {
@@ -16,10 +22,6 @@ export default function DangerZone() {
 		}
 
 		setIsConfirmationModalOpen(false);
-	};
-	const onConfirm = () => {
-		setIsDeletingUser(true);
-		// return deleteUserMutation(); // TODO
 	};
 
 	return (
@@ -63,7 +65,6 @@ export default function DangerZone() {
 								"bg-red-600 hover:bg-red-700": !isDeletingUser,
 							},
 						)}
-						onClick={onConfirm}
 						disabled={isDeletingUser}
 					>
 						Delete my account
