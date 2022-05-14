@@ -18,7 +18,6 @@ const ProfileInformations: FunctionComponent = () => {
 	const isSuccess = actionData?.submitted;
 	const isCurrentFormTransition = transition.submission?.formData.get("_action") === "updateUser";
 	const isSubmitting = isCurrentFormTransition && transition.state === "submitting";
-	console.log("isSuccess", isSuccess, actionData);
 
 	return (
 		<Form method="post">
