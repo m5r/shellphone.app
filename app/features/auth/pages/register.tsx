@@ -38,20 +38,12 @@ export default function RegisterPage() {
 				) : null}
 
 				<LabeledTextField
-					name="orgName"
-					type="text"
-					label="Organization name"
-					disabled={isSubmitting}
-					error={actionData?.errors?.orgName}
-					tabIndex={1}
-				/>
-				<LabeledTextField
 					name="fullName"
 					type="text"
 					label="Full name"
 					disabled={isSubmitting}
 					error={actionData?.errors?.fullName}
-					tabIndex={2}
+					tabIndex={1}
 				/>
 				<LabeledTextField
 					name="email"
@@ -59,7 +51,7 @@ export default function RegisterPage() {
 					label="Email"
 					disabled={isSubmitting}
 					error={actionData?.errors?.email}
-					tabIndex={3}
+					tabIndex={2}
 				/>
 				<LabeledTextField
 					name="password"
@@ -67,13 +59,13 @@ export default function RegisterPage() {
 					label="Password"
 					disabled={isSubmitting}
 					error={actionData?.errors?.password}
-					tabIndex={4}
+					tabIndex={3}
 				/>
 
 				<Button
 					type="submit"
 					disabled={transition.state === "submitting"}
-					tabIndex={5}
+					tabIndex={4}
 				>
 					Register
 				</Button>

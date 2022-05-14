@@ -5,8 +5,7 @@ type Props = {
 	variant: Variant;
 	onClick?: MouseEventHandler;
 	isDisabled?: boolean;
-	type: ButtonHTMLAttributes<HTMLButtonElement>["type"];
-};
+} & ButtonHTMLAttributes<HTMLButtonElement>;
 
 const Button: FunctionComponent<PropsWithChildren<Props>> = ({ children, type, variant, onClick, isDisabled }) => {
 	return (

@@ -2,6 +2,7 @@ import { type ActionFunction, json } from "@remix-run/node";
 import { GlobalRole, MembershipRole } from "@prisma/client";
 
 import db from "~/utils/db.server";
+import logger from "~/utils/logger.server";
 import { authenticate, hashPassword } from "~/utils/auth.server";
 import { type FormError, validate } from "~/utils/validation.server";
 import { Register } from "../validations";
@@ -17,7 +18,7 @@ const action: ActionFunction = async ({ request }) => {
 		return json<RegisterActionData>({ errors: validation.errors });
 	}
 
-	const { orgName, fullName, email, password } = validation.data;
+	const { fullName, email, password } = validation.data;
 	const hashedPassword = await hashPassword(password.trim());
 	try {
 		await db.user.create({
@@ -30,13 +31,15 @@ const action: ActionFunction = async ({ request }) => {
 					create: {
 						role: MembershipRole.OWNER,
 						organization: {
-							create: { name: orgName },
+							create: {}
 						},
 					},
 				},
 			},
 		});
 	} catch (error: any) {
+		logger.error(error);
+
 		if (error.code === "P2002") {
 			if (error.meta.target[0] === "email") {
 				return json<RegisterActionData>({

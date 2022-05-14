@@ -12,7 +12,7 @@ export default function __App() {
 	const hideFooter = false;
 	const matches = useMatches();
 	// matches[0].handle
-	console.log("matches", matches);
+	// console.log("matches", matches);
 
 	return (
 		<div className="h-full w-full overflow-hidden fixed bg-gray-100">

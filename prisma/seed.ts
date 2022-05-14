@@ -3,18 +3,21 @@ import { GlobalRole, MembershipRole } from "@prisma/client";
 
 import db from "~/utils/db.server";
 import { hashPassword } from "~/utils/auth.server";
-import slugify from "~/utils/slugify";
 
 async function seed() {
 	const email = "remixtape@admin.local";
-	const orgName = "Get Psyched";
-	const orgSlug = slugify(orgName);
 	const password = crypto.randomBytes(8).toString("hex");
 
 	// cleanup the existing database
 	await db.user.delete({ where: { email } }).catch(() => {});
 
-	await db.organization.delete({ where: { slug: orgSlug } }).catch(() => {});
+	await db.organization.deleteMany({
+		where: {
+			memberships: {
+				some: { user: { email } },
+			},
+		},
+	}).catch(() => {});
 
 	await db.user.create({
 		data: {
@@ -26,7 +29,7 @@ async function seed() {
 				create: {
 					role: MembershipRole.OWNER,
 					organization: {
-						create: { name: orgName, slug: orgSlug },
+						create: {},
 					},
 				},
 			},
