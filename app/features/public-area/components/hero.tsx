@@ -14,7 +14,7 @@ export default function Hero() {
 									<span className="bg-gradient-to-br from-rebeccapurple-500 to-indigo-600 bg-clip-text decoration-clone text-transparent">
 										Take your phone number
 									</span>{" "}
-									<span className="text-[#24185B]">anywhere you dgo</span>
+									<span className="text-[#24185B]">anywhere you go</span>
 								</h1>
 
 								<p className="text-base lg:text-lg xl:text-xl text-black">
