@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+	font-family: "Inter var";
+	font-weight: 100 900;
+	font-display: optional;
+	font-style: normal;
+	font-named-instance: "Regular";
+	src: url("/fonts/inter-roman.var.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "Inter var";
+	font-weight: 100 900;
+	font-display: optional;
+	font-style: italic;
+	font-named-instance: "Italic";
+	src: url("/fonts/inter-italic.var.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "P22 Mackinac Pro";
+	src: url("/fonts/P22MackinacPro-Book.woff2") format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: optional;
+}
+
+@font-face {
+	font-family: "P22 Mackinac Pro";
+	src: url("/fonts/P22MackinacPro-Bold.woff2") format("woff2");
+	font-weight: 700;
+	font-style: normal;
+	font-display: optional;
+}
+
+@font-face {
+	font-family: "P22 Mackinac Pro";
+	src: url("/fonts/P22MackinacPro-ExtraBold.woff2") format("woff2");
+	font-weight: 800;
+	font-style: normal;
+	font-display: optional;
+}
+
+@font-face {
+	font-family: "P22 Mackinac Pro";
+	src: url("/fonts/P22MackinacPro-Medium.woff2") format("woff2");
+	font-weight: 500;
+	font-style: normal;
+	font-display: optional;
+}
+
+.font-heading {
+	@apply font-mackinac tracking-tight font-bold;
+	word-spacing: 0.025em;
+}

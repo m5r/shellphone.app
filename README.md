@@ -1,173 +1,153 @@
-[![Blitz.js](https://raw.githubusercontent.com/blitz-js/art/master/github-cover-photo.png)](https://blitzjs.com)
+# Remixtape
 
-This is a [Blitz.js](https://github.com/blitz-js/blitz) app.
+Welcome to Remixtape! 💿📼
 
-# **shellphone.app**
+Before getting started, make sure you join the community where you can chat with other Remixtape users, ask questions and get help:  
+[Remixtape Discord](https://discord.gg/KSP8rvtU4R)
 
-## Getting Started
+## Getting started
 
-Run your app in the development mode.
+### System requirements
 
-```
-blitz dev
-```
+- Node.js >=16
+- Docker and docker-compose
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Initial setup
 
-## Environment Variables
+0. Sign up for the third-party services used with this stack.
 
-Ensure the `.env.local` file has required environment variables:
+- [Fly](https://fly.io/) — host the app and its database
+- [Stripe](https://stripe.com) — accept payments
+- [AWS SES](https://aws.amazon.com/ses) — send emails
 
-```
-DATABASE_URL=postgresql://<YOUR_DB_USERNAME>@localhost:5432/shellphone.app
-```
+1. Grab the code and initialize your project's git repository.
 
-Ensure the `.env.test.local` file has required environment variables:
+[Generate a GitHub access token](https://github.com/settings/tokens/new?description=Remixtape%20Stack%20Access&scopes=repo)
+to use with the `create-remix` CLI
 
-```
-DATABASE_URL=postgresql://<YOUR_DB_USERNAME>@localhost:5432/shellphone.app
-```
-
-## Tests
-
-Runs your tests using Jest.
-
-```
-yarn test
+```shell
+GITHUB_TOKEN=paste_access_token_here npx create-remix@latest ./shellphoneappremixed --template m5r/remixtape
+cd shellphoneappremixed
+git init
 ```
 
-Blitz comes with a test setup using [Jest](https://jestjs.io/) and [react-testing-library](https://testing-library.com/).
+2. Start Stripe CLI, Redis, and Postgres.
 
-## Commands
-
-Blitz comes with a powerful CLI that is designed to make development easy and fast. You can install it with `npm i -g blitz`
-
-```
-  blitz [COMMAND]
-
-  dev       Start a development server
-  build     Create a production build
-  start     Start a production server
-  export    Export your Blitz app as a static application
-  prisma    Run prisma commands
-  generate  Generate new files for your Blitz project
-  console   Run the Blitz console REPL
-  install   Install a recipe
-  help      Display help for blitz
-  test      Run project tests
+```shell
+docker-compose up --detach
+npx prisma migrate dev && npx prisma db seed
 ```
 
-You can read more about it on the [CLI Overview](https://blitzjs.com/docs/cli-overview) documentation.
+Print Stripe CLI's logs with `docker-compose logs stripe` and copy the webhook signing secret over to your `.env` file.
 
-## What's included?
+3. 👏 You made it! You're now ready to run your app locally
 
-Here is the starting structure of your app.
-
-```
-shellphone.app
-├── app/
-│   ├── api/
-│   ├── auth/
-│   │   ├── components/
-│   │   │   ├── LoginForm.tsx
-│   │   │   └── SignupForm.tsx
-│   │   ├── mutations/
-│   │   │   ├── changePassword.ts
-│   │   │   ├── forgotPassword.test.ts
-│   │   │   ├── forgotPassword.ts
-│   │   │   ├── login.ts
-│   │   │   ├── logout.ts
-│   │   │   ├── resetPassword.test.ts
-│   │   │   ├── resetPassword.ts
-│   │   │   └── signup.ts
-│   │   ├── pages/
-│   │   │   ├── forgot-password.tsx
-│   │   │   ├── login.tsx
-│   │   │   ├── reset-password.tsx
-│   │   │   └── signup.tsx
-│   │   └── validations.ts
-│   ├── core/
-│   │   ├── components/
-│   │   │   ├── Form.tsx
-│   │   │   └── LabeledTextField.tsx
-│   │   ├── hooks/
-│   │   │   └── useCurrentUser.ts
-│   │   └── layouts/
-│   │       └── Layout.tsx
-│   ├── pages/
-│   │   ├── 404.tsx
-│   │   ├── _app.tsx
-│   │   ├── _document.tsx
-│   │   ├── index.test.tsx
-│   │   └── index.tsx
-│   └── users/
-│       └── queries/
-│           └── getCurrentUser.ts
-├── db/
-│   ├── index.ts
-│   ├── schema.prisma
-│   └── seeds.ts
-├── integrations/
-├── mailers/
-│   └── forgotPasswordMailer.ts
-├── public/
-│   ├── favicon.ico*
-│   └── logo.png
-├── test/
-│   ├── setup.ts
-│   └── utils.tsx
-├── README.md
-├── babel.config.js
-├── blitz.config.js
-├── jest.config.js
-├── package.json
-├── tsconfig.json
-├── types.d.ts
-├── types.ts
-└── yarn.lock
+```shell
+npm run dev
 ```
 
-These files are:
+That's it! You now have your app running locally on http://localhost:3000
 
--   The `app/` folder is a container for most of your project. This is where you’ll put any pages or API routes.
+### Development
 
--   `db/` is where your database configuration goes. If you’re writing models or checking migrations, this is where to go.
+To develop your app, you need to run the development database, the Stripe CLI and the Remix development CLI.
+These two commands will take care of it:
 
--   `public/` is a folder where you will put any static assets. If you have images, files, or videos which you want to use in your app, this is where to put them.
+```shell
+docker-compose up -d
+npm run dev
+```
 
--   `integrations/` is a folder to put all third-party integrations like with Stripe, Sentry, etc.
+### Tests
 
--   `test/` is a folder where you can put test utilities and integration tests.
+The codebase comes with Cypress and end-to-end tests to help you get started testing your app
+and making sure your app works for your users.  
+The `npm run e2e` command will run Cypress and your end-to-end tests,
+but you can always open Cypress with `npx cypress open` to write and run your tests interactively.
 
--   `package.json` contains information about your dependencies and devDependencies. If you’re using a tool like `npm` or `yarn`, you won’t have to worry about this much.
+### Deployment
 
--   `tsconfig.json` is our recommended setup for TypeScript.
+A Remix app can be deployed in a large and growing list of JavaScript environments.
+The simplest and most straightforward option is using the Remix App Server which is basically a Node.js server.  
+Deployment to Fly is covered here because it's an *amazing* hosting service, but you can host your Remix app
+anywhere you'd like with the provided `Dockerfile`.
 
--   `.babelrc.js`, `.env`, etc. ("dotfiles") are configuration files for various bits of JavaScript tooling.
+#### Setup
 
--   `blitz.config.js` is for advanced custom configuration of Blitz. It extends [`next.config.js`](https://nextjs.org/docs/api-reference/next.config.js/introduction).
+Note: make sure you have their CLI `flyctl` installed on your machine.
+Their [docs](https://fly.io/docs/getting-started/installing-flyctl/) cover the installation on Linux, macOS, and Windows.
 
--   `jest.config.js` contains config for Jest tests. You can [customize it if needed](https://jestjs.io/docs/en/configuration).
+1. Create a Fly app
 
-You can read more about it in the [File Structure](https://blitzjs.com/docs/file-structure) section of the documentation.
+Initialize your app from the provided `fly.toml` file but do not deploy it just yet.
 
-### Tools included
+```shell
+flyctl launch --no-deploy --copy-config --name shellphoneappremixed
+```
 
-Blitz comes with a set of tools that corrects and formats your code, facilitating its future maintenance. You can modify their options and even uninstall them.
+2. Import your environment variables as secrets
 
--   **ESLint**: It lints your code: searches for bad practices and tell you about it. You can customize it via the `.eslintrc.js`, and you can install (or even write) plugins to have it the way you like it. It already comes with the [`blitz`](https://github.com/blitz-js/blitz/tree/canary/packages/eslint-config) config, but you can remove it safely. [Learn More](https://eslint.org).
--   **Husky**: It adds [githooks](https://git-scm.com/docs/githooks), little pieces of code that get executed when certain Git events are triggerd. For example, `pre-commit` is triggered just before a commit is created. You can see the current hooks inside `.husky/`. If are having problems commiting and pushing, check out ther [troubleshooting](https://typicode.github.io/husky/#/?id=troubleshoot) guide. [Learn More](https://typicode.github.io/husky).
--   **Prettier**: It formats your code to look the same everywhere. You can configure it via the `.prettierrc` file. The `.prettierignore` contains the files that should be ignored by Prettier; useful when you have large files or when you want to keep a custom formatting. [Learn More](https://prettier.io).
+You can either import them one by one
+```shell
+flyctl secrets set APP_BASE_URL=https://shellphoneappremixed.fly.dev
+flyctl secrets set INVITATION_TOKEN_SECRET=0ded075524fd19fe467eb00480b8d5d4
+# ...
+```
 
-## Learn more
+Or import them in bulk.
+Here `secrets.txt` is a plain text file that contains your secrets in the form of `ENV_NAME=VALUE`,
+kind of like your `.env` file but without any comment.
+```shell
+cat secrets.txt | flyctl secrets import
+```
 
-Read the [Blitz.js Documentation](https://blitzjs.com/docs/getting-started) to learn more.
+3. Deploy a Postgres instance and attach it to your app
 
-The Blitz community is warm, safe, diverse, inclusive, and fun! Feel free to reach out to us in any of our communication channels.
+```shell
+flyctl postgres create --name shellphoneappremixed-pg
+flyctl postgres attach --postgres-app shellphoneappremixed-pg --app shellphoneappremixed
+```
 
--   [Website](https://blitzjs.com/)
--   [Discord](https://discord.blitzjs.com/)
--   [Report an issue](https://github.com/blitz-js/blitz/issues/new/choose)
--   [Forum discussions](https://github.com/blitz-js/blitz/discussions)
--   [How to Contribute](https://blitzjs.com/docs/contributing)
--   [Sponsor or donate](https://github.com/blitz-js/blitz#sponsors-and-donations)
+4. Deploy a Redis instance
+
+It uses a persistent storage through a Fly storage volume we create, preferably in the same region.  
+[BullMQ documentations](https://docs.bullmq.io/guide/connections) recommends setting your Redis instance with
+`maxmemory-policy=noeviction` in order to avoid automatic removal of keys which would cause unexpected errors in BullMQ.  
+I recommend using `openssl` to generate a strong random.
+Keep it somewhere safe, we will need it to connect our app to this Redis instance later.
+
+```shell
+flyctl apps create shellphoneappremixed-redis
+flyctl volumes create shellphoneappremixed_redis_data -c ./fly.redis.toml
+openssl rand -hex 16 # copy its output
+flyctl secrets set MAXMEMORY_POLICY="noeviction" -c ./fly.redis.toml
+flyctl secrets set REDIS_PASSWORD=paste_redis_password_here -c ./fly.redis.toml
+flyctl deploy -c ./fly.redis.toml
+```
+
+5. Connect your app to Redis
+
+Last, we need to tell our app how to connect to our Redis instance.
+It's time to use that Redis password saved from the previous step!  
+We're using our Redis Fly app's .internal address which is formatted like this `{region}.{name}.internal`.
+
+```shell
+flyctl secrets set "REDIS_URL=redis://cdg.shellphoneappremixed-redis.internal"
+flyctl secrets set "REDIS_PASSWORD=paste_redis_password_here"
+```
+
+6. Deploy your app 🚀
+
+```shell
+flyctl deploy
+```
+
+#### Deploy with GitHub Actions
+
+Once your app is set up with its environment variables and connected to both the database and redis,
+setting up automatic deployment is straightforward:
+
+1. Generate a Fly API token in your [Fly account settings](https://web.fly.io/user/personal_access_tokens)
+2. Copy it to your GitHub repository's secrets under the name `FLY_API_TOKEN`.
+
+That's a wrap! From now on, pushing code to the `master` branch will automatically deploy your app to Fly.
