@@ -20,6 +20,7 @@ invariant(
 	`Please define the "AWS_SES_FROM_EMAIL" environment variable`,
 );
 invariant(typeof process.env.REDIS_URL === "string", `Please define the "REDIS_URL" environment variable`);
+invariant(typeof process.env.TWILIO_AUTH_TOKEN === "string", `Please define the "TWILIO_AUTH_TOKEN" environment variable`);
 
 export default {
 	app: {
@@ -36,5 +37,8 @@ export default {
 	redis: {
 		url: process.env.REDIS_URL,
 		password: process.env.REDIS_PASSWORD,
+	},
+	twilio: {
+		authToken: process.env.TWILIO_AUTH_TOKEN,
 	},
 };

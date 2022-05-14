@@ -84,6 +84,7 @@
 		"stripe": "9.1.0",
 		"tiny-invariant": "1.2.0",
 		"tslog": "3.3.3",
+		"twilio": "3.77.0",
 		"zod": "3.16.0"
 	},
 	"devDependencies": {

@@ -9,7 +9,7 @@ import authenticator from "./authenticator.server";
 import { AuthenticationError } from "./errors";
 import { commitSession, destroySession, getSession } from "./session.server";
 
-export type SessionOrganization = Pick<Organization, "id" | "twilioAccountSid"> & { role: MembershipRole };
+export type SessionOrganization = Pick<Organization, "id" | "twilioSubAccountSid" | "twilioAccountSid"> & { role: MembershipRole };
 export type SessionUser = Omit<User, "hashedPassword"> & {
 	organizations: SessionOrganization[];
 };
@@ -39,7 +39,7 @@ export async function login({ form }: FormStrategyVerifyParams): Promise<Session
 			memberships: {
 				select: {
 					organization: {
-						select: { id: true, twilioAccountSid: true },
+						select: { id: true, twilioSubAccountSid: true, twilioAccountSid: true },
 					},
 					role: true,
 				},
@@ -151,7 +151,7 @@ export async function refreshSessionData(request: Request) {
 			memberships: {
 				select: {
 					organization: {
-						select: { id: true, twilioAccountSid: true },
+						select: { id: true, twilioSubAccountSid: true, twilioAccountSid: true },
 					},
 					role: true,
 				},
