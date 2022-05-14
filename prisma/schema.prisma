@@ -12,6 +12,8 @@ model Organization {
     createdAt DateTime @default(now()) @db.Timestamptz
     updatedAt DateTime @updatedAt @db.Timestamptz
 
+    twilioAccountSid String?
+
     memberships   Membership[]
     phoneNumbers  PhoneNumber[]
     subscriptions Subscription[] // many subscriptions to keep a history
