@@ -1,8 +1,6 @@
 .gitkeep
-.env*
-*.ico
-*.lock
-db/migrations
-.next
-.blitz
-mailers/**/*.html
+.env
+.cache
+build
+package-lock.json
+app/tailwind.css

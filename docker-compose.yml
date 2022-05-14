@@ -1,25 +1,28 @@
 version: "3.7"
 
 services:
-    db:
+    postgres:
         image: postgres:13-alpine
         restart: unless-stopped
         volumes:
-            - data:/var/lib/postgresql/data
-        env_file: ./.env #Here we are using the already existing .env file
+            - pg-data:/var/lib/postgresql/data
+        env_file: ./.env
         ports:
             - "5432:5432"
-    pga:
-        image: dpage/pgadmin4
-        environment:
-            PGADMIN_DEFAULT_EMAIL: root@localhost.localdomain
-            PGADMIN_DEFAULT_PASSWORD: secret
-            PGADMIN_DISABLE_POSTFIX: "true"
-            PGADMIN_CONFIG_SERVER_MODE: "False"
-        network_mode: host
+        tty: true
+
+    redis:
+        image: redis:6-alpine
+        command: >
+            --maxmemory-policy noeviction
+        restart: unless-stopped
         volumes:
-            - pgadmin:/var/lib/pgadmin
+            - redis-data:/data
+        ports:
+            - "6379:6379"
+        tty: true
+
 
 volumes:
-    data:
-    pgadmin:
+    pg-data:
+    redis-data:

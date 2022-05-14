@@ -1,24 +1,24 @@
 {
+	"include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],
+	"exclude": ["./cypress/**/*.ts"],
 	"compilerOptions": {
-		"target": "es5",
-		"lib": ["dom", "dom.iterable", "esnext", "webworker"],
-		"baseUrl": "./",
-		"allowJs": true,
-		"skipLibCheck": true,
-		"strict": true,
-		"strictNullChecks": true,
-		"forceConsistentCasingInFileNames": true,
-		"noEmit": true,
-		"noUncheckedIndexedAccess": true,
+		"types": ["vitest/globals"],
+		"lib": ["DOM", "DOM.Iterable", "ES2021"],
+		"module": "commonjs",
+		"target": "ES2021",
+		"isolatedModules": true,
 		"esModuleInterop": true,
-		"module": "esnext",
+		"jsx": "react-jsx",
 		"moduleResolution": "node",
 		"resolveJsonModule": true,
-		"isolatedModules": true,
-		"jsx": "preserve",
-		"incremental": true,
-		"tsBuildInfoFile": ".tsbuildinfo"
-	},
-	"exclude": ["node_modules", "**/*.e2e.ts", "cypress"],
-	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
+		"strict": true,
+		"skipLibCheck": true,
+		"baseUrl": ".",
+		"paths": {
+			"~/*": ["./app/*"]
+		},
+		"noEmit": true,
+		"forceConsistentCasingInFileNames": true,
+		"allowJs": true
+	}
 }

@@ -1,7 +1,6 @@
 const defaultTheme = require("tailwindcss/defaultTheme");
 
 module.exports = {
-	mode: "jit",
 	theme: {
 		extend: {
 			fontFamily: {
@@ -96,18 +95,6 @@ module.exports = {
 				},
 				navy: "#24185B",
 			},
-			boxShadow: {
-				"2xl": "0 25px 50px -12px rgba(0, 0, 0, 0.08)",
-			},
-			outline: {
-				blue: "2px solid rgba(0, 112, 244, 0.5)",
-			},
-			spacing: {
-				128: "32rem",
-				"9/16": "56.25%",
-				"3/4": "75%",
-				"1/1": "100%",
-			},
 			fontSize: {
 				xs: ["0.75rem", { lineHeight: "1.5" }],
 				sm: ["0.875rem", { lineHeight: "1.5" }],
@@ -119,6 +106,18 @@ module.exports = {
 				"4xl": ["3.5rem", { lineHeight: "1.18" }],
 				"5xl": ["4rem", { lineHeight: "1.16" }],
 				"6xl": ["5.5rem", { lineHeight: "1.11" }],
+			},
+			boxShadow: {
+				"2xl": "0 25px 50px -12px rgba(0, 0, 0, 0.08)",
+			},
+			outline: {
+				blue: "2px solid rgba(0, 112, 244, 0.5)",
+			},
+			spacing: {
+				128: "32rem",
+				"9/16": "56.25%",
+				"3/4": "75%",
+				"1/1": "100%",
 			},
 			inset: {
 				"1/2": "50%",
@@ -160,5 +159,5 @@ module.exports = {
 		},
 	},
 	plugins: [require("@tailwindcss/line-clamp"), require("@tailwindcss/forms"), require("@tailwindcss/typography")],
-	purge: ["{pages,app}/**/*.{js,ts,jsx,tsx}"],
+	content: ["./app/**/*.{ts,tsx}"],
 };
