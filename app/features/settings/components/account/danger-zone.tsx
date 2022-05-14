@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { useFetcher, useSubmit, useTransition } from "@remix-run/react";
+import { Form, useTransition } from "@remix-run/react";
 import clsx from "clsx";
 
 import Button from "../button";
@@ -12,9 +12,6 @@ export default function DangerZone() {
 	const isDeletingUser = isCurrentFormTransition && transition.state === "submitting";
 	const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
 	const modalCancelButtonRef = useRef<HTMLButtonElement>(null);
-	const fetcher = useFetcher();
-	const submit = useSubmit();
-	// TODO
 
 	const closeModal = () => {
 		if (isDeletingUser) {
@@ -56,19 +53,22 @@ export default function DangerZone() {
 					</div>
 				</div>
 				<div className="mt-5 md:mt-4 md:flex md:flex-row-reverse">
-					<button
-						type="button"
-						className={clsx(
-							"transition-colors duration-150 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 md:ml-3 md:w-auto md:text-sm",
-							{
-								"bg-red-400 cursor-not-allowed": isDeletingUser,
-								"bg-red-600 hover:bg-red-700": !isDeletingUser,
-							},
-						)}
-						disabled={isDeletingUser}
-					>
-						Delete my account
-					</button>
+					<Form method="post">
+						<button
+							type="submit"
+							className={clsx(
+								"transition-colors duration-150 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 md:ml-3 md:w-auto md:text-sm",
+								{
+									"bg-red-400 cursor-not-allowed": isDeletingUser,
+									"bg-red-600 hover:bg-red-700": !isDeletingUser,
+								},
+							)}
+							disabled={isDeletingUser}
+						>
+							Delete my account
+						</button>
+						<input type="hidden" name="_action" value="deleteUser" />
+					</Form>
 					<button
 						ref={modalCancelButtonRef}
 						type="button"
