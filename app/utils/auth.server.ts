@@ -1,4 +1,4 @@
-import { type Session, redirect } from "@remix-run/node";
+import { redirect, type Session } from "@remix-run/node";
 import type { FormStrategyVerifyParams } from "remix-auth-form";
 import SecurePassword from "secure-password";
 import type { MembershipRole, Organization, User } from "@prisma/client";
@@ -9,7 +9,9 @@ import authenticator from "./authenticator.server";
 import { AuthenticationError } from "./errors";
 import { commitSession, destroySession, getSession } from "./session.server";
 
-export type SessionOrganization = Pick<Organization, "id" | "twilioSubAccountSid" | "twilioAccountSid"> & { role: MembershipRole };
+export type SessionOrganization = Pick<Organization, "id" | "twilioSubAccountSid" | "twilioAccountSid"> & {
+	role: MembershipRole;
+};
 export type SessionUser = Omit<User, "hashedPassword"> & {
 	organizations: SessionOrganization[];
 };
@@ -134,13 +136,26 @@ export async function requireLoggedOut(request: Request) {
 
 export async function requireLoggedIn(request: Request) {
 	const user = await authenticator.isAuthenticated(request);
+	const signInUrl = new URL("/sign-in");
+	const redirectTo = buildRedirectTo(new URL(request.url));
+	signInUrl.searchParams.set("redirectTo", redirectTo);
 	if (!user) {
-		throw redirect("/sign-in", {
+		throw redirect(signInUrl.toString(), {
 			headers: { "Set-Cookie": await destroySession(await getSession(request)) },
 		});
 	}
 
 	return user;
+}
+
+function buildRedirectTo(url: URL): string {
+	let redirectTo = url.pathname;
+	const searchParams = url.searchParams.toString();
+	if (searchParams.length > 0) {
+		redirectTo += `?${searchParams}`;
+	}
+
+	return encodeURIComponent(redirectTo);
 }
 
 export async function refreshSessionData(request: Request) {
