@@ -82,6 +82,7 @@
 		"remix-utils": "3.2.0",
 		"secure-password": "4.0.0",
 		"stripe": "9.1.0",
+		"superjson-remix": "0.1.2",
 		"tiny-invariant": "1.2.0",
 		"tslog": "3.3.3",
 		"twilio": "3.77.0",

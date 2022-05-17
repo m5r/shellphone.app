@@ -1,4 +1,5 @@
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link } from "@remix-run/react";
+import { useLoaderData } from "superjson-remix";
 import { HiPhoneMissedCall, HiPhoneIncoming, HiPhoneOutgoing } from "react-icons/hi";
 import clsx from "clsx";
 import { Direction, CallStatus } from "@prisma/client";

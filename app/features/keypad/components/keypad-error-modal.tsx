@@ -1,7 +1,6 @@
 import type { FunctionComponent } from "react";
 import { useRef } from "react";
-import { useNavigate } from "@remix-run/react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "@remix-run/react";
 
 import Modal, { ModalTitle } from "~/features/core/components/modal";
 
