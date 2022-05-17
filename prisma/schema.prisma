@@ -1,18 +1,17 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
 datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
 }
 
-generator client {
-    provider = "prisma-client-js"
-}
-
 model Organization {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now()) @db.Timestamptz
-    updatedAt DateTime @updatedAt @db.Timestamptz
-
-    twilioAccountSid String?
+    id                  String   @id @default(cuid())
+    createdAt           DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt           DateTime @updatedAt @db.Timestamptz(6)
+    twilioAccountSid    String?
     twilioSubAccountSid String?
 
     memberships   Membership[]
@@ -21,9 +20,8 @@ model Organization {
 }
 
 model Subscription {
-    createdAt DateTime @default(now()) @db.Timestamptz
-    updatedAt DateTime @updatedAt @db.Timestamptz
-
+    createdAt                 DateTime           @default(now()) @db.Timestamptz(6)
+    updatedAt                 DateTime           @updatedAt @db.Timestamptz(6)
     paddleSubscriptionId      Int                @id @unique
     paddlePlanId              Int
     paddleCheckoutId          String
@@ -33,36 +31,109 @@ model Subscription {
     currency                  String
     unitPrice                 Float
     nextBillDate              DateTime           @db.Date
-    lastEventTime             DateTime           @db.Timestamp
+    lastEventTime             DateTime           @db.Timestamp(6)
     cancellationEffectiveDate DateTime?          @db.Date
+    organizationId            String
+    organization              Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
 
-    organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-    organizationId String
+model Membership {
+    id              String         @id @default(cuid())
+    role            MembershipRole
+    organizationId  String
+    userId          String?
+    invitedEmail    String?
+    organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+    user            User?          @relation(fields: [userId], references: [id], onDelete: Cascade)
+    invitationToken Token?
+
+    @@unique([organizationId, invitedEmail])
+}
+
+model User {
+    id             String       @id @default(cuid())
+    createdAt      DateTime     @default(now()) @db.Timestamptz(6)
+    updatedAt      DateTime     @updatedAt @db.Timestamptz(6)
+    fullName       String
+    email          String       @unique
+    hashedPassword String?
+    role           GlobalRole   @default(CUSTOMER)
+    memberships    Membership[]
+    sessions       Session[]
+    tokens         Token[]
+}
+
+model Session {
+    id        String    @id @default(cuid())
+    createdAt DateTime  @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime  @updatedAt @db.Timestamptz(6)
+    expiresAt DateTime? @db.Timestamptz(6)
+    data      String
+    userId    String?
+    user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Token {
+    id           String     @id @default(cuid())
+    createdAt    DateTime   @default(now()) @db.Timestamptz(6)
+    updatedAt    DateTime   @updatedAt @db.Timestamptz(6)
+    hashedToken  String
+    type         TokenType
+    expiresAt    DateTime   @db.Timestamptz(6)
+    sentTo       String
+    userId       String
+    membershipId String     @unique
+    membership   Membership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+    user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([hashedToken, type])
+}
+
+model Message {
+    id            String        @id
+    sentAt        DateTime      @db.Timestamptz(6)
+    content       String
+    from          String
+    to            String
+    direction     Direction
+    status        MessageStatus
+    phoneNumberId String
+    phoneNumber   PhoneNumber   @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
+}
+
+model PhoneCall {
+    id            String      @id @unique
+    createdAt     DateTime    @default(now()) @db.Timestamptz(6)
+    from          String
+    to            String
+    status        CallStatus
+    direction     Direction
+    duration      String
+    phoneNumberId String
+    phoneNumber   PhoneNumber @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
+}
+
+model PhoneNumber {
+    id                 String       @id
+    createdAt          DateTime     @default(now()) @db.Timestamptz(6)
+    number             String
+    isCurrent          Boolean
+    isFetchingMessages Boolean?
+    isFetchingCalls    Boolean?
+    organizationId     String
+    organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+    messages           Message[]
+    phoneCalls         PhoneCall[]
+
+    @@unique([organizationId, isCurrent])
 }
 
 enum SubscriptionStatus {
     active
-    trialing // not used
+    trialing
     past_due
-    paused // not used
+    paused
     deleted
-}
-
-model Membership {
-    id   String         @id @default(cuid())
-    role MembershipRole
-
-    organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-    organizationId String
-
-    user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
-    userId String?
-
-    // When the user joins, we will clear out the email and set the user.
-    invitedEmail    String?
-    invitationToken Token?
-
-    @@unique([organizationId, invitedEmail])
 }
 
 enum MembershipRole {
@@ -70,71 +141,14 @@ enum MembershipRole {
     USER
 }
 
-// The owners of the SaaS (you) can have a SUPERADMIN role to access all data
 enum GlobalRole {
     SUPERADMIN
     CUSTOMER
 }
 
-model User {
-    id             String     @id @default(cuid())
-    createdAt      DateTime   @default(now()) @db.Timestamptz
-    updatedAt      DateTime   @updatedAt @db.Timestamptz
-    fullName       String
-    email          String     @unique
-    hashedPassword String?
-    role           GlobalRole @default(CUSTOMER)
-
-    memberships Membership[]
-    tokens      Token[]
-    sessions    Session[]
-}
-
-model Session {
-    id        String    @id @default(cuid())
-    createdAt DateTime  @default(now()) @db.Timestamptz
-    updatedAt DateTime  @updatedAt @db.Timestamptz
-    expiresAt DateTime? @db.Timestamptz
-    data      String
-
-    user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
-    userId String?
-}
-
-model Token {
-    id          String    @id @default(cuid())
-    createdAt   DateTime  @default(now()) @db.Timestamptz
-    updatedAt   DateTime  @updatedAt @db.Timestamptz
-    hashedToken String
-    type        TokenType
-    expiresAt   DateTime  @db.Timestamptz
-    sentTo      String
-
-    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-    userId String
-
-    membership   Membership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
-    membershipId String     @unique
-
-    @@unique([hashedToken, type])
-}
-
 enum TokenType {
     RESET_PASSWORD
     INVITE_MEMBER
-}
-
-model Message {
-    id        String        @id
-    sentAt    DateTime      @db.Timestamptz
-    content   String
-    from      String
-    to        String
-    direction Direction
-    status    MessageStatus
-
-    phoneNumber   PhoneNumber @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
-    phoneNumberId String
 }
 
 enum Direction {
@@ -156,21 +170,7 @@ enum MessageStatus {
     Read
     PartiallyDelivered
     Canceled
-
     Error
-}
-
-model PhoneCall {
-    id        String     @id
-    createdAt DateTime   @default(now()) @db.Timestamptz
-    from      String
-    to        String
-    status    CallStatus
-    direction Direction
-    duration  String
-
-    phoneNumber   PhoneNumber @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
-    phoneNumberId String
 }
 
 enum CallStatus {
@@ -182,20 +182,4 @@ enum CallStatus {
     Failed
     NoAnswer
     Canceled
-}
-
-model PhoneNumber {
-    id                 String   @id
-    createdAt          DateTime @default(now()) @db.Timestamptz
-    number             String
-    isFetchingMessages Boolean?
-    isFetchingCalls    Boolean?
-
-    messages   Message[]
-    phoneCalls PhoneCall[]
-
-    organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-    organizationId String
-
-    @@unique([organizationId, id])
 }
