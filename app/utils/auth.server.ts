@@ -136,11 +136,11 @@ export async function requireLoggedOut(request: Request) {
 
 export async function requireLoggedIn(request: Request) {
 	const user = await authenticator.isAuthenticated(request);
-	const signInUrl = new URL("/sign-in");
+	const signInUrl = "/sign-in";
 	const redirectTo = buildRedirectTo(new URL(request.url));
-	signInUrl.searchParams.set("redirectTo", redirectTo);
+	const searchParams = new URLSearchParams({ redirectTo });
 	if (!user) {
-		throw redirect(signInUrl.toString(), {
+		throw redirect(`${signInUrl}?${searchParams.toString()}`, {
 			headers: { "Set-Cookie": await destroySession(await getSession(request)) },
 		});
 	}
@@ -148,7 +148,7 @@ export async function requireLoggedIn(request: Request) {
 	return user;
 }
 
-function buildRedirectTo(url: URL): string {
+function buildRedirectTo(url: URL) {
 	let redirectTo = url.pathname;
 	const searchParams = url.searchParams.toString();
 	if (searchParams.length > 0) {
