@@ -1,6 +1,7 @@
 import { Suspense } from "react";
-import { json, type LoaderFunction, type MetaFunction } from "@remix-run/node";
-import { useLoaderData, useNavigate, useParams } from "@remix-run/react";
+import type { LoaderFunction, MetaFunction } from "@remix-run/node";
+import { useNavigate, useParams } from "@remix-run/react";
+import { json, useLoaderData } from "superjson-remix";
 import { IoCall, IoChevronBack, IoInformationCircle } from "react-icons/io5";
 import { type Message, Prisma } from "@prisma/client";
 
@@ -38,32 +39,21 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 	return json<ConversationLoaderData>({ conversation });
 
 	async function getConversation(recipient: string): Promise<ConversationType> {
-		/*if (!hasFilledTwilioCredentials) {
-			return;
-		}*/
-
 		const organizationId = organizations[0].id;
-		const organization = await db.organization.findFirst({
-			where: { id: organizationId },
-			include: { phoneNumbers: true },
+		const phoneNumber = await db.phoneNumber.findUnique({
+			where: { organizationId_isCurrent: { organizationId, isCurrent: true } },
 		});
-		if (!organization || !organization.phoneNumbers[0]) {
-			throw new Error("Not found");
-		}
-
-		const phoneNumber = organization.phoneNumbers[0]; // TODO: use the active number, not the first one
-		const phoneNumberId = phoneNumber.id;
-		if (organization.phoneNumbers[0].isFetchingMessages) {
-			throw new Error("Not found");
+		if (!phoneNumber || phoneNumber.isFetchingMessages) {
+			throw new Error("unreachable");
 		}
 
 		const formattedPhoneNumber = parsePhoneNumber(recipient).getNumber("international");
 		const messages = await db.message.findMany({
 			where: {
-				phoneNumberId,
+				phoneNumberId: phoneNumber.id,
 				OR: [{ from: recipient }, { to: recipient }],
 			},
-			orderBy: { sentAt: Prisma.SortOrder.desc },
+			orderBy: { sentAt: Prisma.SortOrder.asc },
 		});
 		return {
 			recipient,
@@ -91,9 +81,9 @@ export default function ConversationPage() {
 					<IoInformationCircle className="h-8 w-8" />
 				</span>
 			</header>
-			<Suspense fallback={<div className="pt-12">Loading messages with {recipient}</div>}>
-				<Conversation />
-			</Suspense>
+			{/*<Suspense fallback={<div className="pt-12">Loading messages with {recipient}</div>}>*/}
+			<Conversation />
+			{/*</Suspense>*/}
 		</>
 	);
 }

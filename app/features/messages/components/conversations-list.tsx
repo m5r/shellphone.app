@@ -1,4 +1,5 @@
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link } from "@remix-run/react";
+import { useLoaderData } from "superjson-remix";
 import { IoChevronForward } from "react-icons/io5";
 
 import { formatRelativeDate } from "~/features/core/helpers/date-formatter";

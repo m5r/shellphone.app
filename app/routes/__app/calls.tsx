@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import { type PhoneCall, Prisma } from "@prisma/client";
-import { type LoaderFunction, json } from "@remix-run/node";
+import { type LoaderFunction } from "@remix-run/node";
+import { json, useLoaderData } from "superjson-remix";
+import { parsePhoneNumber } from "awesome-phonenumber";
 
 import MissingTwilioCredentials from "~/features/core/components/missing-twilio-credentials";
 import PageTitle from "~/features/core/components/page-title";
@@ -9,30 +11,46 @@ import InactiveSubscription from "~/features/core/components/inactive-subscripti
 import PhoneCallsList from "~/features/phone-calls/components/phone-calls-list";
 import { requireLoggedIn } from "~/utils/auth.server";
 import db from "~/utils/db.server";
-import { parsePhoneNumber } from "awesome-phonenumber";
 
 type PhoneCallMeta = {
 	formattedPhoneNumber: string;
 	country: string | "unknown";
 };
 
-export type PhoneCallsLoaderData = { phoneCalls: (PhoneCall & { toMeta: PhoneCallMeta; fromMeta: PhoneCallMeta })[] };
+export type PhoneCallsLoaderData = {
+	user: {
+		hasOngoingSubscription: boolean;
+		hasPhoneNumber: boolean;
+	};
+	phoneCalls: (PhoneCall & { toMeta: PhoneCallMeta; fromMeta: PhoneCallMeta })[] | undefined;
+};
 
 export const loader: LoaderFunction = async ({ request }) => {
 	const { organizations } = await requireLoggedIn(request);
 	const organizationId = organizations[0].id;
-	const phoneNumberId = "";
-	const phoneNumber = await db.phoneNumber.findFirst({ where: { organizationId, id: phoneNumberId } });
-	if (phoneNumber?.isFetchingCalls) {
-		return;
+	const phoneNumber = await db.phoneNumber.findUnique({
+		where: { organizationId_isCurrent: { organizationId, isCurrent: true } },
+	});
+	if (!phoneNumber || phoneNumber.isFetchingCalls) {
+		return json<PhoneCallsLoaderData>({
+			user: {
+				hasOngoingSubscription: true, // TODO
+				hasPhoneNumber: Boolean(phoneNumber),
+			},
+			phoneCalls: undefined,
+		});
 	}
 
 	const phoneCalls = await db.phoneCall.findMany({
-		where: { phoneNumberId },
+		where: { phoneNumberId: phoneNumber.id },
 		orderBy: { createdAt: Prisma.SortOrder.desc },
 	});
 
 	return json<PhoneCallsLoaderData>({
+		user: {
+			hasOngoingSubscription: true, // TODO
+			hasPhoneNumber: Boolean(phoneNumber),
+		},
 		phoneCalls: phoneCalls.map((phoneCall) => ({
 			...phoneCall,
 			fromMeta: getPhoneNumberMeta(phoneCall.from),
@@ -299,13 +317,9 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export default function PhoneCalls() {
-	const { hasFilledTwilioCredentials, hasPhoneNumber, hasOngoingSubscription } = {
-		hasFilledTwilioCredentials: false,
-		hasPhoneNumber: false,
-		hasOngoingSubscription: false,
-	};
+	const { hasPhoneNumber, hasOngoingSubscription } = useLoaderData<PhoneCallsLoaderData>().user;
 
-	if (!hasFilledTwilioCredentials || !hasPhoneNumber) {
+	if (!hasPhoneNumber) {
 		return (
 			<>
 				<MissingTwilioCredentials />
@@ -334,10 +348,10 @@ export default function PhoneCalls() {
 		<>
 			<PageTitle className="pl-12" title="Calls" />
 			<section className="flex flex-grow flex-col">
-				<Suspense fallback={<Spinner />}>
-					{/* TODO: skeleton phone calls list */}
-					<PhoneCallsList />
-				</Suspense>
+				{/*<Suspense fallback={<Spinner />}>*/}
+				{/* TODO: skeleton phone calls list */}
+				<PhoneCallsList />
+				{/*</Suspense>*/}
 			</section>
 		</>
 	);

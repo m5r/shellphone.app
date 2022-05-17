@@ -1,47 +1,45 @@
-import { useActionData, useCatch, useLoaderData, useTransition } from "@remix-run/react";
+import { Form, useActionData, useCatch, useLoaderData, useTransition } from "@remix-run/react";
 
 import Button from "../button";
 import SettingsSection from "../settings-section";
 import Alert from "~/features/core/components/alert";
 import useSession from "~/features/core/hooks/use-session";
-import { PhoneSettingsLoaderData } from "~/routes/__app/settings/phone";
+import type { PhoneSettingsLoaderData } from "~/routes/__app/settings/phone";
+import type { SetPhoneNumberActionData } from "~/features/settings/actions/phone";
 
 export default function PhoneNumberForm() {
 	const transition = useTransition();
-	const actionData = useActionData();
+	const actionData = useActionData<SetPhoneNumberActionData>();
 	const { currentOrganization } = useSession();
+	const availablePhoneNumbers = useLoaderData<PhoneSettingsLoaderData>().phoneNumbers;
 
 	const isSubmitting = transition.state === "submitting";
 	const isSuccess = actionData?.submitted === true;
-	const error = actionData?.error;
-	const isError = !!error;
-
+	const errors = actionData?.errors;
+	const topErrorMessage = errors?.general ?? errors?.phoneNumberSid;
+	const isError = typeof topErrorMessage !== "undefined";
+	const currentPhoneNumber = availablePhoneNumbers.find(phoneNumber => phoneNumber.isCurrent === true);
 	const hasFilledTwilioCredentials = Boolean(currentOrganization.twilioAccountSid)
-	const availablePhoneNumbers = useLoaderData<PhoneSettingsLoaderData>().phoneNumbers;
-
-	const onSubmit = async () => {
-		// await setPhoneNumberMutation({ phoneNumberSid }); // TODO
-	};
 
 	if (!hasFilledTwilioCredentials) {
 		return null;
 	}
 
 	return (
-		<form onSubmit={onSubmit} className="flex flex-col gap-6">
+		<Form method="post" className="flex flex-col gap-6">
 			<SettingsSection
 				className="relative"
 				footer={
 					<div className="px-4 py-3 bg-gray-50 text-right text-sm font-medium sm:px-6">
 						<Button variant="default" type="submit" isDisabled={isSubmitting}>
-							{isSubmitting ? "Saving..." : "Save"}
+							Save
 						</Button>
 					</div>
 				}
 			>
 				{isError ? (
 					<div className="mb-8">
-						<Alert title="Oops, there was an issue" message={error} variant="error" />
+						<Alert title="Oops, there was an issue" message={topErrorMessage} variant="error" />
 					</div>
 				) : null}
 
@@ -58,16 +56,17 @@ export default function PhoneNumberForm() {
 					id="phoneNumberSid"
 					name="phoneNumberSid"
 					className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
+					defaultValue={currentPhoneNumber?.id}
 				>
 					<option value="none" />
-					{availablePhoneNumbers?.map(({ sid, phoneNumber }) => (
-						<option value={sid} key={sid}>
-							{phoneNumber}
+					{availablePhoneNumbers.map(({ id, number }) => (
+						<option value={id} key={id}>
+							{number}
 						</option>
 					))}
 				</select>
 			</SettingsSection>
-		</form>
+		</Form>
 	);
 }
 

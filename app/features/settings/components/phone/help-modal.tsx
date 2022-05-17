@@ -14,17 +14,16 @@ const HelpModal: FunctionComponent<Props> = ({ isHelpModalOpen, closeModal }) =>
 		<Modal initialFocus={modalCloseButtonRef} isOpen={isHelpModalOpen} onClose={closeModal}>
 			<div className="md:flex md:items-start">
 				<div className="mt-3 text-center md:mt-0 md:ml-4 md:text-left">
-					<ModalTitle>Need help finding your Twilio credentials?</ModalTitle>
+					<ModalTitle>Need some help?</ModalTitle>
 					<div className="mt-6 space-y-3 text-gray-500">
 						<p>
-							You can check out our{" "}
-							<a className="underline" href="https://docs.shellphone.app/guide/getting-started">
-								getting started
-							</a>{" "}
-							guide to set up your account with your Twilio credentials.
+							Try{" "}
+							<a className="underline" href="https://www.twilio.com/authorize/CN01675d385a9ee79e6aa58adf54abe3b3">
+								reconnecting your Twilio account
+							</a> to refresh the phone numbers.
 						</p>
 						<p>
-							If you feel stuck, pick a date & time on{" "}
+							If you are stuck, pick a date & time on{" "}
 							<a className="underline" href="https://calendly.com/shellphone-onboarding">
 								our calendly
 							</a>{" "}

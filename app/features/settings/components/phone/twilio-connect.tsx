@@ -11,12 +11,12 @@ export default function TwilioConnect() {
 
 	return (
 		<>
-			<section className="flex flex-col gap-6">
-				<SettingsSection className="relative">
+			<SettingsSection className="flex flex-col relative">
+				<section>
 					<button onClick={() => setIsHelpModalOpen(true)} className="absolute top-2 right-2">
 						<IoHelpCircle className="w-6 h-6 text-primary-700" />
 					</button>
-					<article>
+					<article className="mb-6">
 						Shellphone needs to connect to your Twilio account to securely use your phone numbers.
 					</article>
 
@@ -31,8 +31,8 @@ export default function TwilioConnect() {
 					) : (
 						<p className="text-green-700">✓ Your Twilio account is connected to Shellphone.</p>
 					)}
-				</SettingsSection>
-			</section>
+				</section>
+			</SettingsSection>
 
 			<HelpModal closeModal={() => setIsHelpModalOpen(false)} isHelpModalOpen={isHelpModalOpen} />
 		</>

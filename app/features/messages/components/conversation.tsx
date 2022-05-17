@@ -1,5 +1,6 @@
 import { Suspense, useEffect, useMemo, useRef } from "react";
-import { useLoaderData, useParams } from "@remix-run/react";
+import { useParams } from "@remix-run/react";
+import { useLoaderData } from "superjson-remix";
 import clsx from "clsx";
 import { Direction } from "@prisma/client";
 
@@ -73,9 +74,7 @@ export default function Conversation() {
 					})}
 				</ul>
 			</div>
-			<Suspense fallback={null}>
-				<NewMessageArea recipient={recipient} />
-			</Suspense>
+			<NewMessageArea recipient={recipient} />
 		</>
 	);
 }
