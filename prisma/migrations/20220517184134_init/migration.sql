@@ -24,6 +24,8 @@ CREATE TABLE "Organization" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ NOT NULL,
+    "twilioAccountSid" TEXT,
+    "twilioSubAccountSid" TEXT,
 
     CONSTRAINT "Organization_pkey" PRIMARY KEY ("id")
 );
@@ -132,6 +134,7 @@ CREATE TABLE "PhoneNumber" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "number" TEXT NOT NULL,
+    "isCurrent" BOOLEAN NOT NULL,
     "isFetchingMessages" BOOLEAN,
     "isFetchingCalls" BOOLEAN,
     "organizationId" TEXT NOT NULL,
@@ -155,7 +158,7 @@ CREATE UNIQUE INDEX "Token_membershipId_key" ON "Token"("membershipId");
 CREATE UNIQUE INDEX "Token_hashedToken_type_key" ON "Token"("hashedToken", "type");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "PhoneNumber_organizationId_id_key" ON "PhoneNumber"("organizationId", "id");
+CREATE UNIQUE INDEX "PhoneNumber_organizationId_isCurrent_key" ON "PhoneNumber"("organizationId", "isCurrent") WHERE ("isCurrent" = true);
 
 -- AddForeignKey
 ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
