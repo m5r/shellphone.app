@@ -15,8 +15,9 @@ const action: ActionFunction = async ({ request }) => {
 
 	const searchParams = new URL(request.url).searchParams;
 	const redirectTo = searchParams.get("redirectTo");
+	const successRedirect = redirectTo ? decodeURIComponent(redirectTo) : null;
 	const { email, password } = validation.data;
-	return authenticate({ email, password, request, successRedirect: redirectTo });
+	return authenticate({ email, password, request, successRedirect });
 };
 
 export default action;
