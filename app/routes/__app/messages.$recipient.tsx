@@ -81,13 +81,11 @@ export default function ConversationPage() {
 				<strong className="absolute right-0 left-0 text-center pointer-events-none">
 					{conversation?.formattedPhoneNumber ?? recipient}
 				</strong>
-				<Link to={`/outgoing-call/${encodeURI(recipient)}`} className="pr-2">
+				<Link prefetch="intent" to={`/outgoing-call/${encodeURI(recipient)}`} className="pr-2">
 					<IoCall className="h-6 w-6" />
 				</Link>
 			</header>
-			{/*<Suspense fallback={<div className="pt-12">Loading messages with {recipient}</div>}>*/}
 			<Conversation />
-			{/*</Suspense>*/}
 		</section>
 	);
 }
