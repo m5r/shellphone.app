@@ -1,5 +1,5 @@
-import { Suspense, useEffect, useMemo, useRef } from "react";
-import { useParams } from "@remix-run/react";
+import { useEffect, useRef } from "react";
+import { useParams, useTransition } from "@remix-run/react";
 import { useLoaderData } from "superjson-remix";
 import clsx from "clsx";
 import { Direction } from "@prisma/client";
@@ -7,13 +7,30 @@ import { Direction } from "@prisma/client";
 import NewMessageArea from "./new-message-area";
 import { formatDate, formatTime } from "~/features/core/helpers/date-formatter";
 import { type ConversationLoaderData } from "~/routes/__app/messages.$recipient";
+import useSession from "~/features/core/hooks/use-session";
 
 export default function Conversation() {
+	const { currentPhoneNumber } = useSession();
 	const params = useParams<{ recipient: string }>();
 	const recipient = decodeURIComponent(params.recipient ?? "");
 	const { conversation } = useLoaderData<ConversationLoaderData>();
-	const messages = useMemo(() => conversation?.messages ?? [], [conversation?.messages]);
+	const transition = useTransition();
 	const messagesListRef = useRef<HTMLUListElement>(null);
+
+	const messages = conversation.messages;
+	if (transition.submission) {
+		messages.push({
+			id: "temp",
+			phoneNumberId: currentPhoneNumber.id,
+			from: currentPhoneNumber.number,
+			to: recipient,
+			sentAt: new Date(),
+			direction: Direction.Outbound,
+
+			status: "Queued",
+			content: transition.submission.formData.get("content")!.toString()
+		})
+	}
 
 	useEffect(() => {
 		messagesListRef.current?.querySelector("li:last-child")?.scrollIntoView();
@@ -74,7 +91,7 @@ export default function Conversation() {
 					})}
 				</ul>
 			</div>
-			<NewMessageArea recipient={recipient} />
+			<NewMessageArea />
 		</>
 	);
 }

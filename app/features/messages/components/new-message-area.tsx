@@ -1,68 +1,34 @@
-import type { FunctionComponent } from "react";
+import { useEffect, useRef } from "react";
+import { Form, useTransition } from "@remix-run/react";
 import { IoSend } from "react-icons/io5";
-import { type Message, Direction, MessageStatus } from "@prisma/client";
-import useSession from "~/features/core/hooks/use-session";
 
-type Props = {
-	recipient: string;
-	onSend?: () => void;
-};
+function NewMessageArea() {
+	const transition = useTransition();
+	const formRef = useRef<HTMLFormElement>(null);
+	const textFieldRef = useRef<HTMLTextAreaElement>(null);
+	const isSendingMessage = transition.state === "submitting";
 
-const NewMessageArea: FunctionComponent<Props> = ({ recipient, onSend }) => {
-	const { currentOrganization, /*hasOngoingSubscription*/ } = useSession();
-	// const phoneNumber = useCurrentPhoneNumber();
-	// const sendMessageMutation = useMutation(sendMessage)[0];
-	const onSubmit = async () => {
-		/*const id = uuidv4();
-		const message: Message = {
-			id,
-			organizationId: organization!.id,
-			phoneNumberId: phoneNumber!.id,
-			from: phoneNumber!.number,
-			to: recipient,
-			content: hasOngoingSubscription
-				? content
-				: content + "\n\nSent from Shellphone (https://www.shellphone.app)",
-			direction: Direction.Outbound,
-			status: MessageStatus.Queued,
-			sentAt: new Date(),
-		};*/
-
-		/*await setConversationsQueryData(
-			(conversations) => {
-				const nextConversations = { ...conversations };
-				if (!nextConversations[recipient]) {
-					nextConversations[recipient] = {
-						recipient,
-						formattedPhoneNumber: recipient,
-						messages: [],
-					};
-				}
-
-				nextConversations[recipient]!.messages = [...nextConversations[recipient]!.messages, message];
-
-				return Object.fromEntries(
-					Object.entries(nextConversations).sort(
-						([, a], [, b]) =>
-							b.messages[b.messages.length - 1]!.sentAt.getTime() -
-							a.messages[a.messages.length - 1]!.sentAt.getTime(),
-					),
-				);
-			},
-			{ refetch: false },
-		);*/
-		// setValue("content", "");
-		// onSend?.();
-	};
+	useEffect(() => {
+		if (isSendingMessage) {
+			formRef.current?.reset();
+			textFieldRef.current?.focus();
+		}
+	}, [isSendingMessage]);
 
 	return (
-		<form
-			onSubmit={onSubmit}
-			className="absolute bottom-0 w-screen backdrop-filter backdrop-blur-xl bg-white bg-opacity-75 border-t flex flex-row h-16 p-2 pr-0"
+		<Form
+			ref={formRef}
+			method="post"
+			className="absolute bottom-0 w-screen backdrop-filter backdrop-blur-xl bg-white bg-opacity-75 border-t flex flex-row h-14 mb-16 p-2 pr-0"
+			replace
 		>
 			<textarea
+				ref={textFieldRef}
 				name="content"
-				className="resize-none flex-1"
+				className="resize-none rounded-full flex-1"
+				style={{
+					scrollbarWidth: "none",
+				}}
 				autoCapitalize="sentences"
 				autoCorrect="on"
 				placeholder="Text message"
@@ -73,16 +39,8 @@ const NewMessageArea: FunctionComponent<Props> = ({ recipient, onSend }) => {
 			<button type="submit">
 				<IoSend className="h-8 w-8 pl-1 pr-2" />
 			</button>
-		</form>
+		</Form>
 	);
-};
+}
 
 export default NewMessageArea;
-
-function uuidv4() {
-	return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-		const r = (Math.random() * 16) | 0,
-			v = c == "x" ? r : (r & 0x3) | 0x8;
-		return v.toString(16);
-	});
-}
