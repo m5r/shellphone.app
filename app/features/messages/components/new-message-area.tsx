@@ -19,7 +19,7 @@ function NewMessageArea() {
 		<Form
 			ref={formRef}
 			method="post"
-			className="absolute bottom-0 w-screen backdrop-filter backdrop-blur-xl bg-white bg-opacity-75 border-t flex flex-row h-14 mb-16 p-2 pr-0"
+			className="absolute bottom-0 w-screen backdrop-filter backdrop-blur-xl bg-white bg-opacity-75 border-t flex flex-row p-2 pr-0"
 			replace
 		>
 			<textarea
