@@ -5,7 +5,7 @@ import { IoChevronForward } from "react-icons/io5";
 import { formatRelativeDate } from "~/features/core/helpers/date-formatter";
 import PhoneInitLoader from "~/features/core/components/phone-init-loader";
 import EmptyMessages from "./empty-messages";
-import type { MessagesLoaderData } from "~/routes/__app/messages";
+import type { MessagesLoaderData } from "~/features/messages/loaders/messages";
 
 export default function ConversationsList() {
 	const { conversations } = useLoaderData<MessagesLoaderData>();
@@ -24,7 +24,7 @@ export default function ConversationsList() {
 			{Object.values(conversations).map(({ recipient, formattedPhoneNumber, lastMessage }) => {
 				return (
 					<li key={`sms-conversation-${recipient}`} className="py-2 px-4">
-						<Link to={`/messages/${recipient}`} className="flex flex-col">
+						<Link prefetch="intent" to={`/messages/${recipient}`} className="flex flex-col">
 							<div className="flex flex-row justify-between">
 								<span className="font-medium">{formattedPhoneNumber ?? recipient}</span>
 								<div className="text-gray-700 flex flex-row gap-x-1">
