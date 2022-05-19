@@ -91,3 +91,5 @@ export default function ConversationPage() {
 		</section>
 	);
 }
+
+export const handle = { hideFooter: true };

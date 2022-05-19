@@ -34,10 +34,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export default function __App() {
-	const hideFooter = false;
 	const matches = useMatches();
-	// matches[0].handle.hideFooter
-	// console.log("matches", matches);
+	const hideFooter = matches.some(match => match.handle?.hideFooter === true);
 
 	return (
 		<div className="h-full w-full overflow-hidden fixed bg-gray-100">
