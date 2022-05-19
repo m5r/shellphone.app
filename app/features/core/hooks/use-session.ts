@@ -1,6 +1,6 @@
 import { useMatches } from "@remix-run/react";
 
-import type { SessionOrganization, SessionUser } from "~/utils/auth.server";
+import type { SessionData } from "~/utils/auth.server";
 
 export default function useSession() {
 	const matches = useMatches();
@@ -9,5 +9,5 @@ export default function useSession() {
 		throw new Error("useSession hook called outside _app route");
 	}
 
-	return __appRoute.data as SessionUser & { currentOrganization: SessionOrganization };
+	return __appRoute.data as SessionData;
 }

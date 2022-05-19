@@ -1,15 +1,16 @@
 import { Suspense } from "react";
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
-import { useNavigate, useParams } from "@remix-run/react";
+import { Link, useNavigate, useParams } from "@remix-run/react";
 import { json, useLoaderData } from "superjson-remix";
-import { IoCall, IoChevronBack, IoInformationCircle } from "react-icons/io5";
+import { IoCall, IoChevronBack } from "react-icons/io5";
+import { parsePhoneNumber } from "awesome-phonenumber";
 import { type Message, Prisma } from "@prisma/client";
 
 import Conversation from "~/features/messages/components/conversation";
 import { getSeoMeta } from "~/utils/seo";
 import db from "~/utils/db.server";
-import { parsePhoneNumber } from "awesome-phonenumber";
 import { requireLoggedIn } from "~/utils/auth.server";
+import newMessageAction from "~/features/messages/actions/messages.$recipient";
 
 export const meta: MetaFunction = ({ params }) => {
 	const recipient = decodeURIComponent(params.recipient ?? "");
@@ -20,6 +21,8 @@ export const meta: MetaFunction = ({ params }) => {
 		}),
 	};
 };
+
+export const action = newMessageAction;
 
 type ConversationType = {
 	recipient: string;
@@ -70,20 +73,21 @@ export default function ConversationPage() {
 	const { conversation } = useLoaderData<ConversationLoaderData>();
 
 	return (
-		<>
-			<header className="absolute top-0 w-screen h-12 backdrop-filter backdrop-blur-sm bg-white bg-opacity-75 border-b grid grid-cols-3 items-center">
-				<span className="col-start-1 col-span-1 pl-2 cursor-pointer" onClick={() => navigate(-1)}>
-					<IoChevronBack className="h-8 w-8" />
+		<section className="h-full">
+			<header className="absolute top-0 w-screen h-12 backdrop-filter backdrop-blur-sm bg-white bg-opacity-75 border-b items-center flex justify-between">
+				<span className="pl-2 cursor-pointer" onClick={() => navigate(-1)}>
+					<IoChevronBack className="h-6 w-6" />
 				</span>
-				<strong className="col-span-1">{conversation?.formattedPhoneNumber ?? recipient}</strong>
-				<span className="col-span-1 flex justify-end space-x-4 pr-2">
-					<IoCall className="h-8 w-8" />
-					<IoInformationCircle className="h-8 w-8" />
-				</span>
+				<strong className="absolute right-0 left-0 text-center pointer-events-none">
+					{conversation?.formattedPhoneNumber ?? recipient}
+				</strong>
+				<Link to={`/outgoing-call/${encodeURI(recipient)}`} className="pr-2">
+					<IoCall className="h-6 w-6" />
+				</Link>
 			</header>
 			{/*<Suspense fallback={<div className="pt-12">Loading messages with {recipient}</div>}>*/}
 			<Conversation />
 			{/*</Suspense>*/}
-		</>
+		</section>
 	);
 }

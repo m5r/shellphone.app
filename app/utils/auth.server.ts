@@ -1,7 +1,7 @@
 import { redirect, type Session } from "@remix-run/node";
 import type { FormStrategyVerifyParams } from "remix-auth-form";
 import SecurePassword from "secure-password";
-import type { MembershipRole, Organization, User } from "@prisma/client";
+import type { MembershipRole, Organization, PhoneNumber, User } from "@prisma/client";
 
 import db from "./db.server";
 import logger from "./logger.server";
@@ -12,10 +12,11 @@ import { commitSession, destroySession, getSession } from "./session.server";
 export type SessionOrganization = Pick<Organization, "id" | "twilioSubAccountSid" | "twilioAccountSid"> & {
 	role: MembershipRole;
 };
+export type SessionPhoneNumber = Pick<PhoneNumber, "id" | "number">;
 export type SessionUser = Omit<User, "hashedPassword"> & {
 	organizations: SessionOrganization[];
 };
-export type SessionData = SessionUser & { currentOrganization: SessionOrganization };
+export type SessionData = SessionUser & { currentOrganization: SessionOrganization; currentPhoneNumber: SessionPhoneNumber };
 
 const SP = new SecurePassword();
 
@@ -136,10 +137,11 @@ export async function requireLoggedOut(request: Request) {
 
 export async function requireLoggedIn(request: Request) {
 	const user = await authenticator.isAuthenticated(request);
-	const signInUrl = "/sign-in";
-	const redirectTo = buildRedirectTo(new URL(request.url));
-	const searchParams = new URLSearchParams({ redirectTo });
 	if (!user) {
+		const signInUrl = "/sign-in";
+		const redirectTo = buildRedirectTo(new URL(request.url));
+		const searchParams = new URLSearchParams({ redirectTo });
+
 		throw redirect(`${signInUrl}?${searchParams.toString()}`, {
 			headers: { "Set-Cookie": await destroySession(await getSession(request)) },
 		});

@@ -6,8 +6,8 @@ import clsx from "clsx";
 export default function Footer() {
 	return (
 		<footer
-			className="grid grid-cols-4 bg-[#F7F7F7] border-t border-gray-400 border-opacity-25 py-3 z-10"
-			style={{ flex: "0 0 50px" }}
+			className="grid grid-cols-4 bg-[#F7F7F7] h-16 border-t border-gray-400 border-opacity-25 py-2 z-10"
+			// className="grid grid-cols-4 border-t border-gray-400 border-opacity-25 py-3 z-10 backdrop-blur"
 		>
 			<FooterLink label="Calls" path="/calls" icon={<IoCall className="w-6 h-6" />} />
 			<FooterLink label="Keypad" path="/keypad" icon={<IoKeypad className="w-6 h-6" />} />
