@@ -1,8 +1,14 @@
+import type { FunctionComponent } from "react";
 import { useEffect, useRef } from "react";
 import { Form, useTransition } from "@remix-run/react";
 import { IoSend } from "react-icons/io5";
 
-function NewMessageArea() {
+type Props = {
+	onSend?: () => void;
+	recipient: string;
+};
+
+const NewMessageArea: FunctionComponent<Props> = ({ onSend, recipient }) => {
 	const transition = useTransition();
 	const formRef = useRef<HTMLFormElement>(null);
 	const textFieldRef = useRef<HTMLTextAreaElement>(null);
@@ -12,12 +18,14 @@ function NewMessageArea() {
 		if (isSendingMessage) {
 			formRef.current?.reset();
 			textFieldRef.current?.focus();
+			onSend?.();
 		}
-	}, [isSendingMessage]);
+	}, [isSendingMessage, onSend]);
 
 	return (
 		<Form
 			ref={formRef}
+			action={`/messages/${recipient}`}
 			method="post"
 			className="absolute bottom-0 w-screen backdrop-filter backdrop-blur-xl bg-white bg-opacity-75 border-t flex flex-row p-2 pr-0"
 			replace
@@ -41,6 +49,6 @@ function NewMessageArea() {
 			</button>
 		</Form>
 	);
-}
+};
 
 export default NewMessageArea;
