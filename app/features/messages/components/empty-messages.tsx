@@ -1,12 +1,11 @@
 import { IoCreateOutline, IoMailOutline } from "react-icons/io5";
-// import { useAtom } from "jotai";
+import { useAtom } from "jotai";
 
-// import { bottomSheetOpenAtom } from "../pages/messages";
+import { bottomSheetOpenAtom } from "~/routes/__app/messages";
 
 export default function EmptyMessages() {
-	// const setIsBottomSheetOpen = useAtom(bottomSheetOpenAtom)[1];
-	// const openNewMessageArea = () => setIsBottomSheetOpen(true);
-	const openNewMessageArea = () => void 0;
+	const setIsBottomSheetOpen = useAtom(bottomSheetOpenAtom)[1];
+	const openNewMessageArea = () => setIsBottomSheetOpen(true);
 
 	return (
 		<div className="text-center my-auto">
