@@ -7,18 +7,23 @@ import { Direction, CallStatus } from "@prisma/client";
 import PhoneInitLoader from "~/features/core/components/phone-init-loader";
 import EmptyCalls from "../components/empty-calls";
 import { formatRelativeDate } from "~/features/core/helpers/date-formatter";
-import type { PhoneCallsLoaderData } from "~/routes/__app/calls";
+import type { PhoneCallsLoaderData } from "~/features/phone-calls/loaders/calls";
 
 export default function PhoneCallsList() {
-	const { hasOngoingSubscription } = { hasOngoingSubscription: false };
-	const { phoneCalls } = useLoaderData<PhoneCallsLoaderData>();
+	const { hasOngoingSubscription, isFetchingCalls, phoneCalls } = useLoaderData<PhoneCallsLoaderData>();
 
-	if (!phoneCalls) {
-		return hasOngoingSubscription ? <PhoneInitLoader /> : null;
-	}
+	if (!hasOngoingSubscription) {
+		if (!phoneCalls || phoneCalls.length === 0) {
+			return null;
+		}
+	} else {
+		if (isFetchingCalls || !phoneCalls) {
+			return <PhoneInitLoader />;
+		}
 
-	if (phoneCalls.length === 0) {
-		return hasOngoingSubscription ? <EmptyCalls /> : null;
+		if (phoneCalls.length === 0) {
+			return hasOngoingSubscription ? <EmptyCalls /> : null;
+		}
 	}
 
 	return (
@@ -30,7 +35,7 @@ export default function PhoneCallsList() {
 				const formattedRecipient = isOutboundCall
 					? phoneCall.toMeta.formattedPhoneNumber
 					: phoneCall.fromMeta.formattedPhoneNumber;
-				const recipient = isOutboundCall ? phoneCall.to : phoneCall.from;
+				const recipient = phoneCall.recipient;
 
 				return (
 					<li key={phoneCall.id} className="py-2 px-4 hover:bg-gray-200 hover:bg-opacity-50">
