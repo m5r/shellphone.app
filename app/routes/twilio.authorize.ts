@@ -8,10 +8,10 @@ import serverConfig from "~/config/config.server";
 import getTwilioClient from "~/utils/twilio.server";
 import fetchPhoneCallsQueue from "~/queues/fetch-phone-calls.server";
 import fetchMessagesQueue from "~/queues/fetch-messages.server";
+import { encrypt } from "~/utils/encryption";
 
 export const loader: LoaderFunction = async ({ request }) => {
-	const user = await requireLoggedIn(request);
-	const organization = user.organizations[0];
+	const { organization } = await requireLoggedIn(request);
 	const url = new URL(request.url);
 	const twilioSubAccountSid = url.searchParams.get("AccountSid");
 	if (!twilioSubAccountSid) {
@@ -20,13 +20,21 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 	let twilioClient = twilio(twilioSubAccountSid, serverConfig.twilio.authToken);
 	const twilioSubAccount = await twilioClient.api.accounts(twilioSubAccountSid).fetch();
-	const twilioAccountSid = twilioSubAccount.ownerAccountSid;
-	await db.organization.update({
-		where: { id: organization.id },
-		data: { twilioSubAccountSid, twilioAccountSid },
+	const twilioMainAccountSid = twilioSubAccount.ownerAccountSid;
+	const twilioMainAccount = await twilioClient.api.accounts(twilioMainAccountSid).fetch();
+	console.log("twilioSubAccount", twilioSubAccount);
+	console.log("twilioAccount", twilioMainAccount);
+	const twilioAccount = await db.twilioAccount.update({
+		where: { organizationId: organization.id },
+		data: {
+			subAccountSid: twilioSubAccount.sid,
+			subAccountAuthToken: encrypt(twilioSubAccount.authToken),
+			accountSid: twilioMainAccount.sid,
+			accountAuthToken: encrypt(twilioMainAccount.authToken),
+		},
 	});
 
-	twilioClient = getTwilioClient({ twilioAccountSid, twilioSubAccountSid });
+	twilioClient = getTwilioClient(twilioAccount);
 	const phoneNumbers = await twilioClient.incomingPhoneNumbers.list();
 	await Promise.all(
 		phoneNumbers.map(async (phoneNumber) => {

@@ -1,26 +1,31 @@
 import { redirect, type Session } from "@remix-run/node";
 import type { FormStrategyVerifyParams } from "remix-auth-form";
 import SecurePassword from "secure-password";
-import type { MembershipRole, Organization, PhoneNumber, User } from "@prisma/client";
+import type { MembershipRole, Organization, PhoneNumber, TwilioAccount, User } from "@prisma/client";
 
 import db from "./db.server";
 import logger from "./logger.server";
 import authenticator from "./authenticator.server";
-import { AuthenticationError } from "./errors";
+import { AuthenticationError, NotFoundError } from "./errors";
 import { commitSession, destroySession, getSession } from "./session.server";
 
-export type SessionOrganization = Pick<Organization, "id" | "twilioSubAccountSid" | "twilioAccountSid"> & {
-	role: MembershipRole;
+type SessionTwilioAccount = Pick<
+	TwilioAccount,
+	"accountSid" | "accountAuthToken" | "subAccountSid" | "subAccountAuthToken" | "twimlAppSid"
+>;
+type SessionOrganization = Pick<Organization, "id"> & { role: MembershipRole };
+type SessionPhoneNumber = Pick<PhoneNumber, "id" | "number">;
+export type SessionUser = Pick<User, "id" | "role" | "email" | "fullName">;
+export type SessionData = {
+	user: SessionUser;
+	organization: SessionOrganization;
+	phoneNumber: SessionPhoneNumber | null;
+	twilioAccount: SessionTwilioAccount | null;
 };
-export type SessionPhoneNumber = Pick<PhoneNumber, "id" | "number">;
-export type SessionUser = Omit<User, "hashedPassword"> & {
-	organizations: SessionOrganization[];
-};
-export type SessionData = SessionUser & { currentOrganization: SessionOrganization; currentPhoneNumber: SessionPhoneNumber };
 
 const SP = new SecurePassword();
 
-export async function login({ form }: FormStrategyVerifyParams): Promise<SessionUser> {
+export async function login({ form }: FormStrategyVerifyParams): Promise<SessionData> {
 	const email = form.get("email");
 	const password = form.get("password");
 	const isEmailValid = typeof email === "string" && email.length > 0;
@@ -36,21 +41,8 @@ export async function login({ form }: FormStrategyVerifyParams): Promise<Session
 		throw new AuthenticationError("Password is required");
 	}
 
-	const user = await db.user.findUnique({
-		where: { email: email.toLowerCase() },
-		include: {
-			memberships: {
-				select: {
-					organization: {
-						select: { id: true, twilioSubAccountSid: true, twilioAccountSid: true },
-					},
-					role: true,
-				},
-			},
-		},
-	});
+	const user = await db.user.findUnique({ where: { email: email.toLowerCase() } });
 	if (!user || !user.hashedPassword) {
-		logger.warn(`User with email=${email.toLowerCase()} not found`);
 		throw new AuthenticationError("Incorrect password");
 	}
 
@@ -67,16 +59,15 @@ export async function login({ form }: FormStrategyVerifyParams): Promise<Session
 			throw new AuthenticationError("Incorrect password");
 	}
 
-	const { hashedPassword, memberships, ...rest } = user;
-	const organizations = memberships.map((membership) => ({
-		...membership.organization,
-		role: membership.role,
-	}));
+	try {
+		return await buildSessionData(user.id);
+	} catch (error: any) {
+		if (error instanceof AuthenticationError) {
+			throw error;
+		}
 
-	return {
-		...rest,
-		organizations,
-	};
+		throw new AuthenticationError("Incorrect password");
+	}
 }
 
 export async function verifyPassword(hashedPassword: string, password: string) {
@@ -114,9 +105,10 @@ export async function authenticate({
 		method: "post",
 		headers: request.headers,
 	});
-	const user = await authenticator.authenticate("email-password", signInRequest, { failureRedirect });
+	const sessionData = await authenticator.authenticate("email-password", signInRequest, { failureRedirect });
+	console.log("sessionKey", authenticator.sessionKey);
 	const session = await getSession(request);
-	session.set(authenticator.sessionKey, user);
+	session.set(authenticator.sessionKey, sessionData);
 	const redirectTo = successRedirect ?? "/messages";
 	return redirect(redirectTo, {
 		headers: { "Set-Cookie": await commitSession(session) },
@@ -161,23 +153,50 @@ function buildRedirectTo(url: URL) {
 }
 
 export async function refreshSessionData(request: Request) {
-	const { id } = await requireLoggedIn(request);
+	const {
+		user: { id },
+	} = await requireLoggedIn(request);
+	const user = await db.user.findUnique({ where: { id } });
+	if (!user || !user.hashedPassword) {
+		logger.warn(`User with id=${id} not found`);
+		throw new AuthenticationError("Could not refresh session, user does not exist");
+	}
+
+	const sessionData = await buildSessionData(id);
+	const session = await getSession(request);
+	session.set(authenticator.sessionKey, sessionData);
+
+	return { session, sessionData: sessionData };
+}
+
+async function buildSessionData(id: string): Promise<SessionData> {
 	const user = await db.user.findUnique({
 		where: { id },
 		include: {
 			memberships: {
 				select: {
 					organization: {
-						select: { id: true, twilioSubAccountSid: true, twilioAccountSid: true },
+						select: {
+							id: true,
+							twilioAccount: {
+								select: {
+									accountSid: true,
+									accountAuthToken: true,
+									subAccountSid: true,
+									subAccountAuthToken: true,
+									twimlAppSid: true,
+								},
+							},
+						},
 					},
 					role: true,
 				},
 			},
 		},
 	});
-	if (!user || !user.hashedPassword) {
+	if (!user) {
 		logger.warn(`User with id=${id} not found`);
-		throw new AuthenticationError("Could not refresh session, user does not exist");
+		throw new NotFoundError(`User with id=${id} not found`);
 	}
 
 	const { hashedPassword, memberships, ...rest } = user;
@@ -185,12 +204,14 @@ export async function refreshSessionData(request: Request) {
 		...membership.organization,
 		role: membership.role,
 	}));
-	const sessionUser: SessionUser = {
-		...rest,
-		organizations,
+	const { twilioAccount, ...organization } = organizations[0];
+	const phoneNumber = await db.phoneNumber.findUnique({
+		where: { organizationId_isCurrent: { organizationId: organization.id, isCurrent: true } },
+	});
+	return {
+		user: rest,
+		organization,
+		phoneNumber,
+		twilioAccount,
 	};
-	const session = await getSession(request);
-	session.set(authenticator.sessionKey, sessionUser);
-
-	return { session, user: sessionUser };
 }

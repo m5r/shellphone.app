@@ -13,7 +13,7 @@ import useKeyPress from "~/features/keypad/hooks/use-key-press";
 import KeypadErrorModal from "~/features/keypad/components/keypad-error-modal";
 import InactiveSubscription from "~/features/core/components/inactive-subscription";
 
-export default function SettingsLayout() {
+export default function KeypadPage() {
 	const { hasFilledTwilioCredentials, hasPhoneNumber, hasOngoingSubscription } = {
 		hasFilledTwilioCredentials: false,
 		hasPhoneNumber: false,

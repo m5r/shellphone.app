@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { Link, useNavigate, useParams } from "@remix-run/react";
 import { json, useLoaderData } from "superjson-remix";
@@ -35,14 +34,14 @@ export type ConversationLoaderData = {
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-	const { organizations } = await requireLoggedIn(request);
+	const { organization } = await requireLoggedIn(request);
 	const recipient = decodeURIComponent(params.recipient ?? "");
 	const conversation = await getConversation(recipient);
 
 	return json<ConversationLoaderData>({ conversation });
 
 	async function getConversation(recipient: string): Promise<ConversationType> {
-		const organizationId = organizations[0].id;
+		const organizationId = organization.id;
 		const phoneNumber = await db.phoneNumber.findUnique({
 			where: { organizationId_isCurrent: { organizationId, isCurrent: true } },
 		});

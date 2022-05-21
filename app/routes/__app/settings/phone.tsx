@@ -13,9 +13,8 @@ export type PhoneSettingsLoaderData = {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-	const { organizations } = await requireLoggedIn(request);
-	const organization = organizations[0];
-	if (!organization.twilioAccountSid) {
+	const { organization, twilioAccount } = await requireLoggedIn(request);
+	if (!twilioAccount) {
 		logger.warn("Twilio account is not connected");
 		return json<PhoneSettingsLoaderData>({ phoneNumbers: [] });
 	}

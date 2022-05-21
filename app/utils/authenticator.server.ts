@@ -2,9 +2,9 @@ import { Authenticator } from "remix-auth";
 import { FormStrategy } from "remix-auth-form";
 
 import { sessionStorage } from "./session.server";
-import { type SessionUser, login } from "./auth.server";
+import { type SessionData, login } from "./auth.server";
 
-const authenticator = new Authenticator<SessionUser>(sessionStorage);
+const authenticator = new Authenticator<SessionData>(sessionStorage);
 
 authenticator.use(new FormStrategy(login), "email-password");
 

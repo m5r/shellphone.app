@@ -20,8 +20,8 @@ export default function NewMessageBottomSheet() {
 			onClose={() => setIsOpen(false)}
 			snapPoints={[0.5]}
 		>
-			<BottomSheet.Container>
-				<BottomSheet.Header>
+			<BottomSheet.Container onViewportBoxUpdate={null}>
+				<BottomSheet.Header onViewportBoxUpdate={null}>
 					<div className="w-full flex items-center justify-center p-4 text-black relative">
 						<span className="font-semibold text-base">New Message</span>
 
@@ -30,7 +30,7 @@ export default function NewMessageBottomSheet() {
 						</button>
 					</div>
 				</BottomSheet.Header>
-				<BottomSheet.Content>
+				<BottomSheet.Content onViewportBoxUpdate={null}>
 					<main className="flex flex-col h-full overflow-hidden">
 						<div className="flex items-center p-4 border-t border-b">
 							<span className="mr-4 text-[#333]">To:</span>
@@ -48,7 +48,7 @@ export default function NewMessageBottomSheet() {
 				</BottomSheet.Content>
 			</BottomSheet.Container>
 
-			<BottomSheet.Backdrop onTap={() => setIsOpen(false)} />
+			<BottomSheet.Backdrop onViewportBoxUpdate={null} onTap={() => setIsOpen(false)} />
 		</BottomSheet>
 	);
 }

@@ -5,14 +5,14 @@ import { z } from "zod";
 import db from "~/utils/db.server";
 import { type FormError, validate } from "~/utils/validation.server";
 import { requireLoggedIn } from "~/utils/auth.server";
+import setTwilioWebhooksQueue from "~/queues/set-twilio-webhooks.server";
 
 type SetPhoneNumberFailureActionData = { errors: FormError<typeof bodySchema>; submitted?: never };
 type SetPhoneNumberSuccessfulActionData = { errors?: never; submitted: true };
 export type SetPhoneNumberActionData = SetPhoneNumberFailureActionData | SetPhoneNumberSuccessfulActionData;
 
 const action: ActionFunction = async ({ request }) => {
-	const { organizations } = await requireLoggedIn(request);
-	const organization = organizations[0];
+	const { organization } = await requireLoggedIn(request);
 	const formData = Object.fromEntries(await request.formData());
 	const validation = validate(bodySchema, formData);
 	if (validation.errors) {
@@ -35,6 +35,11 @@ const action: ActionFunction = async ({ request }) => {
 		where: { id: validation.data.phoneNumberSid },
 		data: { isCurrent: true },
 	});
+	await setTwilioWebhooksQueue.add(`set twilio webhooks for phoneNumberId=${validation.data.phoneNumberSid}`, {
+		phoneNumberId: validation.data.phoneNumberSid,
+		organizationId: organization.id,
+	});
+	console.log("queued");
 
 	return json<SetPhoneNumberActionData>({ submitted: true });
 };

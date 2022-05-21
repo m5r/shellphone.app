@@ -10,7 +10,7 @@ import type { SetPhoneNumberActionData } from "~/features/settings/actions/phone
 export default function PhoneNumberForm() {
 	const transition = useTransition();
 	const actionData = useActionData<SetPhoneNumberActionData>();
-	const { currentOrganization } = useSession();
+	const { twilioAccount } = useSession();
 	const availablePhoneNumbers = useLoaderData<PhoneSettingsLoaderData>().phoneNumbers;
 
 	const isSubmitting = transition.state === "submitting";
@@ -18,8 +18,8 @@ export default function PhoneNumberForm() {
 	const errors = actionData?.errors;
 	const topErrorMessage = errors?.general ?? errors?.phoneNumberSid;
 	const isError = typeof topErrorMessage !== "undefined";
-	const currentPhoneNumber = availablePhoneNumbers.find(phoneNumber => phoneNumber.isCurrent === true);
-	const hasFilledTwilioCredentials = Boolean(currentOrganization.twilioAccountSid)
+	const currentPhoneNumber = availablePhoneNumbers.find((phoneNumber) => phoneNumber.isCurrent === true);
+	const hasFilledTwilioCredentials = twilioAccount !== null;
 
 	if (!hasFilledTwilioCredentials) {
 		return null;

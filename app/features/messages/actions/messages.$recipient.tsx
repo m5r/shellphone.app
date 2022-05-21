@@ -8,19 +8,14 @@ import getTwilioClient, { translateMessageDirection, translateMessageStatus } fr
 export type NewMessageActionData = {};
 
 const action: ActionFunction = async ({ params, request }) => {
-	const user = await requireLoggedIn(request);
-	const organization = user.organizations[0];
-	const phoneNumber = await db.phoneNumber.findUnique({
-		where: { organizationId_isCurrent: { organizationId: user.organizations[0].id, isCurrent: true } },
-	});
+	const { phoneNumber, twilioAccount } = await requireLoggedIn(request);
+	if (!twilioAccount) {
+		throw new Error("unreachable");
+	}
 	const recipient = decodeURIComponent(params.recipient ?? "");
 	const formData = Object.fromEntries(await request.formData());
-
-	const { twilioAccountSid, twilioSubAccountSid } = organization;
-	// const twilioClient = getTwilioClient({ twilioSubAccountSid, twilioAccountSid });
-	const twilioClient = getTwilioClient({ twilioSubAccountSid: twilioAccountSid, twilioAccountSid });
+	const twilioClient = getTwilioClient(twilioAccount);
 	try {
-		console.log({ twilioAccountSid, twilioSubAccountSid });
 		console.log({
 			body: formData.content.toString(),
 			to: recipient,

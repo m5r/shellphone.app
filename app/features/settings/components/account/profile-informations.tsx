@@ -8,7 +8,7 @@ import Button from "../button";
 import SettingsSection from "../settings-section";
 
 const ProfileInformations: FunctionComponent = () => {
-	const user = useSession();
+	const { user } = useSession();
 	const transition = useTransition();
 	const actionData = useActionData<UpdateUserActionData>()?.updateUser;
 

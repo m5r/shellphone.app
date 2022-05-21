@@ -1,20 +1,38 @@
 import twilio from "twilio";
 import type { MessageInstance } from "twilio/lib/rest/api/v2010/account/message";
 import type { CallInstance } from "twilio/lib/rest/api/v2010/account/call";
-import { type Organization, CallStatus, Direction, MessageStatus } from "@prisma/client";
+import { type TwilioAccount, CallStatus, Direction, MessageStatus } from "@prisma/client";
 
 import serverConfig from "~/config/config.server";
 
-type MinimalOrganization = Pick<Organization, "twilioSubAccountSid" | "twilioAccountSid">;
-
-export default function getTwilioClient({ twilioAccountSid, twilioSubAccountSid }: MinimalOrganization): twilio.Twilio {
-	if (!twilioSubAccountSid || !twilioAccountSid) {
+export default function getTwilioClient({
+	accountSid,
+	subAccountSid,
+	subAccountAuthToken,
+}: Pick<TwilioAccount, "accountSid" | "subAccountSid"> &
+	Partial<Pick<TwilioAccount, "subAccountAuthToken">>): twilio.Twilio {
+	if (!subAccountSid || !accountSid) {
 		throw new Error("unreachable");
 	}
 
-	return twilio(twilioSubAccountSid, serverConfig.twilio.authToken, {
-		accountSid: twilioAccountSid,
+	return twilio(subAccountSid, serverConfig.twilio.authToken, {
+		accountSid,
 	});
+}
+
+export const smsUrl = `https://${serverConfig.app.baseUrl}/webhook/message`;
+
+export const voiceUrl = `https://${serverConfig.app.baseUrl}/webhook/call`;
+
+export function getTwiMLName() {
+	switch (serverConfig.app.baseUrl) {
+		case "local.shellphone.app":
+			return "Shellphone LOCAL";
+		case "dev.shellphone.app":
+			return "Shellphone DEV";
+		case "www.shellphone.app":
+			return "Shellphone";
+	}
 }
 
 export function translateMessageStatus(status: MessageInstance["status"]): MessageStatus {
