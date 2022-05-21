@@ -1,5 +1,5 @@
 import type { MessageInstance } from "twilio/lib/rest/api/v2010/account/message";
-import type { Message } from "@prisma/client";
+import { type Message, Direction } from "@prisma/client";
 
 import { Queue } from "~/utils/queue.server";
 import db from "~/utils/db.server";
@@ -22,20 +22,25 @@ export default Queue<Payload>("insert messages", async ({ data }) => {
 	}
 
 	const sms = messages
-		.map<Message>((message) => ({
-			id: message.sid,
-			phoneNumberId: phoneNumber.id,
-			content: message.body,
-			from: message.from,
-			to: message.to,
-			status: translateMessageStatus(message.status),
-			direction: translateMessageDirection(message.direction),
-			sentAt: new Date(message.dateCreated),
-		}))
+		.map<Message>((message) => {
+			const status = translateMessageStatus(message.status);
+			const direction = translateMessageDirection(message.direction);
+			return {
+				id: message.sid,
+				phoneNumberId: phoneNumber.id,
+				content: message.body,
+				recipient: direction === Direction.Outbound ? message.to : message.from,
+				from: message.from,
+				to: message.to,
+				status,
+				direction,
+				sentAt: new Date(message.dateCreated),
+			};
+		})
 		.sort((a, b) => a.sentAt.getTime() - b.sentAt.getTime());
 
 	const { count } = await db.message.createMany({ data: sms, skipDuplicates: true });
-	logger.info(`inserted ${count} new messages for phoneNumberId=${phoneNumberId}`)
+	logger.info(`inserted ${count} new messages for phoneNumberId=${phoneNumberId}`);
 
 	if (!phoneNumber.isFetchingMessages) {
 		return;

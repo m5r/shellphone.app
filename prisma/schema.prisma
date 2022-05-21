@@ -17,7 +17,7 @@ model TwilioAccount {
   twimlAppSid         String?
 
   organizationId String       @unique
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 }
 
 model Organization {
@@ -105,17 +105,21 @@ model Message {
   id            String        @id
   sentAt        DateTime      @db.Timestamptz(6)
   content       String
+  recipient     String
   from          String
   to            String
   direction     Direction
   status        MessageStatus
   phoneNumberId String
   phoneNumber   PhoneNumber   @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
+
+  @@index([phoneNumberId, recipient])
 }
 
 model PhoneCall {
   id            String      @id
   createdAt     DateTime    @default(now()) @db.Timestamptz(6)
+  recipient     String
   from          String
   to            String
   status        CallStatus
@@ -123,6 +127,8 @@ model PhoneCall {
   duration      String
   phoneNumberId String
   phoneNumber   PhoneNumber @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
+
+  @@index([phoneNumberId, recipient])
 }
 
 model PhoneNumber {
