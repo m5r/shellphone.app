@@ -20,12 +20,24 @@ CREATE TYPE "MessageStatus" AS ENUM ('Queued', 'Sending', 'Sent', 'Failed', 'Del
 CREATE TYPE "CallStatus" AS ENUM ('Queued', 'Ringing', 'InProgress', 'Completed', 'Busy', 'Failed', 'NoAnswer', 'Canceled');
 
 -- CreateTable
+CREATE TABLE "TwilioAccount" (
+    "subAccountSid" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(6) NOT NULL,
+    "subAccountAuthToken" TEXT NOT NULL,
+    "accountSid" TEXT NOT NULL,
+    "accountAuthToken" TEXT NOT NULL,
+    "twimlAppSid" TEXT,
+    "organizationId" TEXT NOT NULL,
+
+    CONSTRAINT "TwilioAccount_pkey" PRIMARY KEY ("subAccountSid")
+);
+
+-- CreateTable
 CREATE TABLE "Organization" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ NOT NULL,
-    "twilioAccountSid" TEXT,
-    "twilioSubAccountSid" TEXT,
 
     CONSTRAINT "Organization_pkey" PRIMARY KEY ("id")
 );
@@ -143,6 +155,9 @@ CREATE TABLE "PhoneNumber" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "TwilioAccount_organizationId_key" ON "TwilioAccount"("organizationId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Subscription_paddleSubscriptionId_key" ON "Subscription"("paddleSubscriptionId");
 
 -- CreateIndex
@@ -159,6 +174,10 @@ CREATE UNIQUE INDEX "Token_hashedToken_type_key" ON "Token"("hashedToken", "type
 
 -- CreateIndex
 CREATE UNIQUE INDEX "PhoneNumber_organizationId_isCurrent_key" ON "PhoneNumber"("organizationId", "isCurrent") WHERE ("isCurrent" = true);
+
+-- AddForeignKey
+ALTER TABLE "TwilioAccount" ADD CONSTRAINT "TwilioAccount_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
 
 -- AddForeignKey
 ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;

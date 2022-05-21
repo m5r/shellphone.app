@@ -6,7 +6,7 @@ import SettingsSection from "../settings-section";
 import useSession from "~/features/core/hooks/use-session";
 
 export default function TwilioConnect() {
-	const { currentOrganization } = useSession();
+	const { twilioAccount } = useSession();
 	const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
 	return (
@@ -20,7 +20,7 @@ export default function TwilioConnect() {
 						Shellphone needs to connect to your Twilio account to securely use your phone numbers.
 					</article>
 
-					{currentOrganization.twilioAccountSid === null ? (
+					{twilioAccount === null ? (
 						<a
 							href="https://www.twilio.com/authorize/CN01675d385a9ee79e6aa58adf54abe3b3"
 							rel="noopener noreferrer"

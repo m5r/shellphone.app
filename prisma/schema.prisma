@@ -1,185 +1,197 @@
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model TwilioAccount {
+  subAccountSid       String   @id
+  createdAt           DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime @updatedAt @db.Timestamptz(6)
+  subAccountAuthToken String
+  accountSid          String
+  accountAuthToken    String
+  twimlAppSid         String?
+
+  organizationId String       @unique
+  organization   Organization @relation(fields: [organizationId], references: [id])
 }
 
 model Organization {
-    id                  String   @id @default(cuid())
-    createdAt           DateTime @default(now()) @db.Timestamptz(6)
-    updatedAt           DateTime @updatedAt @db.Timestamptz(6)
-    twilioAccountSid    String?
-    twilioSubAccountSid String?
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-    memberships   Membership[]
-    phoneNumbers  PhoneNumber[]
-    subscriptions Subscription[] // many subscriptions to keep a history
+  twilioAccount TwilioAccount?
+  memberships   Membership[]
+  phoneNumbers  PhoneNumber[]
+  subscriptions Subscription[] // many subscriptions to keep a history
 }
 
 model Subscription {
-    createdAt                 DateTime           @default(now()) @db.Timestamptz(6)
-    updatedAt                 DateTime           @updatedAt @db.Timestamptz(6)
-    paddleSubscriptionId      Int                @id @unique
-    paddlePlanId              Int
-    paddleCheckoutId          String
-    status                    SubscriptionStatus
-    updateUrl                 String
-    cancelUrl                 String
-    currency                  String
-    unitPrice                 Float
-    nextBillDate              DateTime           @db.Date
-    lastEventTime             DateTime           @db.Timestamp(6)
-    cancellationEffectiveDate DateTime?          @db.Date
-    organizationId            String
-    organization              Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt                 DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt                 DateTime           @updatedAt @db.Timestamptz(6)
+  paddleSubscriptionId      Int                @id @unique
+  paddlePlanId              Int
+  paddleCheckoutId          String
+  status                    SubscriptionStatus
+  updateUrl                 String
+  cancelUrl                 String
+  currency                  String
+  unitPrice                 Float
+  nextBillDate              DateTime           @db.Date
+  lastEventTime             DateTime           @db.Timestamp(6)
+  cancellationEffectiveDate DateTime?          @db.Date
+  organizationId            String
+  organization              Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 }
 
 model Membership {
-    id              String         @id @default(cuid())
-    role            MembershipRole
-    organizationId  String
-    userId          String?
-    invitedEmail    String?
-    organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-    user            User?          @relation(fields: [userId], references: [id], onDelete: Cascade)
-    invitationToken Token?
+  id              String         @id @default(cuid())
+  role            MembershipRole
+  organizationId  String
+  userId          String?
+  invitedEmail    String?
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user            User?          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invitationToken Token?
 
-    @@unique([organizationId, invitedEmail])
+  @@unique([organizationId, invitedEmail])
 }
 
 model User {
-    id             String       @id @default(cuid())
-    createdAt      DateTime     @default(now()) @db.Timestamptz(6)
-    updatedAt      DateTime     @updatedAt @db.Timestamptz(6)
-    fullName       String
-    email          String       @unique
-    hashedPassword String?
-    role           GlobalRole   @default(CUSTOMER)
-    memberships    Membership[]
-    sessions       Session[]
-    tokens         Token[]
+  id             String       @id @default(cuid())
+  createdAt      DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime     @updatedAt @db.Timestamptz(6)
+  fullName       String
+  email          String       @unique
+  hashedPassword String?
+  role           GlobalRole   @default(CUSTOMER)
+  memberships    Membership[]
+  sessions       Session[]
+  tokens         Token[]
 }
 
 model Session {
-    id        String    @id @default(cuid())
-    createdAt DateTime  @default(now()) @db.Timestamptz(6)
-    updatedAt DateTime  @updatedAt @db.Timestamptz(6)
-    expiresAt DateTime? @db.Timestamptz(6)
-    data      String
-    userId    String?
-    user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
+  expiresAt DateTime? @db.Timestamptz(6)
+  data      String
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Token {
-    id           String     @id @default(cuid())
-    createdAt    DateTime   @default(now()) @db.Timestamptz(6)
-    updatedAt    DateTime   @updatedAt @db.Timestamptz(6)
-    hashedToken  String
-    type         TokenType
-    expiresAt    DateTime   @db.Timestamptz(6)
-    sentTo       String
-    userId       String
-    membershipId String     @unique
-    membership   Membership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
-    user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String     @id @default(cuid())
+  createdAt    DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime   @updatedAt @db.Timestamptz(6)
+  hashedToken  String
+  type         TokenType
+  expiresAt    DateTime   @db.Timestamptz(6)
+  sentTo       String
+  userId       String
+  membershipId String     @unique
+  membership   Membership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@unique([hashedToken, type])
+  @@unique([hashedToken, type])
 }
 
 model Message {
-    id            String        @id
-    sentAt        DateTime      @db.Timestamptz(6)
-    content       String
-    from          String
-    to            String
-    direction     Direction
-    status        MessageStatus
-    phoneNumberId String
-    phoneNumber   PhoneNumber   @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
+  id            String        @id
+  sentAt        DateTime      @db.Timestamptz(6)
+  content       String
+  from          String
+  to            String
+  direction     Direction
+  status        MessageStatus
+  phoneNumberId String
+  phoneNumber   PhoneNumber   @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
 }
 
 model PhoneCall {
-    id            String      @id @unique
-    createdAt     DateTime    @default(now()) @db.Timestamptz(6)
-    from          String
-    to            String
-    status        CallStatus
-    direction     Direction
-    duration      String
-    phoneNumberId String
-    phoneNumber   PhoneNumber @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
+  id            String      @id
+  createdAt     DateTime    @default(now()) @db.Timestamptz(6)
+  from          String
+  to            String
+  status        CallStatus
+  direction     Direction
+  duration      String
+  phoneNumberId String
+  phoneNumber   PhoneNumber @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
 }
 
 model PhoneNumber {
-    id                 String       @id
-    createdAt          DateTime     @default(now()) @db.Timestamptz(6)
-    number             String
-    isCurrent          Boolean
-    isFetchingMessages Boolean?
-    isFetchingCalls    Boolean?
-    organizationId     String
-    organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-    messages           Message[]
-    phoneCalls         PhoneCall[]
+  id                 String       @id
+  createdAt          DateTime     @default(now()) @db.Timestamptz(6)
+  number             String
+  isCurrent          Boolean
+  isFetchingMessages Boolean?
+  isFetchingCalls    Boolean?
+  organizationId     String
+  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  messages           Message[]
+  phoneCalls         PhoneCall[]
 
-    @@unique([organizationId, isCurrent])
+  @@unique([organizationId, isCurrent])
 }
 
 enum SubscriptionStatus {
-    active
-    trialing
-    past_due
-    paused
-    deleted
+  active
+  trialing
+  past_due
+  paused
+  deleted
 }
 
 enum MembershipRole {
-    OWNER
-    USER
+  OWNER
+  USER
 }
 
 enum GlobalRole {
-    SUPERADMIN
-    CUSTOMER
+  SUPERADMIN
+  CUSTOMER
 }
 
 enum TokenType {
-    RESET_PASSWORD
-    INVITE_MEMBER
+  RESET_PASSWORD
+  INVITE_MEMBER
 }
 
 enum Direction {
-    Inbound
-    Outbound
+  Inbound
+  Outbound
 }
 
 enum MessageStatus {
-    Queued
-    Sending
-    Sent
-    Failed
-    Delivered
-    Undelivered
-    Receiving
-    Received
-    Accepted
-    Scheduled
-    Read
-    PartiallyDelivered
-    Canceled
-    Error
+  Queued
+  Sending
+  Sent
+  Failed
+  Delivered
+  Undelivered
+  Receiving
+  Received
+  Accepted
+  Scheduled
+  Read
+  PartiallyDelivered
+  Canceled
+  Error
 }
 
 enum CallStatus {
-    Queued
-    Ringing
-    InProgress
-    Completed
-    Busy
-    Failed
-    NoAnswer
-    Canceled
+  Queued
+  Ringing
+  InProgress
+  Completed
+  Busy
+  Failed
+  NoAnswer
+  Canceled
 }

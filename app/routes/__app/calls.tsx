@@ -26,10 +26,13 @@ export type PhoneCallsLoaderData = {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-	const { organizations } = await requireLoggedIn(request);
-	const organizationId = organizations[0].id;
+	const sessionData = await requireLoggedIn(request);
+	if (!sessionData.phoneNumber) {
+		throw new Error("unreachable");
+	}
+
 	const phoneNumber = await db.phoneNumber.findUnique({
-		where: { organizationId_isCurrent: { organizationId, isCurrent: true } },
+		where: { id: sessionData.phoneNumber.id },
 	});
 	if (!phoneNumber || phoneNumber.isFetchingCalls) {
 		return json<PhoneCallsLoaderData>({

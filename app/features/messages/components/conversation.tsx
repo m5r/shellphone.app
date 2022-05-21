@@ -10,7 +10,7 @@ import { type ConversationLoaderData } from "~/routes/__app/messages.$recipient"
 import useSession from "~/features/core/hooks/use-session";
 
 export default function Conversation() {
-	const { currentPhoneNumber } = useSession();
+	const { phoneNumber } = useSession();
 	const params = useParams<{ recipient: string }>();
 	const recipient = decodeURIComponent(params.recipient ?? "");
 	const { conversation } = useLoaderData<ConversationLoaderData>();
@@ -21,15 +21,15 @@ export default function Conversation() {
 	if (transition.submission) {
 		messages.push({
 			id: "temp",
-			phoneNumberId: currentPhoneNumber.id,
-			from: currentPhoneNumber.number,
+			phoneNumberId: phoneNumber!.id,
+			from: phoneNumber!.number,
 			to: recipient,
 			sentAt: new Date(),
 			direction: Direction.Outbound,
 
 			status: "Queued",
-			content: transition.submission.formData.get("content")!.toString()
-		})
+			content: transition.submission.formData.get("content")!.toString(),
+		});
 	}
 
 	useEffect(() => {
@@ -91,7 +91,7 @@ export default function Conversation() {
 					})}
 				</ul>
 			</div>
-			<NewMessageArea />
+			<NewMessageArea recipient={recipient} />
 		</>
 	);
 }

@@ -19,23 +19,25 @@ const action: ActionFunction = async ({ request }) => {
 	}
 
 	switch (formData._action as Action) {
-	case "deleteUser":
-		return deleteUser(request);
-	case "changePassword":
-		return changePassword(request, formData);
-	case "updateUser":
-		return updateUser(request, formData);
-	default:
-		const errorMessage = `POST /settings with an invalid _action=${formData._action}`;
-		logger.error(errorMessage);
-		return badRequest({ errorMessage });
+		case "deleteUser":
+			return deleteUser(request);
+		case "changePassword":
+			return changePassword(request, formData);
+		case "updateUser":
+			return updateUser(request, formData);
+		default:
+			const errorMessage = `POST /settings with an invalid _action=${formData._action}`;
+			logger.error(errorMessage);
+			return badRequest({ errorMessage });
 	}
 };
 
 export default action;
 
 async function deleteUser(request: Request) {
-	const { id } = await requireLoggedIn(request);
+	const {
+		user: { id },
+	} = await requireLoggedIn(request);
 
 	await db.user.update({
 		where: { id },
@@ -64,7 +66,9 @@ async function changePassword(request: Request, formData: unknown) {
 		});
 	}
 
-	const { id } = await requireLoggedIn(request);
+	const {
+		user: { id },
+	} = await requireLoggedIn(request);
 	const user = await db.user.findUnique({ where: { id } });
 	const { currentPassword, newPassword } = validation.data;
 	const verificationResult = await verifyPassword(user!.hashedPassword!, currentPassword);
@@ -99,7 +103,7 @@ async function updateUser(request: Request, formData: unknown) {
 		});
 	}
 
-	const user = await requireLoggedIn(request);
+	const { user } = await requireLoggedIn(request);
 	const { email, fullName } = validation.data;
 	await db.user.update({
 		where: { id: user.id },

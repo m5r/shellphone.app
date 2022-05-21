@@ -3,6 +3,8 @@ import { type Session, type SessionIdStorageStrategy, createSessionStorage } fro
 import serverConfig from "~/config/config.server";
 import db from "./db.server";
 import logger from "./logger.server";
+import authenticator from "~/utils/authenticator.server";
+import type { SessionData } from "~/utils/auth.server";
 
 const SECOND = 1;
 const MINUTE = 60 * SECOND;
@@ -32,8 +34,9 @@ function createDatabaseSessionStorage({ cookie }: Pick<SessionIdStorageStrategy,
 		cookie,
 		async createData(sessionData, expiresAt) {
 			let user;
-			if (sessionData.user) {
-				user = { connect: { id: sessionData.user.id } };
+			const sessionAuthData: SessionData = sessionData[authenticator.sessionKey];
+			if (sessionAuthData) {
+				user = { connect: { id: sessionAuthData.user.id } };
 			}
 			const { id } = await db.session.create({
 				data: {
