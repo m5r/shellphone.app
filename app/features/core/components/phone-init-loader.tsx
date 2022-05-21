@@ -16,6 +16,7 @@ export default function PhoneInitLoader() {
 			</svg>
 			<p>We&#39;re finalizing your &#128026;phone initialization.</p>
 			<p>
+				{/* TODO */}
 				You don&#39;t have to refresh this page, we will do it automatically for you when your phone is ready.
 			</p>
 		</div>

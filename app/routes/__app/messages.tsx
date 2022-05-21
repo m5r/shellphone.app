@@ -1,3 +1,4 @@
+import type { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "superjson-remix";
 import { atom, useAtom } from "jotai";
 
@@ -7,14 +8,19 @@ import MissingTwilioCredentials from "~/features/core/components/missing-twilio-
 import ConversationsList from "~/features/messages/components/conversations-list";
 import NewMessageButton from "~/features/messages/components/new-message-button";
 import NewMessageBottomSheet from "~/features/messages/components/new-message-bottom-sheet";
+import { getSeoMeta } from "~/utils/seo";
+
+export const meta: MetaFunction = () => ({
+	...getSeoMeta({ title: "Messages" }),
+});
 
 export const loader = messagesLoader;
 
 export default function MessagesPage() {
-	const { user } = useLoaderData<MessagesLoaderData>();
+	const { hasPhoneNumber } = useLoaderData<MessagesLoaderData>();
 	const setIsNewMessageSheetOpen = useAtom(bottomSheetOpenAtom)[1];
 
-	if (!user.hasPhoneNumber) {
+	if (!hasPhoneNumber) {
 		return (
 			<>
 				<MissingTwilioCredentials />
