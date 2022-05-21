@@ -118,6 +118,7 @@ CREATE TABLE "Message" (
     "id" TEXT NOT NULL,
     "sentAt" TIMESTAMPTZ NOT NULL,
     "content" TEXT NOT NULL,
+    "recipient" TEXT NOT NULL,
     "from" TEXT NOT NULL,
     "to" TEXT NOT NULL,
     "direction" "Direction" NOT NULL,
@@ -131,6 +132,7 @@ CREATE TABLE "Message" (
 CREATE TABLE "PhoneCall" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "recipient" TEXT NOT NULL,
     "from" TEXT NOT NULL,
     "to" TEXT NOT NULL,
     "status" "CallStatus" NOT NULL,
@@ -173,10 +175,16 @@ CREATE UNIQUE INDEX "Token_membershipId_key" ON "Token"("membershipId");
 CREATE UNIQUE INDEX "Token_hashedToken_type_key" ON "Token"("hashedToken", "type");
 
 -- CreateIndex
+CREATE INDEX "Message_phoneNumberId_recipient_idx" ON "Message"("phoneNumberId", "recipient");
+
+-- CreateIndex
+CREATE INDEX "PhoneCall_phoneNumberId_recipient_idx" ON "PhoneCall"("phoneNumberId", "recipient");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "PhoneNumber_organizationId_isCurrent_key" ON "PhoneNumber"("organizationId", "isCurrent") WHERE ("isCurrent" = true);
 
 -- AddForeignKey
-ALTER TABLE "TwilioAccount" ADD CONSTRAINT "TwilioAccount_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TwilioAccount" ADD CONSTRAINT "TwilioAccount_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 
 -- AddForeignKey

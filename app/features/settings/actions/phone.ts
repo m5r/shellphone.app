@@ -4,7 +4,8 @@ import { z } from "zod";
 
 import db from "~/utils/db.server";
 import { type FormError, validate } from "~/utils/validation.server";
-import { requireLoggedIn } from "~/utils/auth.server";
+import { refreshSessionData, requireLoggedIn } from "~/utils/auth.server";
+import { commitSession } from "~/utils/session.server";
 import setTwilioWebhooksQueue from "~/queues/set-twilio-webhooks.server";
 
 type SetPhoneNumberFailureActionData = { errors: FormError<typeof bodySchema>; submitted?: never };
@@ -39,9 +40,16 @@ const action: ActionFunction = async ({ request }) => {
 		phoneNumberId: validation.data.phoneNumberSid,
 		organizationId: organization.id,
 	});
-	console.log("queued");
+	const { session } = await refreshSessionData(request);
 
-	return json<SetPhoneNumberActionData>({ submitted: true });
+	return json<SetPhoneNumberActionData>(
+		{ submitted: true },
+		{
+			headers: {
+				"Set-Cookie": await commitSession(session),
+			},
+		},
+	);
 };
 
 export default action;
