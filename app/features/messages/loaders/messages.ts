@@ -1,13 +1,14 @@
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "superjson-remix";
 import { parsePhoneNumber } from "awesome-phonenumber";
-import { type Message, Prisma } from "@prisma/client";
+import { type Message, type PhoneNumber, Prisma } from "@prisma/client";
 
 import db from "~/utils/db.server";
-import { requireLoggedIn, type SessionData } from "~/utils/auth.server";
+import { requireLoggedIn } from "~/utils/auth.server";
 
 export type MessagesLoaderData = {
-	user: { hasPhoneNumber: boolean };
+	hasPhoneNumber: boolean;
+	isFetchingMessages: boolean | null;
 	conversations: Conversations | undefined;
 };
 
@@ -18,9 +19,15 @@ type Conversation = {
 };
 
 const loader: LoaderFunction = async ({ request }) => {
-	const { phoneNumber } = await requireLoggedIn(request);
+	const sessionData = await requireLoggedIn(request);
+	const phoneNumber =
+		sessionData.phoneNumber &&
+		(await db.phoneNumber.findUnique({
+			where: { id: sessionData.phoneNumber.id },
+		}));
 	return json<MessagesLoaderData>({
-		user: { hasPhoneNumber: Boolean(phoneNumber) },
+		hasPhoneNumber: Boolean(phoneNumber),
+		isFetchingMessages: phoneNumber?.isFetchingMessages ?? null,
 		conversations: await getConversations(phoneNumber),
 	});
 };
@@ -29,13 +36,8 @@ export default loader;
 
 type Conversations = Record<string, Conversation>;
 
-async function getConversations(sessionPhoneNumber: SessionData["phoneNumber"]) {
-	if (!sessionPhoneNumber) {
-		return;
-	}
-
-	const phoneNumber = await db.phoneNumber.findUnique({ where: { id: sessionPhoneNumber.id } });
-	if (!phoneNumber || phoneNumber.isFetchingMessages) {
+async function getConversations(phoneNumber: PhoneNumber | null) {
+	if (!phoneNumber) {
 		return;
 	}
 

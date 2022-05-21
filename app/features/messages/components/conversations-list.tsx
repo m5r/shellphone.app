@@ -8,9 +8,9 @@ import EmptyMessages from "./empty-messages";
 import type { MessagesLoaderData } from "~/features/messages/loaders/messages";
 
 export default function ConversationsList() {
-	const { conversations } = useLoaderData<MessagesLoaderData>();
+	const { conversations, isFetchingMessages } = useLoaderData<MessagesLoaderData>();
 
-	if (!conversations) {
+	if (isFetchingMessages || !conversations) {
 		// we're still importing messages from twilio
 		return <PhoneInitLoader />;
 	}
