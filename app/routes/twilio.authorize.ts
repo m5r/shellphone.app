@@ -24,9 +24,18 @@ export const loader: LoaderFunction = async ({ request }) => {
 	const twilioMainAccount = await twilioClient.api.accounts(twilioMainAccountSid).fetch();
 	console.log("twilioSubAccount", twilioSubAccount);
 	console.log("twilioAccount", twilioMainAccount);
-	const twilioAccount = await db.twilioAccount.update({
+	const twilioAccount = await db.twilioAccount.upsert({
 		where: { organizationId: organization.id },
-		data: {
+		create: {
+			organization: {
+				connect: { id: organization.id },
+			},
+			subAccountSid: twilioSubAccount.sid,
+			subAccountAuthToken: encrypt(twilioSubAccount.authToken),
+			accountSid: twilioMainAccount.sid,
+			accountAuthToken: encrypt(twilioMainAccount.authToken),
+		},
+		update: {
 			subAccountSid: twilioSubAccount.sid,
 			subAccountAuthToken: encrypt(twilioSubAccount.authToken),
 			accountSid: twilioMainAccount.sid,
