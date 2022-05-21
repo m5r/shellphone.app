@@ -16,7 +16,7 @@ export default function InactiveSubscription() {
 					<p className="mt-1 text-sm text-gray-500 max-w-sm mx-auto break-normal whitespace-normal">
 						You need an active subscription to use this feature.
 						<br />
-						Head over to your settings to pick up a plan.
+						Head over to your settings to pick a plan.
 					</p>
 					<div className="mt-6">
 						<button
