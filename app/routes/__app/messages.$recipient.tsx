@@ -1,15 +1,12 @@
-import type { LoaderFunction, MetaFunction } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/node";
 import { Link, useNavigate, useParams } from "@remix-run/react";
-import { json, useLoaderData } from "superjson-remix";
+import { useLoaderData } from "superjson-remix";
 import { IoCall, IoChevronBack } from "react-icons/io5";
-import { parsePhoneNumber } from "awesome-phonenumber";
-import { type Message, Prisma } from "@prisma/client";
 
 import Conversation from "~/features/messages/components/conversation";
 import { getSeoMeta } from "~/utils/seo";
-import db from "~/utils/db.server";
-import { requireLoggedIn } from "~/utils/auth.server";
-import newMessageAction from "~/features/messages/actions/messages.$recipient";
+import conversationAction from "~/features/messages/actions/messages.$recipient";
+import conversationLoader, { type ConversationLoaderData } from "~/features/messages/loaders/messages.$recipient";
 
 export const meta: MetaFunction = ({ params }) => {
 	const recipient = decodeURIComponent(params.recipient ?? "");
@@ -21,49 +18,9 @@ export const meta: MetaFunction = ({ params }) => {
 	};
 };
 
-export const action = newMessageAction;
+export const action = conversationAction;
 
-type ConversationType = {
-	recipient: string;
-	formattedPhoneNumber: string;
-	messages: Message[];
-};
-
-export type ConversationLoaderData = {
-	conversation: ConversationType;
-};
-
-export const loader: LoaderFunction = async ({ request, params }) => {
-	const { organization } = await requireLoggedIn(request);
-	const recipient = decodeURIComponent(params.recipient ?? "");
-	const conversation = await getConversation(recipient);
-
-	return json<ConversationLoaderData>({ conversation });
-
-	async function getConversation(recipient: string): Promise<ConversationType> {
-		const organizationId = organization.id;
-		const phoneNumber = await db.phoneNumber.findUnique({
-			where: { organizationId_isCurrent: { organizationId, isCurrent: true } },
-		});
-		if (!phoneNumber || phoneNumber.isFetchingMessages) {
-			throw new Error("unreachable");
-		}
-
-		const formattedPhoneNumber = parsePhoneNumber(recipient).getNumber("international");
-		const messages = await db.message.findMany({
-			where: {
-				phoneNumberId: phoneNumber.id,
-				OR: [{ from: recipient }, { to: recipient }],
-			},
-			orderBy: { sentAt: Prisma.SortOrder.asc },
-		});
-		return {
-			recipient,
-			formattedPhoneNumber,
-			messages,
-		};
-	}
-};
+export const loader = conversationLoader;
 
 export default function ConversationPage() {
 	const navigate = useNavigate();
