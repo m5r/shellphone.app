@@ -20,13 +20,21 @@ invariant(
 	`Please define the "AWS_SES_FROM_EMAIL" environment variable`,
 );
 invariant(typeof process.env.REDIS_URL === "string", `Please define the "REDIS_URL" environment variable`);
-invariant(typeof process.env.TWILIO_AUTH_TOKEN === "string", `Please define the "TWILIO_AUTH_TOKEN" environment variable`);
+invariant(
+	typeof process.env.TWILIO_AUTH_TOKEN === "string",
+	`Please define the "TWILIO_AUTH_TOKEN" environment variable`,
+);
+invariant(
+	typeof process.env.MASTER_ENCRYPTION_KEY === "string",
+	`Please define the "MASTER_ENCRYPTION_KEY" environment variable`,
+);
 
 export default {
 	app: {
 		baseUrl: process.env.APP_BASE_URL,
 		invitationTokenSecret: process.env.INVITATION_TOKEN_SECRET,
 		sessionSecret: process.env.SESSION_SECRET,
+		encryptionKey: process.env.MASTER_ENCRYPTION_KEY,
 	},
 	awsSes: {
 		awsRegion: process.env.AWS_SES_REGION,
