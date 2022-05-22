@@ -1,32 +1,56 @@
-import { Fragment, useRef, useState } from "react";
+import { Fragment } from "react";
+import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { useNavigate } from "@remix-run/react";
-import { atom, useAtom } from "jotai";
-import { usePress } from "@react-aria/interactions";
+import { json, useLoaderData } from "superjson-remix";
 import { Transition } from "@headlessui/react";
 import { IoBackspace, IoCall } from "react-icons/io5";
-import { Direction } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
-import Keypad from "~/features/keypad/components/keypad";
-// import usePhoneCalls from "~/features/keypad/hooks/use-phone-calls";
 import useKeyPress from "~/features/keypad/hooks/use-key-press";
-// import useCurrentUser from "~/features/core/hooks/use-current-user";
-import KeypadErrorModal from "~/features/keypad/components/keypad-error-modal";
+import useOnBackspacePress from "~/features/keypad/hooks/use-on-backspace-press";
+import Keypad from "~/features/keypad/components/keypad";
+import BlurredKeypad from "~/features/keypad/components/blurred-keypad";
+import MissingTwilioCredentials from "~/features/core/components/missing-twilio-credentials";
 import InactiveSubscription from "~/features/core/components/inactive-subscription";
+import { getSeoMeta } from "~/utils/seo";
+import db from "~/utils/db.server";
+import { requireLoggedIn } from "~/utils/auth.server";
+import { usePhoneNumber, usePressDigit, useRemoveDigit } from "~/features/keypad/hooks/atoms";
+
+export const meta: MetaFunction = () => ({
+	...getSeoMeta({ title: "Keypad" }),
+});
+
+type KeypadLoaderData = {
+	hasOngoingSubscription: boolean;
+	hasPhoneNumber: boolean;
+	lastRecipientCalled?: string;
+};
+
+export const loader: LoaderFunction = async ({ request }) => {
+	const { phoneNumber } = await requireLoggedIn(request);
+	const hasOngoingSubscription = true; // TODO
+	const hasPhoneNumber = Boolean(phoneNumber);
+	const lastCall =
+		phoneNumber &&
+		(await db.phoneCall.findFirst({
+			where: { phoneNumberId: phoneNumber.id },
+			orderBy: { createdAt: Prisma.SortOrder.desc },
+		}));
+	return json<KeypadLoaderData>({
+		hasOngoingSubscription,
+		hasPhoneNumber,
+		lastRecipientCalled: lastCall?.recipient,
+	});
+};
 
 export default function KeypadPage() {
-	const { hasFilledTwilioCredentials, hasPhoneNumber, hasOngoingSubscription } = {
-		hasFilledTwilioCredentials: false,
-		hasPhoneNumber: false,
-		hasOngoingSubscription: false,
-	};
+	const { hasOngoingSubscription, hasPhoneNumber, lastRecipientCalled } = useLoaderData<KeypadLoaderData>();
 	const navigate = useNavigate();
-	const [isKeypadErrorModalOpen, setIsKeypadErrorModalOpen] = useState(false);
-	const phoneCalls: any[] = []; //usePhoneCalls();
-	const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
-	const removeDigit = useAtom(pressBackspaceAtom)[1];
-	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-	const pressDigit = useAtom(pressDigitAtom)[1];
+	const [phoneNumber, setPhoneNumber] = usePhoneNumber();
+	const removeDigit = useRemoveDigit();
+	const pressDigit = usePressDigit();
+	const onBackspacePress = useOnBackspacePress();
 	useKeyPress((key) => {
 		if (!hasOngoingSubscription) {
 			return;
@@ -38,74 +62,21 @@ export default function KeypadPage() {
 
 		pressDigit(key);
 	});
-	const longPressDigit = useAtom(longPressDigitAtom)[1];
-	const onZeroPressProps = {
-		onPressStart() {
-			if (!hasOngoingSubscription) {
-				return;
-			}
 
-			pressDigit("0");
-			timeoutRef.current = setTimeout(() => {
-				longPressDigit("+");
-			}, 750);
-		},
-		onPressEnd() {
-			if (timeoutRef.current) {
-				clearTimeout(timeoutRef.current);
-				timeoutRef.current = null;
-			}
-		},
-	};
-	const onDigitPressProps = (digit: string) => ({
-		onPress() {
-			// navigator.vibrate(1); // removed in webkit
-			if (!hasOngoingSubscription) {
-				return;
-			}
-
-			pressDigit(digit);
-		},
-	});
-	const { pressProps: onBackspacePress } = usePress({
-		onPressStart() {
-			timeoutRef.current = setTimeout(() => {
-				removeDigit();
-				intervalRef.current = setInterval(removeDigit, 75);
-			}, 325);
-		},
-		onPressEnd() {
-			if (timeoutRef.current) {
-				clearTimeout(timeoutRef.current);
-				timeoutRef.current = null;
-			}
-
-			if (intervalRef.current) {
-				clearInterval(intervalRef.current);
-				intervalRef.current = null;
-				return;
-			}
-
-			removeDigit();
-		},
-	});
+	if (!hasPhoneNumber) {
+		return (
+			<>
+				<MissingTwilioCredentials />
+				<BlurredKeypad />
+			</>
+		);
+	}
 
 	if (!hasOngoingSubscription) {
 		return (
 			<>
 				<InactiveSubscription />
-				<div className="filter blur-sm select-none absolute top-0 w-full h-full z-0">
-					<section className="relative w-96 h-full flex flex-col justify-around mx-auto py-5 text-center">
-						<div className="h-16 text-3xl text-gray-700">
-							<span>{phoneNumber}</span>
-						</div>
-						<Keypad onDigitPressProps={onDigitPressProps} onZeroPressProps={onZeroPressProps}>
-							<button className="cursor-pointer select-none col-start-2 h-12 w-12 flex justify-center items-center mx-auto bg-green-800 rounded-full">
-								<IoCall className="w-6 h-6 text-white" />
-							</button>
-						</Keypad>
-					</section>
-				</div>
+				<BlurredKeypad />
 			</>
 		);
 	}
@@ -117,24 +88,16 @@ export default function KeypadPage() {
 					<span>{phoneNumber}</span>
 				</div>
 
-				<Keypad onDigitPressProps={onDigitPressProps} onZeroPressProps={onZeroPressProps}>
+				<Keypad>
 					<button
 						onClick={async () => {
-							if (!hasFilledTwilioCredentials || !hasPhoneNumber) {
-								setIsKeypadErrorModalOpen(true);
-								return;
-							}
-
-							if (!hasOngoingSubscription) {
+							if (!hasPhoneNumber || !hasOngoingSubscription) {
 								return;
 							}
 
 							if (phoneNumber === "") {
-								const lastCall = phoneCalls?.[0];
-								if (lastCall) {
-									const lastCallRecipient =
-										lastCall.direction === Direction.Inbound ? lastCall.from : lastCall.to;
-									setPhoneNumber(lastCallRecipient);
+								if (lastRecipientCalled) {
+									setPhoneNumber(lastRecipientCalled);
 								}
 
 								return;
@@ -164,34 +127,6 @@ export default function KeypadPage() {
 					</Transition>
 				</Keypad>
 			</div>
-			<KeypadErrorModal closeModal={() => setIsKeypadErrorModalOpen(false)} isOpen={isKeypadErrorModalOpen} />
 		</>
 	);
 }
-
-const phoneNumberAtom = atom("");
-const pressDigitAtom = atom(null, (get, set, digit: string) => {
-	if (get(phoneNumberAtom).length > 17) {
-		return;
-	}
-
-	if ("0123456789+#*".indexOf(digit) === -1) {
-		return;
-	}
-
-	set(phoneNumberAtom, (prevState) => prevState + digit);
-});
-const longPressDigitAtom = atom(null, (get, set, replaceWith: string) => {
-	if (get(phoneNumberAtom).length > 17) {
-		return;
-	}
-
-	set(phoneNumberAtom, (prevState) => prevState.slice(0, -1) + replaceWith);
-});
-const pressBackspaceAtom = atom(null, (get, set) => {
-	if (get(phoneNumberAtom).length === 0) {
-		return;
-	}
-
-	set(phoneNumberAtom, (prevState) => prevState.slice(0, -1));
-});
