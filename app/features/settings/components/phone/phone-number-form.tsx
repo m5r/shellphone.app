@@ -4,7 +4,7 @@ import Button from "../button";
 import SettingsSection from "../settings-section";
 import Alert from "~/features/core/components/alert";
 import useSession from "~/features/core/hooks/use-session";
-import type { PhoneSettingsLoaderData } from "~/routes/__app/settings/phone";
+import type { PhoneSettingsLoaderData } from "~/features/settings/loaders/phone";
 import type { SetPhoneNumberActionData } from "~/features/settings/actions/phone";
 
 export default function PhoneNumberForm() {
