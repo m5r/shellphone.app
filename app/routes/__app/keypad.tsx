@@ -1,11 +1,11 @@
 import { Fragment } from "react";
-import type { LoaderFunction, MetaFunction } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/node";
 import { useNavigate } from "@remix-run/react";
-import { json, useLoaderData } from "superjson-remix";
+import { useLoaderData } from "superjson-remix";
 import { Transition } from "@headlessui/react";
 import { IoBackspace, IoCall } from "react-icons/io5";
-import { Prisma } from "@prisma/client";
 
+import keypadLoader, { type KeypadLoaderData } from "~/features/keypad/loaders/keypad";
 import useKeyPress from "~/features/keypad/hooks/use-key-press";
 import useOnBackspacePress from "~/features/keypad/hooks/use-on-backspace-press";
 import Keypad from "~/features/keypad/components/keypad";
@@ -13,36 +13,13 @@ import BlurredKeypad from "~/features/keypad/components/blurred-keypad";
 import MissingTwilioCredentials from "~/features/core/components/missing-twilio-credentials";
 import InactiveSubscription from "~/features/core/components/inactive-subscription";
 import { getSeoMeta } from "~/utils/seo";
-import db from "~/utils/db.server";
-import { requireLoggedIn } from "~/utils/auth.server";
 import { usePhoneNumber, usePressDigit, useRemoveDigit } from "~/features/keypad/hooks/atoms";
 
 export const meta: MetaFunction = () => ({
 	...getSeoMeta({ title: "Keypad" }),
 });
 
-type KeypadLoaderData = {
-	hasOngoingSubscription: boolean;
-	hasPhoneNumber: boolean;
-	lastRecipientCalled?: string;
-};
-
-export const loader: LoaderFunction = async ({ request }) => {
-	const { phoneNumber } = await requireLoggedIn(request);
-	const hasOngoingSubscription = true; // TODO
-	const hasPhoneNumber = Boolean(phoneNumber);
-	const lastCall =
-		phoneNumber &&
-		(await db.phoneCall.findFirst({
-			where: { phoneNumberId: phoneNumber.id },
-			orderBy: { createdAt: Prisma.SortOrder.desc },
-		}));
-	return json<KeypadLoaderData>({
-		hasOngoingSubscription,
-		hasPhoneNumber,
-		lastRecipientCalled: lastCall?.recipient,
-	});
-};
+export const loader = keypadLoader;
 
 export default function KeypadPage() {
 	const { hasOngoingSubscription, hasPhoneNumber, lastRecipientCalled } = useLoaderData<KeypadLoaderData>();
