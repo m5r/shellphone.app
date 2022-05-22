@@ -14,14 +14,27 @@ type PhoneCallMeta = {
 export type PhoneCallsLoaderData = {
 	hasOngoingSubscription: boolean;
 	hasPhoneNumber: boolean;
-	isFetchingCalls: boolean | null;
-	phoneCalls: (PhoneCall & { toMeta: PhoneCallMeta; fromMeta: PhoneCallMeta })[] | undefined;
-};
+} & (
+	| {
+			phoneCalls: (PhoneCall & { toMeta: PhoneCallMeta; fromMeta: PhoneCallMeta })[];
+			isFetchingCalls?: never;
+	  }
+	| {
+			phoneCalls?: never;
+			isFetchingCalls: boolean;
+	  }
+);
 
 const loader: LoaderFunction = async ({ request }) => {
 	const sessionData = await requireLoggedIn(request);
+	const hasOngoingSubscription = true; // TODO
+	const hasPhoneNumber = Boolean(sessionData.phoneNumber);
 	if (!sessionData.phoneNumber) {
-		throw new Error("unreachable");
+		return json<PhoneCallsLoaderData>({
+			hasOngoingSubscription,
+			hasPhoneNumber: false,
+			isFetchingCalls: false,
+		});
 	}
 
 	const phoneNumber = await db.phoneNumber.findUnique({
@@ -29,10 +42,9 @@ const loader: LoaderFunction = async ({ request }) => {
 	});
 	if (!phoneNumber || phoneNumber.isFetchingCalls) {
 		return json<PhoneCallsLoaderData>({
-			hasOngoingSubscription: true, // TODO
-			hasPhoneNumber: Boolean(phoneNumber),
-			isFetchingCalls: true,
-			phoneCalls: undefined,
+			hasOngoingSubscription,
+			hasPhoneNumber,
+			isFetchingCalls: phoneNumber?.isFetchingCalls ?? false,
 		});
 	}
 
@@ -41,9 +53,8 @@ const loader: LoaderFunction = async ({ request }) => {
 		orderBy: { createdAt: Prisma.SortOrder.desc },
 	});
 	return json<PhoneCallsLoaderData>({
-		hasOngoingSubscription: true, // TODO
-		hasPhoneNumber: Boolean(phoneNumber),
-		isFetchingCalls: null,
+		hasOngoingSubscription,
+		hasPhoneNumber,
 		phoneCalls: phoneCalls.map((phoneCall) => ({
 			...phoneCall,
 			fromMeta: getPhoneNumberMeta(phoneCall.from),
