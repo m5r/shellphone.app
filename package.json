@@ -58,6 +58,7 @@
 		"@tailwindcss/forms": "0.5.1",
 		"@tailwindcss/line-clamp": "0.4.0",
 		"@tailwindcss/typography": "0.5.2",
+		"@twilio/voice-sdk": "2.1.1",
 		"awesome-phonenumber": "3.0.1",
 		"aws-sdk": "2.1134.0",
 		"bullmq": "1.82.0",

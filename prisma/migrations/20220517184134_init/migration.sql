@@ -26,8 +26,9 @@ CREATE TABLE "TwilioAccount" (
     "updatedAt" TIMESTAMPTZ(6) NOT NULL,
     "subAccountAuthToken" TEXT NOT NULL,
     "accountSid" TEXT NOT NULL,
-    "accountAuthToken" TEXT NOT NULL,
     "twimlAppSid" TEXT,
+    "apiKeySid" TEXT,
+    "apiKeySecret" TEXT,
     "organizationId" TEXT NOT NULL,
 
     CONSTRAINT "TwilioAccount_pkey" PRIMARY KEY ("subAccountSid")

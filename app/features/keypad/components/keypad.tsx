@@ -1,45 +1,51 @@
 import { type FunctionComponent, type PropsWithChildren, useRef } from "react";
-import { usePress } from "@react-aria/interactions";
+import { type PressHookProps, usePress } from "@react-aria/interactions";
+
 import { useLongPressDigit, usePressDigit } from "~/features/keypad/hooks/atoms";
 
-const Keypad: FunctionComponent<PropsWithChildren<{}>> = ({ children }) => {
+type Props = {
+	onDigitPressProps?: (digit: string) => PressHookProps;
+	onZeroPressProps?: PressHookProps;
+};
+
+const Keypad: FunctionComponent<PropsWithChildren<Props>> = ({ children, onDigitPressProps, onZeroPressProps }) => {
 	return (
 		<section>
 			<Row>
-				<Digit digit="1" />
-				<Digit digit="2">
+				<Digit onPressProps={onDigitPressProps} digit="1" />
+				<Digit onPressProps={onDigitPressProps} digit="2">
 					<DigitLetters>ABC</DigitLetters>
 				</Digit>
-				<Digit digit="3">
+				<Digit onPressProps={onDigitPressProps} digit="3">
 					<DigitLetters>DEF</DigitLetters>
 				</Digit>
 			</Row>
 			<Row>
-				<Digit digit="4">
+				<Digit onPressProps={onDigitPressProps} digit="4">
 					<DigitLetters>GHI</DigitLetters>
 				</Digit>
-				<Digit digit="5">
+				<Digit onPressProps={onDigitPressProps} digit="5">
 					<DigitLetters>JKL</DigitLetters>
 				</Digit>
-				<Digit digit="6">
+				<Digit onPressProps={onDigitPressProps} digit="6">
 					<DigitLetters>MNO</DigitLetters>
 				</Digit>
 			</Row>
 			<Row>
-				<Digit digit="7">
+				<Digit onPressProps={onDigitPressProps} digit="7">
 					<DigitLetters>PQRS</DigitLetters>
 				</Digit>
-				<Digit digit="8">
+				<Digit onPressProps={onDigitPressProps} digit="8">
 					<DigitLetters>TUV</DigitLetters>
 				</Digit>
-				<Digit digit="9">
+				<Digit onPressProps={onDigitPressProps} digit="9">
 					<DigitLetters>WXYZ</DigitLetters>
 				</Digit>
 			</Row>
 			<Row>
-				<Digit digit="*" />
-				<ZeroDigit />
-				<Digit digit="#" />
+				<Digit onPressProps={onDigitPressProps} digit="*" />
+				<ZeroDigit onPressProps={onZeroPressProps} />
+				<Digit onPressProps={onDigitPressProps} digit="#" />
 			</Row>
 			{typeof children !== "undefined" ? <Row>{children}</Row> : null}
 		</section>
@@ -58,27 +64,32 @@ const DigitLetters: FunctionComponent<PropsWithChildren<{}>> = ({ children }) =>
 
 type DigitProps = {
 	digit: string;
+	onPressProps: Props["onDigitPressProps"];
 };
 
-const Digit: FunctionComponent<PropsWithChildren<DigitProps>> = ({ children, digit }) => {
+const Digit: FunctionComponent<PropsWithChildren<DigitProps>> = (props) => {
 	const pressDigit = usePressDigit();
 	const onPressProps = {
 		onPress() {
 			// navigator.vibrate(1); // removed in webkit
-			pressDigit(digit);
+			pressDigit(props.digit);
 		},
 	};
-	const { pressProps } = usePress(onPressProps);
+	const { pressProps } = usePress(props.onPressProps?.(props.digit) ?? onPressProps);
 
 	return (
 		<div {...pressProps} className="text-3xl cursor-pointer select-none">
-			{digit}
-			{children}
+			{props.digit}
+			{props.children}
 		</div>
 	);
 };
 
-const ZeroDigit: FunctionComponent = () => {
+type ZeroDigitProps = {
+	onPressProps: Props["onZeroPressProps"];
+};
+
+const ZeroDigit: FunctionComponent<ZeroDigitProps> = (props) => {
 	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const pressDigit = usePressDigit();
 	const longPressDigit = useLongPressDigit();
@@ -96,7 +107,7 @@ const ZeroDigit: FunctionComponent = () => {
 			}
 		},
 	};
-	const { pressProps } = usePress(onPressProps);
+	const { pressProps } = usePress(props.onPressProps ?? onPressProps);
 
 	return (
 		<div {...pressProps} className="text-3xl cursor-pointer select-none">

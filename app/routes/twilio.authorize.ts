@@ -1,10 +1,8 @@
 import { type LoaderFunction, redirect } from "@remix-run/node";
-import twilio from "twilio";
 
 import { refreshSessionData, requireLoggedIn } from "~/utils/auth.server";
 import { commitSession } from "~/utils/session.server";
 import db from "~/utils/db.server";
-import serverConfig from "~/config/config.server";
 import getTwilioClient from "~/utils/twilio.server";
 import fetchPhoneCallsQueue from "~/queues/fetch-phone-calls.server";
 import fetchMessagesQueue from "~/queues/fetch-messages.server";
@@ -18,29 +16,27 @@ export const loader: LoaderFunction = async ({ request }) => {
 		throw new Error("unreachable");
 	}
 
-	let twilioClient = twilio(twilioSubAccountSid, serverConfig.twilio.authToken);
+	let twilioClient = getTwilioClient({ accountSid: twilioSubAccountSid, subAccountSid: twilioSubAccountSid });
 	const twilioSubAccount = await twilioClient.api.accounts(twilioSubAccountSid).fetch();
 	const twilioMainAccountSid = twilioSubAccount.ownerAccountSid;
 	const twilioMainAccount = await twilioClient.api.accounts(twilioMainAccountSid).fetch();
 	console.log("twilioSubAccount", twilioSubAccount);
 	console.log("twilioAccount", twilioMainAccount);
+	const data = {
+		subAccountSid: twilioSubAccount.sid,
+		subAccountAuthToken: encrypt(twilioSubAccount.authToken),
+		accountSid: twilioMainAccount.sid,
+	};
+
 	const twilioAccount = await db.twilioAccount.upsert({
 		where: { organizationId: organization.id },
 		create: {
 			organization: {
 				connect: { id: organization.id },
 			},
-			subAccountSid: twilioSubAccount.sid,
-			subAccountAuthToken: encrypt(twilioSubAccount.authToken),
-			accountSid: twilioMainAccount.sid,
-			accountAuthToken: encrypt(twilioMainAccount.authToken),
+			...data,
 		},
-		update: {
-			subAccountSid: twilioSubAccount.sid,
-			subAccountAuthToken: encrypt(twilioSubAccount.authToken),
-			accountSid: twilioMainAccount.sid,
-			accountAuthToken: encrypt(twilioMainAccount.authToken),
-		},
+		update: data,
 	});
 
 	twilioClient = getTwilioClient(twilioAccount);
