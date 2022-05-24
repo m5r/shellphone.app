@@ -15,7 +15,7 @@ export default function getTwilioClient({
 		throw new Error("unreachable");
 	}
 
-	return twilio(subAccountSid, serverConfig.twilio.authToken, {
+	return twilio(subAccountSid, subAccountAuthToken ?? serverConfig.twilio.authToken, {
 		accountSid,
 	});
 }

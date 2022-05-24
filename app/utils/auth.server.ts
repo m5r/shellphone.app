@@ -11,7 +11,7 @@ import { commitSession, destroySession, getSession } from "./session.server";
 
 type SessionTwilioAccount = Pick<
 	TwilioAccount,
-	"accountSid" | "accountAuthToken" | "subAccountSid" | "subAccountAuthToken" | "twimlAppSid"
+	"accountSid" | "subAccountSid" | "subAccountAuthToken" | "apiKeySid" | "apiKeySecret" | "twimlAppSid"
 >;
 type SessionOrganization = Pick<Organization, "id"> & { role: MembershipRole };
 type SessionPhoneNumber = Pick<PhoneNumber, "id" | "number">;
@@ -106,7 +106,6 @@ export async function authenticate({
 		headers: request.headers,
 	});
 	const sessionData = await authenticator.authenticate("email-password", signInRequest, { failureRedirect });
-	console.log("sessionKey", authenticator.sessionKey);
 	const session = await getSession(request);
 	session.set(authenticator.sessionKey, sessionData);
 	const redirectTo = successRedirect ?? "/messages";
@@ -181,9 +180,10 @@ async function buildSessionData(id: string): Promise<SessionData> {
 							twilioAccount: {
 								select: {
 									accountSid: true,
-									accountAuthToken: true,
 									subAccountSid: true,
 									subAccountAuthToken: true,
+									apiKeySid: true,
+									apiKeySecret: true,
 									twimlAppSid: true,
 								},
 							},
