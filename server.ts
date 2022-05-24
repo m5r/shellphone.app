@@ -12,7 +12,7 @@ import cronJobs from "~/cron-jobs";
 import queues from "~/queues";
 import logger from "~/utils/logger.server";
 import { __getSession } from "~/utils/session.server";
-import { type SessionUser } from "~/utils/auth.server";
+import { type SessionData } from "~/utils/auth.server";
 
 const app = express();
 app.use((req, res, next) => {
@@ -76,8 +76,8 @@ app.listen(port, () => {
 
 async function adminMiddleware(req: Request, res: Response, next: NextFunction) {
 	const session = await __getSession(req.headers.cookie);
-	const user: SessionUser | undefined = session.data.user;
-	if (!user || user.role !== GlobalRole.SUPERADMIN) {
+	const sessionData: SessionData | undefined = session.data.user;
+	if (!sessionData || sessionData.user.role !== GlobalRole.SUPERADMIN) {
 		return res.setHeader("Location", "/sign-in").status(302).end();
 	}
 
