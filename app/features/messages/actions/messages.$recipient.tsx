@@ -31,6 +31,7 @@ const action: ActionFunction = async ({ params, request }) => {
 				phoneNumberId: phoneNumber!.id,
 				id: message.sid,
 				to: message.to,
+				recipient: message.to,
 				from: message.from,
 				status: translateMessageStatus(message.status),
 				direction: translateMessageDirection(message.direction),

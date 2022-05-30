@@ -51,14 +51,15 @@ model Subscription {
 }
 
 model Membership {
-  id              String         @id @default(cuid())
-  role            MembershipRole
-  organizationId  String
-  userId          String?
-  invitedEmail    String?
-  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  user            User?          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  invitationToken Token?
+  id                       String                     @id @default(cuid())
+  role                     MembershipRole
+  organizationId           String
+  userId                   String?
+  invitedEmail             String?
+  organization             Organization               @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user                     User?                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invitationToken          Token?
+  notificationSubscription NotificationSubscription[]
 
   @@unique([organizationId, invitedEmail])
 }
@@ -145,6 +146,19 @@ model PhoneNumber {
   phoneCalls         PhoneCall[]
 
   @@unique([organizationId, isCurrent])
+}
+
+model NotificationSubscription {
+  id             String   @id @default(uuid())
+  createdAt      DateTime @default(now()) @db.Timestamptz
+  updatedAt      DateTime @updatedAt @db.Timestamptz
+  endpoint       String   @unique
+  expirationTime Int?
+  keys_p256dh    String
+  keys_auth      String
+
+  membership   Membership? @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  membershipId String?
 }
 
 enum SubscriptionStatus {

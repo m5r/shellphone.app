@@ -1,4 +1,4 @@
-import type { FunctionComponent, ReactNode } from "react";
+import { type FunctionComponent, type PropsWithChildren } from "react";
 import type { LinksFunction } from "@remix-run/node";
 import { Link, Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useCatch } from "@remix-run/react";
 
@@ -6,35 +6,7 @@ import Logo from "~/features/core/components/logo";
 
 import styles from "./styles/tailwind.css";
 
-export const links: LinksFunction = () => [
-	{ rel: "stylesheet", href: styles },
-	{
-		rel: "icon",
-		href: "/favicon.ico",
-	},
-	{
-		rel: "apple-touch-icon",
-		sizes: "180x180",
-		href: "/apple-touch-icon.png",
-	},
-	{
-		rel: "icon",
-		type: "image/png",
-		sizes: "32x32",
-		href: "/favicon-32x32.png",
-	},
-	{
-		rel: "icon",
-		type: "image/png",
-		sizes: "16x16",
-		href: "/favicon-16x16.png",
-	},
-	{
-		rel: "mask-icon",
-		href: "/safari-pinned-tab.svg",
-		color: "#663399",
-	},
-];
+export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
 export default function App() {
 	return (
@@ -92,11 +64,29 @@ export function CatchBoundary() {
 	);
 }
 
-const Document: FunctionComponent<{ children: ReactNode }> = ({ children }) => (
+const Document: FunctionComponent<PropsWithChildren<{}>> = ({ children }) => (
 	<html lang="en" className="h-full">
 		<head>
 			<meta charSet="utf-8" />
-			<meta name="viewport" content="width=device-width,initial-scale=1" />
+			<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+
+			<meta name="apple-mobile-web-app-capable" content="yes" />
+			<meta name="apple-mobile-web-app-title" content="Shellphone" />
+			<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+			<meta name="mobile-web-app-capable" content="yes" />
+			<meta name="application-name" content="Shellphone" />
+			<meta name="theme-color" content="#F4F4F5" />
+
+			<meta name="msapplication-navbutton-color" content="#F4F4F5" />
+			<meta name="msapplication-starturl" content="/messages" />
+			<meta name="msapplication-TileColor" content="#F4F4F5" />
+
+			<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+			<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
+			<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png" />
+			<link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#F4F4F5" />
+			<link rel="manifest" href="/manifest.webmanifest" />
 			<Meta />
 			<Links />
 		</head>

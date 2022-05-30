@@ -8,6 +8,7 @@ import {
 	IoCardOutline,
 	IoCallOutline,
 	IoPersonCircleOutline,
+	IoHelpBuoyOutline,
 } from "react-icons/io5";
 
 import Divider from "~/features/settings/components/divider";
@@ -18,6 +19,7 @@ const subNavigation = [
 	{ name: "Phone", to: "/settings/phone", icon: IoCallOutline },
 	{ name: "Billing", to: "/settings/billing", icon: IoCardOutline },
 	{ name: "Notifications", to: "/settings/notifications", icon: IoNotificationsOutline },
+	{ name: "Support", to: "/settings/support", icon: IoHelpBuoyOutline },
 ];
 
 export const meta: MetaFunction = () => ({
@@ -90,4 +92,4 @@ export default function SettingsLayout() {
 			</main>
 		</section>
 	);
-};
+}

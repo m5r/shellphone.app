@@ -13,7 +13,7 @@ type SessionTwilioAccount = Pick<
 	TwilioAccount,
 	"accountSid" | "subAccountSid" | "subAccountAuthToken" | "apiKeySid" | "apiKeySecret" | "twimlAppSid"
 >;
-type SessionOrganization = Pick<Organization, "id"> & { role: MembershipRole };
+type SessionOrganization = Pick<Organization, "id"> & { role: MembershipRole; membershipId: string };
 type SessionPhoneNumber = Pick<PhoneNumber, "id" | "number">;
 export type SessionUser = Pick<User, "id" | "role" | "email" | "fullName">;
 export type SessionData = {
@@ -190,6 +190,7 @@ async function buildSessionData(id: string): Promise<SessionData> {
 						},
 					},
 					role: true,
+					id: true,
 				},
 			},
 		},
@@ -203,6 +204,7 @@ async function buildSessionData(id: string): Promise<SessionData> {
 	const organizations = memberships.map((membership) => ({
 		...membership.organization,
 		role: membership.role,
+		membershipId: membership.id,
 	}));
 	const { twilioAccount, ...organization } = organizations[0];
 	const phoneNumber = await db.phoneNumber.findUnique({

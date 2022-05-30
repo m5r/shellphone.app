@@ -4,5 +4,5 @@ export const { getSeo, getSeoMeta, getSeoLinks } = initSeo({
 	title: "",
 	titleTemplate: "%s | Shellphone",
 	description: "",
-	defaultTitle: "Shellphone",
+	defaultTitle: "Shellphone: Your Personal Cloud Phone",
 });

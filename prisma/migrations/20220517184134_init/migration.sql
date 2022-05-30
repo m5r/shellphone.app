@@ -157,6 +157,20 @@ CREATE TABLE "PhoneNumber" (
     CONSTRAINT "PhoneNumber_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "NotificationSubscription" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ NOT NULL,
+    "endpoint" TEXT NOT NULL,
+    "expirationTime" INTEGER,
+    "keys_p256dh" TEXT NOT NULL,
+    "keys_auth" TEXT NOT NULL,
+    "membershipId" TEXT NOT NULL,
+
+    CONSTRAINT "NotificationSubscription_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "TwilioAccount_organizationId_key" ON "TwilioAccount"("organizationId");
 
@@ -184,9 +198,11 @@ CREATE INDEX "PhoneCall_phoneNumberId_recipient_idx" ON "PhoneCall"("phoneNumber
 -- CreateIndex
 CREATE UNIQUE INDEX "PhoneNumber_organizationId_isCurrent_key" ON "PhoneNumber"("organizationId", "isCurrent") WHERE ("isCurrent" = true);
 
+-- CreateIndex
+CREATE UNIQUE INDEX "NotificationSubscription_endpoint_key" ON "NotificationSubscription"("endpoint");
+
 -- AddForeignKey
 ALTER TABLE "TwilioAccount" ADD CONSTRAINT "TwilioAccount_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
 
 -- AddForeignKey
 ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -214,3 +230,6 @@ ALTER TABLE "PhoneCall" ADD CONSTRAINT "PhoneCall_phoneNumberId_fkey" FOREIGN KE
 
 -- AddForeignKey
 ALTER TABLE "PhoneNumber" ADD CONSTRAINT "PhoneNumber_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "NotificationSubscription" ADD CONSTRAINT "NotificationSubscription_membershipId_fkey" FOREIGN KEY ("membershipId") REFERENCES "Membership"("id") ON DELETE CASCADE ON UPDATE CASCADE;
