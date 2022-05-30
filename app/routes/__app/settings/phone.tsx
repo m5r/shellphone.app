@@ -7,7 +7,7 @@ export const loader = settingsPhoneLoader;
 
 export const action = settingsPhoneAction;
 
-function PhoneSettings() {
+export default function PhoneSettings() {
 	return (
 		<div className="flex flex-col space-y-6">
 			<TwilioConnect />
@@ -15,5 +15,3 @@ function PhoneSettings() {
 		</div>
 	);
 }
-
-export default PhoneSettings;

@@ -3,6 +3,7 @@ node_modules
 /.cache
 /server/build
 /public/build
+/public/entry.worker.js
 /build
 server.js
 /app/styles/tailwind.css

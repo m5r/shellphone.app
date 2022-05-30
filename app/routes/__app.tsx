@@ -1,15 +1,31 @@
-import { type LoaderFunction, json } from "@remix-run/node";
+import { type LinksFunction, type LoaderFunction, json } from "@remix-run/node";
 import { Outlet, useCatch, useMatches } from "@remix-run/react";
 
+import serverConfig from "~/config/config.server";
 import { type SessionData, requireLoggedIn } from "~/utils/auth.server";
 import Footer from "~/features/core/components/footer";
+import footerStyles from "~/features/core/components/footer.css";
+import appStyles from "~/styles/app.css";
 
-export type AppLoaderData = SessionData;
+export const links: LinksFunction = () => [
+	{ rel: "stylesheet", href: appStyles },
+	{ rel: "stylesheet", href: footerStyles },
+];
+
+export type AppLoaderData = {
+	sessionData: SessionData;
+	config: { webPushPublicKey: string };
+};
 
 export const loader: LoaderFunction = async ({ request }) => {
 	const sessionData = await requireLoggedIn(request);
 
-	return json<AppLoaderData>(sessionData);
+	return json<AppLoaderData>({
+		sessionData,
+		config: {
+			webPushPublicKey: serverConfig.webPush.publicKey,
+		},
+	});
 };
 
 export default function __App() {
@@ -24,7 +40,7 @@ export default function __App() {
 						<Outlet />
 					</main>
 				</div>
-				{!hideFooter ? <Footer /> : null}
+				{hideFooter ? null : <Footer />}
 			</div>
 		</div>
 	);

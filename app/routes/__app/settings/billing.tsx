@@ -15,7 +15,7 @@ function useSubscription() {
 	};
 }
 
-function Billing() {
+export default function Billing() {
 	const { count: paymentsCount } = usePaymentsHistory();
 	const { subscription, cancelSubscription, updatePaymentMethod } = useSubscription();
 
@@ -64,5 +64,3 @@ const plansName: Record<number, string> = {
 	727544: "Yearly",
 	727540: "Monthly",
 };
-
-export default Billing;

@@ -1,0 +1,4 @@
+.footer-ios {
+	margin-bottom: var(--safe-area-bottom);
+	padding-bottom: var(--safe-area-bottom);
+}

@@ -28,6 +28,14 @@ invariant(
 	typeof process.env.MASTER_ENCRYPTION_KEY === "string",
 	`Please define the "MASTER_ENCRYPTION_KEY" environment variable`,
 );
+invariant(
+	typeof process.env.WEB_PUSH_VAPID_PRIVATE_KEY === "string",
+	`Please define the "WEB_PUSH_VAPID_PRIVATE_KEY" environment variable`,
+);
+invariant(
+	typeof process.env.WEB_PUSH_VAPID_PUBLIC_KEY === "string",
+	`Please define the "WEB_PUSH_VAPID_PUBLIC_KEY" environment variable`,
+);
 
 export default {
 	app: {
@@ -48,5 +56,9 @@ export default {
 	},
 	twilio: {
 		authToken: process.env.TWILIO_AUTH_TOKEN,
+	},
+	webPush: {
+		privateKey: process.env.WEB_PUSH_VAPID_PRIVATE_KEY,
+		publicKey: process.env.WEB_PUSH_VAPID_PUBLIC_KEY,
 	},
 };
