@@ -16,11 +16,6 @@ const action: ActionFunction = async ({ params, request }) => {
 	const formData = Object.fromEntries(await request.formData());
 	const twilioClient = getTwilioClient(twilioAccount);
 	try {
-		console.log({
-			body: formData.content.toString(),
-			to: recipient,
-			from: phoneNumber!.number,
-		});
 		const message = await twilioClient.messages.create({
 			body: formData.content.toString(),
 			to: recipient,

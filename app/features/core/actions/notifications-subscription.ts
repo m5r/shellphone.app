@@ -61,9 +61,10 @@ async function subscribe(request: Request) {
 		});
 	} catch (error: any) {
 		if (error.code !== "P2002") {
-			logger.error(error);
 			throw error;
 		}
+
+		logger.warn(`Duplicate insertion of subscription with endpoint=${subscription.endpoint}`);
 	}
 
 	return null;
@@ -80,7 +81,15 @@ async function unsubscribe(request: Request) {
 	}
 
 	const endpoint = validation.data.subscriptionEndpoint;
-	await db.notificationSubscription.delete({ where: { endpoint } });
+	try {
+		await db.notificationSubscription.delete({ where: { endpoint } });
+	} catch (error: any) {
+		if (error.code !== "P2025") {
+			throw error;
+		}
+
+		logger.warn(`Could not delete subscription with endpoint=${endpoint} because it has already been deleted`);
+	}
 
 	return null;
 }
