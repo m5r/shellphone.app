@@ -1,37 +1,24 @@
 import webpush, { type PushSubscription, WebPushError } from "web-push";
+import type { NotificationSubscription } from "@prisma/client";
 
 import serverConfig from "~/config/config.server";
 import db from "~/utils/db.server";
 import logger from "~/utils/logger.server";
 
 export type NotificationPayload = NotificationOptions & {
-	title: string;
-	body: string;
+	title: string; // max 50 characters
+	body: string; // max 150 characters
 };
 
-export async function notify(phoneNumberId: string, payload: NotificationPayload) {
+export async function notify(subscriptions: NotificationSubscription[], payload: NotificationPayload) {
 	webpush.setVapidDetails("mailto:mokht@rmi.al", serverConfig.webPush.publicKey, serverConfig.webPush.privateKey);
-
-	const phoneNumber = await db.phoneNumber.findUnique({
-		where: { id: phoneNumberId },
-		select: {
-			organization: {
-				select: {
-					memberships: {
-						select: { notificationSubscription: true },
-					},
-				},
-			},
-		},
+	const title = truncate(payload.title, 50);
+	const body = truncate(payload.body, 150);
+	const _payload = JSON.stringify({
+		...payload,
+		title,
+		body,
 	});
-	if (!phoneNumber) {
-		// TODO
-		return;
-	}
-
-	const subscriptions = phoneNumber.organization.memberships.flatMap(
-		(membership) => membership.notificationSubscription,
-	);
 
 	await Promise.all(
 		subscriptions.map(async (subscription) => {
@@ -44,7 +31,7 @@ export async function notify(phoneNumberId: string, payload: NotificationPayload
 			};
 
 			try {
-				await webpush.sendNotification(webPushSubscription, JSON.stringify(payload));
+				await webpush.sendNotification(webPushSubscription, _payload);
 			} catch (error: any) {
 				logger.error(error);
 				if (error instanceof WebPushError) {
@@ -54,4 +41,12 @@ export async function notify(phoneNumberId: string, payload: NotificationPayload
 			}
 		}),
 	);
+}
+
+function truncate(str: string, maxLength: number) {
+	if (str.length <= maxLength) {
+		return str;
+	}
+
+	return str.substring(0, maxLength - 1) + "\u2026";
 }
