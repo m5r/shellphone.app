@@ -2,12 +2,12 @@ import type { ActionFunction } from "@remix-run/node";
 import { ClientOnly } from "remix-utils";
 import { Form } from "@remix-run/react";
 
+import db from "~/utils/db.server";
 import { notify } from "~/utils/web-push.server";
 import Button from "~/features/settings/components/button";
 import NotificationsSettings, {
 	FallbackNotificationsSettings,
 } from "~/features/settings/components/settings/notifications-settings";
-import db from "~/utils/db.server";
 
 export const action: ActionFunction = async () => {
 	const phoneNumber = await db.phoneNumber.findUnique({
@@ -34,7 +34,7 @@ export const action: ActionFunction = async () => {
 				title: "Reply",
 			},
 		],
-		data: { recipient: "+33613370787" },
+		data: { recipient: "+33613370787", type: "message" },
 	});
 	return null;
 };
@@ -48,7 +48,7 @@ export default function Notifications() {
 			</div>
 
 			<section>
-				<Form method="post" action="/settings/notifications">
+				<Form method="post">
 					<Button variant="default" type="submit">
 						send it!!!
 					</Button>

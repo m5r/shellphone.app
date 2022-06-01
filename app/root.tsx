@@ -1,4 +1,4 @@
-import { type FunctionComponent, type PropsWithChildren } from "react";
+import type { FunctionComponent, PropsWithChildren } from "react";
 import type { LinksFunction } from "@remix-run/node";
 import { Link, Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useCatch } from "@remix-run/react";
 
