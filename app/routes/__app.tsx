@@ -4,6 +4,7 @@ import { Outlet, useCatch, useMatches } from "@remix-run/react";
 import serverConfig from "~/config/config.server";
 import { type SessionData, requireLoggedIn } from "~/utils/auth.server";
 import Footer from "~/features/core/components/footer";
+import ServiceWorkerUpdateNotifier from "~/features/core/components/service-worker-update-notifier";
 import useServiceWorkerRevalidate from "~/features/core/hooks/use-service-worker-revalidate";
 import footerStyles from "~/features/core/components/footer.css";
 import appStyles from "~/styles/app.css";
@@ -37,6 +38,7 @@ export default function __App() {
 	return (
 		<div className="h-full w-full overflow-hidden fixed bg-gray-100">
 			<div className="flex flex-col w-full h-full">
+				<ServiceWorkerUpdateNotifier />
 				<div className="flex flex-col flex-1 w-full overflow-y-auto">
 					<main className="flex flex-col flex-1 my-0 h-full">
 						<Outlet />
