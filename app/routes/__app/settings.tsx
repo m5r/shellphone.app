@@ -1,8 +1,7 @@
 import type { MetaFunction } from "@remix-run/node";
-import { Link, NavLink, Outlet, useNavigate } from "@remix-run/react";
+import { Link, NavLink, Outlet } from "@remix-run/react";
 import clsx from "clsx";
 import {
-	IoChevronBack,
 	IoLogOutOutline,
 	IoNotificationsOutline,
 	IoCardOutline,
@@ -27,18 +26,8 @@ export const meta: MetaFunction = () => ({
 });
 
 export default function SettingsLayout() {
-	const navigate = useNavigate();
-
 	return (
 		<section>
-			<header className="bg-gray-100 px-2 sm:px-6 lg:px-8">
-				<header className="flex">
-					<span className="flex items-center cursor-pointer" onClick={() => navigate(-1)}>
-						<IoChevronBack className="h-8 w-8 mr-2" /> Back
-					</span>
-				</header>
-			</header>
-
 			<main className="flex flex-col flex-grow mx-auto w-full max-w-7xl pb-10 lg:py-12 lg:px-8">
 				<div className="flex flex-col flex-grow lg:grid lg:grid-cols-12 lg:gap-x-5">
 					<aside className="py-6 px-2 sm:px-6 lg:py-0 lg:px-0 lg:col-span-3">
