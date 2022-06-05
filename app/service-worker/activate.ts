@@ -10,5 +10,5 @@ export default async function handleActivate(event: ExtendableEvent) {
 		await self.registration.navigationPreload.enable();
 	}
 
-	await deleteCaches();
+	await deleteCaches(); // TODO: maybe wait for the user to reload before busting the cache
 }

@@ -27,7 +27,7 @@ export function cacheAsset(event: FetchEvent): Promise<Response> {
 			ignoreSearch: true,
 		})
 		.then((cachedResponse) => {
-			console.debug(`Serving asset from ${cachedResponse ? "cache" : " network"}`, url.pathname);
+			console.debug(`Serving asset from ${cachedResponse ? "cache" : "network"}`, url.pathname);
 
 			const fetchPromise = event.preloadResponse
 				.then((preloadedResponse?: Response) => preloadedResponse || fetch(event.request.clone()))
@@ -253,7 +253,7 @@ export function cacheDocument(event: FetchEvent): Promise<Response> {
 }
 
 export async function deleteCaches() {
-	console.debug("Caches deleted");
 	const allCaches = await caches.keys();
 	await Promise.all(allCaches.map((cacheName) => caches.delete(cacheName)));
+	console.debug("Caches deleted");
 }
