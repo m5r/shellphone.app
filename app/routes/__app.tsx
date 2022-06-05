@@ -4,6 +4,7 @@ import { Outlet, useCatch, useMatches } from "@remix-run/react";
 import serverConfig from "~/config/config.server";
 import { type SessionData, requireLoggedIn } from "~/utils/auth.server";
 import Footer from "~/features/core/components/footer";
+import useServiceWorkerRevalidate from "~/features/core/hooks/use-service-worker-revalidate";
 import footerStyles from "~/features/core/components/footer.css";
 import appStyles from "~/styles/app.css";
 
@@ -29,6 +30,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export default function __App() {
+	useServiceWorkerRevalidate();
 	const matches = useMatches();
 	const hideFooter = matches.some((match) => match.handle?.hideFooter === true);
 

@@ -5,7 +5,7 @@ import {
 	isAssetRequest,
 	isDocumentGetRequest,
 	isLoaderRequest,
-} from "~/service-worker/cache-utils";
+} from "./cache-utils";
 
 declare let self: ServiceWorkerGlobalScope;
 
