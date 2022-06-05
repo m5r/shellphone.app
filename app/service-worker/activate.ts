@@ -1,3 +1,5 @@
+import { deleteCaches } from "./cache-utils";
+
 declare let self: ServiceWorkerGlobalScope;
 
 export default async function handleActivate(event: ExtendableEvent) {
@@ -7,4 +9,6 @@ export default async function handleActivate(event: ExtendableEvent) {
 		// @ts-ignore
 		await self.registration.navigationPreload.enable();
 	}
+
+	await deleteCaches();
 }
