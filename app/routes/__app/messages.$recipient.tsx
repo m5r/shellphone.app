@@ -1,5 +1,5 @@
 import type { MetaFunction } from "@remix-run/node";
-import { Link, useNavigate, useParams } from "@remix-run/react";
+import { Link, useParams } from "@remix-run/react";
 import { useLoaderData } from "superjson-remix";
 import { IoCall, IoChevronBack } from "react-icons/io5";
 
@@ -23,7 +23,6 @@ export const action = conversationAction;
 export const loader = conversationLoader;
 
 export default function ConversationPage() {
-	const navigate = useNavigate();
 	const params = useParams<{ recipient: string }>();
 	const recipient = decodeURIComponent(params.recipient ?? "");
 	const { conversation } = useLoaderData<ConversationLoaderData>();
@@ -31,9 +30,9 @@ export default function ConversationPage() {
 	return (
 		<section className="h-full">
 			<header className="absolute top-0 w-screen h-12 backdrop-filter backdrop-blur-sm bg-white bg-opacity-75 border-b items-center flex justify-between">
-				<span className="pl-2 cursor-pointer" onClick={() => navigate(-1)}>
+				<Link className="pl-2 cursor-pointer" to="/messages">
 					<IoChevronBack className="h-6 w-6" />
-				</span>
+				</Link>
 				<strong className="absolute right-0 left-0 text-center pointer-events-none">
 					{conversation?.formattedPhoneNumber ?? recipient}
 				</strong>
