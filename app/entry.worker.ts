@@ -5,6 +5,7 @@ import handleActivate from "./service-worker/activate";
 import handlePush from "./service-worker/push";
 import handleNotificationClick from "./service-worker/notification-click";
 import handleFetch from "./service-worker/fetch";
+import handleMessage from "./service-worker/message";
 
 declare let self: ServiceWorkerGlobalScope;
 
@@ -22,6 +23,10 @@ self.addEventListener("push", (event) => {
 
 self.addEventListener("notificationclick", (event) => {
 	event.waitUntil(handleNotificationClick(event));
+});
+
+self.addEventListener("message", (event) => {
+	event.waitUntil(handleMessage(event));
 });
 
 self.addEventListener("fetch", (event) => {
