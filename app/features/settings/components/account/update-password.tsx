@@ -47,6 +47,7 @@ const UpdatePassword: FunctionComponent = () => {
 					tabIndex={3}
 					error={actionData?.errors?.currentPassword}
 					disabled={isSubmitting}
+					autoComplete="current-password"
 				/>
 
 				<LabeledTextField
@@ -56,6 +57,7 @@ const UpdatePassword: FunctionComponent = () => {
 					tabIndex={4}
 					error={actionData?.errors?.newPassword}
 					disabled={isSubmitting}
+					autoComplete="new-password"
 				/>
 
 				<input type="hidden" name="_action" value="changePassword" />
