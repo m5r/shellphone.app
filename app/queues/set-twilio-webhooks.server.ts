@@ -1,9 +1,10 @@
-import type twilio from "twilio";
+import twilio from "twilio";
 import type { ApplicationInstance } from "twilio/lib/rest/api/v2010/account/application";
 
 import { Queue } from "~/utils/queue.server";
 import db from "~/utils/db.server";
-import getTwilioClient, { getTwiMLName, smsUrl, voiceUrl } from "~/utils/twilio.server";
+import { getTwiMLName, smsUrl, voiceUrl } from "~/utils/twilio.server";
+import { decrypt } from "~/utils/encryption";
 
 type Payload = {
 	phoneNumberId: string;
@@ -18,7 +19,7 @@ export default Queue<Payload>("set twilio webhooks", async ({ data }) => {
 			organization: {
 				select: {
 					twilioAccount: {
-						select: { accountSid: true, subAccountSid: true, twimlAppSid: true },
+						select: { accountSid: true, twimlAppSid: true, authToken: true },
 					},
 				},
 			},
@@ -29,7 +30,8 @@ export default Queue<Payload>("set twilio webhooks", async ({ data }) => {
 	}
 
 	const twilioAccount = phoneNumber.organization.twilioAccount;
-	const twilioClient = getTwilioClient(twilioAccount);
+	const authToken = decrypt(twilioAccount.authToken);
+	const twilioClient = twilio(twilioAccount.accountSid, authToken);
 	const twimlApp = await getTwimlApplication(twilioClient, twilioAccount.twimlAppSid);
 	const twimlAppSid = twimlApp.sid;
 

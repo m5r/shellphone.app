@@ -32,3 +32,16 @@ export function validate<Data, Schema = z.Schema<Data>["_type"]>(
 		errors,
 	};
 }
+
+type FormFailureData<Validations extends Record<string, z.Schema>, Action extends keyof Validations> = {
+	errors: FormError<Validations[Action]>;
+	submitted?: never;
+};
+type FormSuccessData = {
+	errors?: never;
+	submitted: true;
+};
+export type FormActionData<Validations extends Record<string, z.Schema>, Action extends keyof Validations> = Record<
+	Action,
+	FormSuccessData | FormFailureData<Validations, Action>
+>;

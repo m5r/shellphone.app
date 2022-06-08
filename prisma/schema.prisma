@@ -8,14 +8,13 @@ datasource db {
 }
 
 model TwilioAccount {
-  subAccountSid       String   @id
-  createdAt           DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt           DateTime @updatedAt @db.Timestamptz(6)
-  subAccountAuthToken String
-  accountSid          String
-  twimlAppSid         String?
-  apiKeySid           String?
-  apiKeySecret        String?
+  accountSid   String   @id
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(6)
+  authToken    String
+  twimlAppSid  String?
+  apiKeySid    String?
+  apiKeySecret String?
 
   organizationId String       @unique
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -157,8 +156,8 @@ model NotificationSubscription {
   keys_p256dh    String
   keys_auth      String
 
-  membership   Membership? @relation(fields: [membershipId], references: [id], onDelete: Cascade)
-  membershipId String?
+  membership   Membership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  membershipId String
 }
 
 enum SubscriptionStatus {

@@ -6,7 +6,7 @@ import { Direction } from "@prisma/client";
 
 import NewMessageArea from "./new-message-area";
 import { formatDate, formatTime } from "~/features/core/helpers/date-formatter";
-import { type ConversationLoaderData } from "~/routes/__app/messages.$recipient";
+import { type ConversationLoaderData } from "~/features/messages/loaders/messages.$recipient";
 import useSession from "~/features/core/hooks/use-session";
 
 export default function Conversation() {
@@ -24,6 +24,7 @@ export default function Conversation() {
 			phoneNumberId: phoneNumber!.id,
 			from: phoneNumber!.number,
 			to: recipient,
+			recipient,
 			sentAt: new Date(),
 			direction: Direction.Outbound,
 

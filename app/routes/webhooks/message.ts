@@ -57,7 +57,7 @@ export const action: ActionFunction = async ({ request }) => {
 			// if multiple organizations have the same number
 			// find the organization currently using that phone number
 			// maybe we shouldn't let that happen by restricting a phone number to one org?
-			const encryptedAuthToken = phoneNumber.organization.twilioAccount?.subAccountAuthToken;
+			const encryptedAuthToken = phoneNumber.organization.twilioAccount?.authToken;
 			const authToken = encryptedAuthToken ? decrypt(encryptedAuthToken) : "";
 			return twilio.validateRequest(authToken, twilioSignature, smsUrl, body);
 		});
