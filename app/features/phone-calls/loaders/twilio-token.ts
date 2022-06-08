@@ -10,7 +10,12 @@ import getTwilioClient from "~/utils/twilio.server";
 export type TwilioTokenLoaderData = string;
 
 const loader: LoaderFunction = async ({ request }) => {
-	const { user, organization, twilioAccount } = await requireLoggedIn(request);
+	const { user, organization, twilio } = await requireLoggedIn(request);
+	if (!twilio) {
+		throw new Error("unreachable");
+	}
+
+	const twilioAccount = await db.twilioAccount.findUnique({ where: { accountSid: twilio.accountSid } });
 	if (!twilioAccount || !twilioAccount.twimlAppSid) {
 		throw new Error("unreachable");
 	}
@@ -36,12 +41,12 @@ const loader: LoaderFunction = async ({ request }) => {
 		apiKeySid = apiKey.sid;
 		apiKeySecret = apiKey.secret;
 		await db.twilioAccount.update({
-			where: { subAccountSid: twilioAccount.subAccountSid },
+			where: { accountSid: twilioAccount.accountSid },
 			data: { apiKeySid: apiKey.sid, apiKeySecret: encrypt(apiKey.secret) },
 		});
 	}
 
-	const accessToken = new Twilio.jwt.AccessToken(twilioAccount.subAccountSid, apiKeySid, apiKeySecret, {
+	const accessToken = new Twilio.jwt.AccessToken(twilioAccount.accountSid, apiKeySid, apiKeySecret, {
 		identity: `${organization.id}__${user.id}`,
 		ttl: 3600,
 	});

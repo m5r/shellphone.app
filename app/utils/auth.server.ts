@@ -9,10 +9,7 @@ import authenticator from "./authenticator.server";
 import { AuthenticationError, NotFoundError } from "./errors";
 import { commitSession, destroySession, getSession } from "./session.server";
 
-type SessionTwilioAccount = Pick<
-	TwilioAccount,
-	"accountSid" | "subAccountSid" | "subAccountAuthToken" | "apiKeySid" | "apiKeySecret" | "twimlAppSid"
->;
+type SessionTwilioAccount = Pick<TwilioAccount, "accountSid" | "authToken">;
 type SessionOrganization = Pick<Organization, "id"> & { role: MembershipRole; membershipId: string };
 type SessionPhoneNumber = Pick<PhoneNumber, "id" | "number">;
 export type SessionUser = Pick<User, "id" | "role" | "email" | "fullName">;
@@ -20,7 +17,7 @@ export type SessionData = {
 	user: SessionUser;
 	organization: SessionOrganization;
 	phoneNumber: SessionPhoneNumber | null;
-	twilioAccount: SessionTwilioAccount | null;
+	twilio: SessionTwilioAccount | null;
 };
 
 const SP = new SecurePassword();
@@ -62,6 +59,7 @@ export async function login({ form }: FormStrategyVerifyParams): Promise<Session
 	try {
 		return await buildSessionData(user.id);
 	} catch (error: any) {
+		logger.error(error);
 		if (error instanceof AuthenticationError) {
 			throw error;
 		}
@@ -178,14 +176,7 @@ async function buildSessionData(id: string): Promise<SessionData> {
 						select: {
 							id: true,
 							twilioAccount: {
-								select: {
-									accountSid: true,
-									subAccountSid: true,
-									subAccountAuthToken: true,
-									apiKeySid: true,
-									apiKeySecret: true,
-									twimlAppSid: true,
-								},
+								select: { accountSid: true, authToken: true },
 							},
 						},
 					},
@@ -214,6 +205,6 @@ async function buildSessionData(id: string): Promise<SessionData> {
 		user: rest,
 		organization,
 		phoneNumber,
-		twilioAccount,
+		twilio: twilioAccount,
 	};
 }

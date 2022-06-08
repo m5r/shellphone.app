@@ -13,7 +13,7 @@ import deleteUserQueue from "~/queues/delete-user-data.server";
 const action: ActionFunction = async ({ request }) => {
 	const formData = Object.fromEntries(await request.formData());
 	if (!formData._action) {
-		const errorMessage = "POST /settings without any _action";
+		const errorMessage = "POST /settings/phone without any _action";
 		logger.error(errorMessage);
 		return badRequest({ errorMessage });
 	}
@@ -26,7 +26,7 @@ const action: ActionFunction = async ({ request }) => {
 		case "updateUser":
 			return updateUser(request, formData);
 		default:
-			const errorMessage = `POST /settings with an invalid _action=${formData._action}`;
+			const errorMessage = `POST /settings/phone with an invalid _action=${formData._action}`;
 			logger.error(errorMessage);
 			return badRequest({ errorMessage });
 	}

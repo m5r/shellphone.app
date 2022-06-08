@@ -1,4 +1,5 @@
-import { Form, useActionData, useCatch, useLoaderData, useTransition } from "@remix-run/react";
+import { Form, useActionData, useCatch, useFetcher, useLoaderData, useTransition } from "@remix-run/react";
+import { IoReloadOutline } from "react-icons/io5";
 
 import Button from "../button";
 import SettingsSection from "../settings-section";
@@ -6,11 +7,13 @@ import Alert from "~/features/core/components/alert";
 import useSession from "~/features/core/hooks/use-session";
 import type { PhoneSettingsLoaderData } from "~/features/settings/loaders/phone";
 import type { SetPhoneNumberActionData } from "~/features/settings/actions/phone";
+import clsx from "clsx";
 
 export default function PhoneNumberForm() {
+	const { twilio } = useSession();
+	const fetcher = useFetcher();
 	const transition = useTransition();
-	const actionData = useActionData<SetPhoneNumberActionData>();
-	const { twilioAccount } = useSession();
+	const actionData = useActionData<SetPhoneNumberActionData>()?.setPhoneNumber;
 	const availablePhoneNumbers = useLoaderData<PhoneSettingsLoaderData>().phoneNumbers;
 
 	const isSubmitting = transition.state === "submitting";
@@ -19,54 +22,72 @@ export default function PhoneNumberForm() {
 	const topErrorMessage = errors?.general ?? errors?.phoneNumberSid;
 	const isError = typeof topErrorMessage !== "undefined";
 	const currentPhoneNumber = availablePhoneNumbers.find((phoneNumber) => phoneNumber.isCurrent === true);
-	const hasFilledTwilioCredentials = twilioAccount !== null;
+	const hasFilledTwilioCredentials = twilio !== null;
 
 	if (!hasFilledTwilioCredentials) {
 		return null;
 	}
 
 	return (
-		<Form method="post" className="flex flex-col gap-6">
-			<SettingsSection
-				className="relative"
-				footer={
-					<div className="px-4 py-3 bg-gray-50 text-right text-sm font-medium sm:px-6">
-						<Button variant="default" type="submit" isDisabled={isSubmitting}>
-							Save
-						</Button>
-					</div>
-				}
+		<section className="relative">
+			<button
+				className={clsx("absolute top-2 right-2 z-10", { "animate-spin": fetcher.submission })}
+				onClick={() => fetcher.submit({ _action: "refreshPhoneNumbers" }, { method: "post" })}
+				disabled={!!fetcher.submission}
+				title="Refresh the list of phone numbers from Twilio"
+				aria-label="Refresh the list of phone numbers from Twilio"
 			>
-				{isError ? (
-					<div className="mb-8">
-						<Alert title="Oops, there was an issue" message={topErrorMessage} variant="error" />
-					</div>
-				) : null}
+				<IoReloadOutline className="w-5 h-5 text-primary-700" aria-hidden="true" />
+			</button>
 
-				{isSuccess ? (
-					<div className="mb-8">
-						<Alert title="Saved successfully" message="Your changes have been saved." variant="success" />
-					</div>
-				) : null}
-
-				<label htmlFor="phoneNumberSid" className="block text-sm font-medium text-gray-700">
-					Phone number
-				</label>
-				<select
-					id="phoneNumberSid"
-					name="phoneNumberSid"
-					className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
-					defaultValue={currentPhoneNumber?.id}
+			<Form method="post" className="flex flex-col gap-6">
+				<SettingsSection
+					className="relative"
+					footer={
+						<div className="px-4 py-3 bg-gray-50 text-right text-sm font-medium sm:px-6">
+							<Button variant="default" type="submit" isDisabled={isSubmitting}>
+								Save
+							</Button>
+						</div>
+					}
 				>
-					<option value="none" />
-					{availablePhoneNumbers.map(({ id, number }) => (
-						<option value={id} key={id}>
-							{number}
-						</option>
-					))}
-				</select>
-			</SettingsSection>
-		</Form>
+					{isError ? (
+						<div className="mb-8">
+							<Alert title="Oops, there was an issue" message={topErrorMessage} variant="error" />
+						</div>
+					) : null}
+
+					{isSuccess ? (
+						<div className="mb-8">
+							<Alert
+								title="Saved successfully"
+								message="Your changes have been saved."
+								variant="success"
+							/>
+						</div>
+					) : null}
+
+					<label htmlFor="phoneNumberSid" className="block text-sm font-medium text-gray-700">
+						Phone number
+					</label>
+					<select
+						id="phoneNumberSid"
+						name="phoneNumberSid"
+						className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md"
+						defaultValue={currentPhoneNumber?.id}
+					>
+						<option value="none" />
+						{availablePhoneNumbers.map(({ id, number }) => (
+							<option value={id} key={id}>
+								{number}
+							</option>
+						))}
+					</select>
+
+					<input type="hidden" name="_action" value="setPhoneNumber" />
+				</SettingsSection>
+			</Form>
+		</section>
 	);
 }
 

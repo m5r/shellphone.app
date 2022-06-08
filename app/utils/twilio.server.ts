@@ -4,20 +4,17 @@ import type { CallInstance } from "twilio/lib/rest/api/v2010/account/call";
 import { type TwilioAccount, CallStatus, Direction, MessageStatus } from "@prisma/client";
 
 import serverConfig from "~/config/config.server";
+import { decrypt } from "~/utils/encryption";
 
 export default function getTwilioClient({
 	accountSid,
-	subAccountSid,
-	subAccountAuthToken,
-}: Pick<TwilioAccount, "accountSid" | "subAccountSid"> &
-	Partial<Pick<TwilioAccount, "subAccountAuthToken">>): twilio.Twilio {
-	if (!subAccountSid || !accountSid) {
+	authToken,
+}: Pick<TwilioAccount, "accountSid" | "authToken">): twilio.Twilio {
+	if (!accountSid || !authToken) {
 		throw new Error("unreachable");
 	}
 
-	return twilio(subAccountSid, serverConfig.twilio.authToken, {
-		accountSid,
-	});
+	return twilio(accountSid, decrypt(authToken));
 }
 
 export const smsUrl = `https://${serverConfig.app.baseUrl}/webhook/message`;

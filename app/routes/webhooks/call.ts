@@ -51,7 +51,7 @@ export const action: ActionFunction = async ({ request }) => {
 				return new Response(null, { status: 402 });
 			}
 
-			const encryptedAuthToken = phoneNumber?.organization.twilioAccount?.subAccountAuthToken;
+			const encryptedAuthToken = phoneNumber?.organization.twilioAccount?.authToken;
 			const authToken = encryptedAuthToken ? decrypt(encryptedAuthToken) : "";
 			if (
 				!phoneNumber ||

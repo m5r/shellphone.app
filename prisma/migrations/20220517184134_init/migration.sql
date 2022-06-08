@@ -21,17 +21,16 @@ CREATE TYPE "CallStatus" AS ENUM ('Queued', 'Ringing', 'InProgress', 'Completed'
 
 -- CreateTable
 CREATE TABLE "TwilioAccount" (
-    "subAccountSid" TEXT NOT NULL,
+    "accountSid" TEXT NOT NULL,
     "createdAt" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(6) NOT NULL,
-    "subAccountAuthToken" TEXT NOT NULL,
-    "accountSid" TEXT NOT NULL,
+    "authToken" TEXT NOT NULL,
     "twimlAppSid" TEXT,
     "apiKeySid" TEXT,
     "apiKeySecret" TEXT,
     "organizationId" TEXT NOT NULL,
 
-    CONSTRAINT "TwilioAccount_pkey" PRIMARY KEY ("subAccountSid")
+    CONSTRAINT "TwilioAccount_pkey" PRIMARY KEY ("accountSid")
 );
 
 -- CreateTable

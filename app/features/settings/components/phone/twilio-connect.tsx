@@ -1,38 +1,82 @@
 import { useState } from "react";
+import { Form, useActionData, useLoaderData, useTransition } from "@remix-run/react";
 import { IoHelpCircle } from "react-icons/io5";
 
+import type { PhoneSettingsLoaderData } from "~/features/settings/loaders/phone";
+import type { SetTwilioCredentialsActionData } from "~/features/settings/actions/phone";
 import HelpModal from "./help-modal";
 import SettingsSection from "../settings-section";
 import useSession from "~/features/core/hooks/use-session";
+import Alert from "~/features/core/components/alert";
+import LabeledTextField from "~/features/core/components/labeled-text-field";
+import Button from "~/features/settings/components/button";
 
 export default function TwilioConnect() {
-	const { twilioAccount } = useSession();
+	const { twilio } = useSession();
 	const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+	const transition = useTransition();
+	const actionData = useActionData<SetTwilioCredentialsActionData>()?.setTwilioCredentials;
+	const { accountSid, authToken } = useLoaderData<PhoneSettingsLoaderData>();
+
+	const topErrorMessage = actionData?.errors?.general;
+	const isError = typeof topErrorMessage !== "undefined";
+	const isCurrentFormTransition = transition.submission?.formData.get("_action") === "changePassword";
+	const isSubmitting = isCurrentFormTransition && transition.state === "submitting";
 
 	return (
 		<>
-			<SettingsSection className="flex flex-col relative">
-				<section>
+			<Form method="post">
+				<SettingsSection
+					className="flex flex-col relative"
+					footer={
+						<div className="px-4 py-3 bg-gray-50 text-right text-sm font-medium sm:px-6">
+							<Button tabIndex={3} variant="default" type="submit" isDisabled={isSubmitting}>
+								Save
+							</Button>
+						</div>
+					}
+				>
 					<button onClick={() => setIsHelpModalOpen(true)} className="absolute top-2 right-2">
 						<IoHelpCircle className="w-6 h-6 text-primary-700" />
 					</button>
 					<article className="mb-6">
-						Shellphone needs to connect to your Twilio account to securely use your phone numbers.
+						Shellphone needs some informations about your Twilio account to securely use your phone numbers.
 					</article>
 
-					{twilioAccount === null ? (
-						<a
-							href="https://www.twilio.com/authorize/CN01675d385a9ee79e6aa58adf54abe3b3"
-							rel="noopener noreferrer"
-							className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 bg-primary-600 hover:bg-primary-700 focus:ring-primary-500"
-						>
-							Connect Twilio account
-						</a>
-					) : (
+					{twilio !== null ? (
 						<p className="text-green-700">✓ Your Twilio account is connected to Shellphone.</p>
-					)}
-				</section>
-			</SettingsSection>
+					) : null}
+
+					{isError ? (
+						<div className="mb-8">
+							<Alert title="Oops, there was an issue" message={topErrorMessage} variant="error" />
+						</div>
+					) : null}
+
+					<LabeledTextField
+						name="twilioAccountSid"
+						label="Account SID"
+						type="text"
+						tabIndex={1}
+						error={actionData?.errors?.twilioAccountSid}
+						disabled={isSubmitting}
+						defaultValue={accountSid}
+					/>
+
+					<LabeledTextField
+						name="twilioAuthToken"
+						label="Auth Token"
+						type="password"
+						tabIndex={2}
+						error={actionData?.errors?.twilioAuthToken}
+						disabled={isSubmitting}
+						autoComplete="off"
+						defaultValue={authToken}
+					/>
+
+					<input type="hidden" name="_action" value="setTwilioCredentials" />
+				</SettingsSection>
+			</Form>
 
 			<HelpModal closeModal={() => setIsHelpModalOpen(false)} isHelpModalOpen={isHelpModalOpen} />
 		</>
