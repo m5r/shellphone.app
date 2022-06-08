@@ -1,4 +1,7 @@
-.footer-ios {
-	margin-bottom: var(--safe-area-bottom);
-	padding-bottom: var(--safe-area-bottom);
+@supports (-webkit-touch-callout: none) {
+	/* CSS specific to iOS devices */
+	.footer-ios {
+		margin-bottom: var(--safe-area-bottom);
+		padding-bottom: var(--safe-area-bottom);
+	}
 }

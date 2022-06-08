@@ -54,94 +54,6 @@ export function cacheAsset(event: FetchEvent): Promise<Response> {
 const lastTimeRevalidated: Record<string, number> = {};
 
 export function cacheLoaderData(event: FetchEvent): Promise<Response> {
-	/*if (searchParams.get("_refresh") === "groot") {
-		console.debug("Serving refreshed data from network", url.pathname + url.search);
-		return event.preloadResponse
-			.then((preloadedResponse?: Response) => preloadedResponse || fetch(event.request.clone()))
-			.then((response) =>
-				caches
-					.open(DATA_CACHE)
-					.then((cache) => cache.put(event.request, response.clone()))
-					.then(() =>
-						response
-							.clone()
-							.json()
-							.then(({ json }) => console.debug("ddd", json?.phoneCalls?.[0]?.recipient)),
-					)
-					.then(() => {
-						console.debug("returned latest", Date.now());
-						return response;
-					}),
-			)
-			.catch(() => {
-				console.debug("Serving data from network failed, falling back to cache", url.pathname + url.search);
-				return caches.match(url).then((response) => {
-					if (!response) {
-						return json(
-							{ message: "Network Error" },
-							{
-								status: 500,
-								headers: { "X-Remix-Catch": "yes", "X-Remix-Worker": "yes" },
-							},
-						);
-					}
-
-					response.headers.set("X-Remix-Worker", "yes");
-					return response;
-				});
-			});
-	}*/
-
-	/*return caches.match(event.request, { cacheName: DATA_CACHE }).then((cachedResponse) => {
-		console.debug(`Serving data from ${cachedResponse ? "cache" : "network"}`, url.pathname + url.search);
-		cachedResponse?.headers.set("X-Remix-Worker", "yes");
-
-		const fetchPromise = event.preloadResponse
-			.then((preloadedResponse?: Response) => preloadedResponse || fetch(event.request.clone()))
-			.then((response) =>
-				caches.open(DATA_CACHE).then((cache) => {
-					response.text().then(rrr => console.log(response.ok, url.pathname + url.search, rrr));
-					if (!response.ok) {
-						return json(
-							{ message: "Network Error" },
-							{
-								status: 500,
-								headers: { "X-Remix-Catch": "yes", "X-Remix-Worker": "yes" },
-							},
-						);
-					}
-
-					cache.put(event.request, response.clone());
-					const timestamp = lastTimeResponded[url.pathname + url.search];
-					console.log("timestamp - Date.now()", Date.now() - timestamp);
-
-					/!*if (timestamp && (Date.now() - timestamp > 10 * 1000)) {
-						console.debug("update UI with latest", Date.now());
-						// we already returned the cached response
-						// we need to update the UI with the latest data
-						const message = {
-							type: "revalidateLoaderData",
-							// href: url.pathname + "?_refresh=groot",
-						};
-						const channel = new BroadcastChannel("sw-messages");
-						channel.postMessage(JSON.stringify(message));
-					}*!/
-
-					return response;
-				}),
-			);
-
-		if (cachedResponse) {
-			console.debug("returned cached", Date.now());
-			lastTimeResponded[url.pathname + url.search] = Date.now();
-		}
-		return fetchPromise.then(response => {
-			console.debug("returned networked", Date.now());
-			lastTimeResponded[url.pathname + url.search] = Date.now();
-			return response;
-		})
-	});*/
-
 	const url = new URL(event.request.url);
 	const path = url.pathname + url.search;
 
@@ -158,8 +70,11 @@ export function cacheLoaderData(event: FetchEvent): Promise<Response> {
 			return cachedResponse;
 		}
 
+		const request = cachedResponse
+			? new Request(event.request.clone(), { cache: "reload" })
+			: event.request.clone();
 		const fetchPromise = event.preloadResponse
-			.then((preloadedResponse?: Response) => preloadedResponse || fetch(event.request.clone()))
+			.then((preloadedResponse?: Response) => preloadedResponse || fetch(request))
 			.then((response) =>
 				caches.open(DATA_CACHE).then((cache) => {
 					if (!response.ok) {
@@ -180,14 +95,15 @@ export function cacheLoaderData(event: FetchEvent): Promise<Response> {
 							return;
 						}
 
+						// otherwise, cache the new response
+						await cache.put(event.request, clonedResponse.clone());
+
 						if (await areResponsesEqual(cached.clone(), clonedResponse.clone())) {
 							// if what we have in the cache is up-to-date, we don't have to do anything
 							console.debug("Responses are the same, no need to revalidate", path);
+							lastTimeRevalidated[path] = Date.now();
 							return;
 						}
-
-						// otherwise, cache the new response
-						await cache.put(event.request, clonedResponse.clone());
 
 						if (cachedResponse) {
 							// and if we had returned a cached response
