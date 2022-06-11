@@ -15,7 +15,7 @@ export const action: ActionFunction = async ({ request }) => {
 		return badRequest("Invalid header X-Twilio-Signature");
 	}
 
-	const body: Body = await request.json();
+	const body: Body = Object.fromEntries(await request.formData()) as any;
 	try {
 		const phoneNumbers = await db.phoneNumber.findMany({
 			where: { number: body.To },
@@ -53,10 +53,13 @@ export const action: ActionFunction = async ({ request }) => {
 		if (phoneNumbersWithActiveSub.length === 0) {
 			// accept the webhook but don't store incoming message
 			// because the organization is on the free plan
-			return html("<Response></Response>");
+			console.log("no active subscription"); // TODO: uncomment the line below -- beware: refresh phone numbers refetch those missed messages lol
+			// return html("<Response></Response>");
 		}
 
-		const phoneNumber = phoneNumbersWithActiveSub.find((phoneNumber) => {
+		const phoneNumber = phoneNumbers.find((phoneNumber) => {
+			// TODO: uncomment the line below
+			// const phoneNumber = phoneNumbersWithActiveSub.find((phoneNumber) => {
 			// if multiple organizations have the same number
 			// find the organization currently using that phone number
 			// maybe we shouldn't let that happen by restricting a phone number to one org?
