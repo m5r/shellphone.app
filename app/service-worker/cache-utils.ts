@@ -17,6 +17,10 @@ export function isDocumentGetRequest(request: Request) {
 	return request.method.toLowerCase() === "get" && request.mode === "navigate";
 }
 
+export function isMutationRequest(request: Request) {
+	return ["POST", "DELETE"].includes(request.method);
+}
+
 export function fetchAsset(event: FetchEvent): Promise<Response> {
 	// stale-while-revalidate
 	const url = new URL(event.request.url);
@@ -172,5 +176,30 @@ export async function deleteCaches() {
 	const allCaches = await caches.keys();
 	const cachesToDelete = allCaches.filter((cacheName) => cacheName !== ASSET_CACHE);
 	await Promise.all(cachesToDelete.map((cacheName) => caches.delete(cacheName)));
-	console.debug("Caches deleted");
+	console.debug("Old caches deleted");
+}
+
+export async function purgeMutatedLoaders(event: FetchEvent) {
+	const url = new URL(event.request.url);
+	const rootPathname = "/" + url.pathname.split("/")[1];
+	const cache = await caches.open(DATA_CACHE);
+	const cachedLoaders = await cache.keys();
+
+	const loadersToDelete = cachedLoaders.filter((loader) => {
+		const cachedPathname = new URL(loader.url).pathname;
+		const shouldPurge = cachedPathname.startsWith(rootPathname);
+
+		if (url.pathname === "/settings/phone") {
+			// changes phone number or twilio account credentials
+			// so purge messages and phone calls from cache
+			return (
+				shouldPurge ||
+				["/messages", "/calls", "/keypad"].some((pathname) => cachedPathname.startsWith(pathname))
+			);
+		}
+
+		return shouldPurge;
+	});
+	await Promise.all(loadersToDelete.map((loader) => cache.delete(loader)));
+	console.debug("Purged loaders data starting with", rootPathname);
 }

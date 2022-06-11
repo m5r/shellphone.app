@@ -24,11 +24,16 @@ const loader: LoaderFunction = async ({ request }) => {
 			where: { phoneNumberId: phoneNumber.id },
 			orderBy: { createdAt: Prisma.SortOrder.desc },
 		}));
-	return json<KeypadLoaderData>({
-		hasOngoingSubscription,
-		hasPhoneNumber,
-		lastRecipientCalled: lastCall?.recipient,
-	});
+	return json<KeypadLoaderData>(
+		{
+			hasOngoingSubscription,
+			hasPhoneNumber,
+			lastRecipientCalled: lastCall?.recipient,
+		},
+		{
+			headers: { Vary: "Cookie" },
+		},
+	);
 };
 
 export default loader;

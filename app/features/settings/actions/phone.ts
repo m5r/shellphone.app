@@ -23,7 +23,6 @@ const action: ActionFunction = async ({ request }) => {
 		return badRequest({ errorMessage });
 	}
 
-	console.log("formData._action", formData._action);
 	switch (formData._action as Action) {
 		case "setPhoneNumber":
 			return setPhoneNumber(request, formData);
@@ -128,9 +127,6 @@ async function setTwilioCredentials(request: Request, formData: unknown) {
 	};
 	const [phoneNumbers] = await Promise.all([
 		twilioClient.incomingPhoneNumbers.list(),
-		setTwilioApiKeyQueue.add(`set twilio api key for accountSid=${twilioAccountSid}`, {
-			accountSid: twilioAccountSid,
-		}),
 		db.twilioAccount.upsert({
 			where: { organizationId: organization.id },
 			create: {
@@ -143,6 +139,9 @@ async function setTwilioCredentials(request: Request, formData: unknown) {
 		}),
 	]);
 
+	setTwilioApiKeyQueue.add(`set twilio api key for accountSid=${twilioAccountSid}`, {
+		accountSid: twilioAccountSid,
+	});
 	await Promise.all(
 		phoneNumbers.map(async (phoneNumber) => {
 			const phoneNumberId = phoneNumber.sid;

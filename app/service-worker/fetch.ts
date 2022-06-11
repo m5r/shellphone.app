@@ -5,6 +5,8 @@ import {
 	isAssetRequest,
 	isDocumentGetRequest,
 	isLoaderRequest,
+	isMutationRequest,
+	purgeMutatedLoaders,
 } from "./cache-utils";
 
 declare const self: ServiceWorkerGlobalScope;
@@ -20,6 +22,10 @@ export default async function handleFetch(event: FetchEvent) {
 
 	if (isDocumentGetRequest(event.request)) {
 		return fetchDocument(event);
+	}
+
+	if (isMutationRequest(event.request)) {
+		await purgeMutatedLoaders(event);
 	}
 
 	return fetch(event.request);

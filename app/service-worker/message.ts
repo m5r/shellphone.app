@@ -51,9 +51,5 @@ async function purgeStaticAssets(assetsToCache: string[]) {
 	const assetCache = await caches.open(ASSET_CACHE);
 	const cachedAssets = await assetCache.keys();
 	const cachesToDelete = cachedAssets.filter((asset) => !assetsToCache.includes(new URL(asset.url).pathname));
-	console.log(
-		"cachesToDelete",
-		cachesToDelete.map((c) => new URL(c.url).pathname),
-	);
 	await Promise.all(cachesToDelete.map((asset) => assetCache.delete(asset)));
 }
