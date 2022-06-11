@@ -53,7 +53,6 @@ export default function ServiceWorkerUpdateNotifier() {
 					aria-label="An updated version of the app is available. Reload to get the latest version."
 				/>
 			</button>
-			;
 		</div>
 	);
 }
