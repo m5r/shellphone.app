@@ -20,21 +20,24 @@ export const action: ActionFunction = async ({ request }) => {
 		const phoneNumbers = await db.phoneNumber.findMany({
 			where: { number: body.To },
 			include: {
-				organization: {
+				twilioAccount: {
 					include: {
-						subscriptions: {
-							where: {
-								OR: [
-									{ status: { not: SubscriptionStatus.deleted } },
-									{
-										status: SubscriptionStatus.deleted,
-										cancellationEffectiveDate: { gt: new Date() },
+						organization: {
+							select: {
+								subscriptions: {
+									where: {
+										OR: [
+											{ status: { not: SubscriptionStatus.deleted } },
+											{
+												status: SubscriptionStatus.deleted,
+												cancellationEffectiveDate: { gt: new Date() },
+											},
+										],
 									},
-								],
+									orderBy: { lastEventTime: Prisma.SortOrder.desc },
+								},
 							},
-							orderBy: { lastEventTime: Prisma.SortOrder.desc },
 						},
-						twilioAccount: true,
 					},
 				},
 			},
@@ -45,7 +48,7 @@ export const action: ActionFunction = async ({ request }) => {
 		}
 
 		const phoneNumbersWithActiveSub = phoneNumbers.filter(
-			(phoneNumber) => phoneNumber.organization.subscriptions.length > 0,
+			(phoneNumber) => phoneNumber.twilioAccount.organization.subscriptions.length > 0,
 		);
 		if (phoneNumbersWithActiveSub.length === 0) {
 			// accept the webhook but don't store incoming message
@@ -57,7 +60,7 @@ export const action: ActionFunction = async ({ request }) => {
 			// if multiple organizations have the same number
 			// find the organization currently using that phone number
 			// maybe we shouldn't let that happen by restricting a phone number to one org?
-			const encryptedAuthToken = phoneNumber.organization.twilioAccount?.authToken;
+			const encryptedAuthToken = phoneNumber.twilioAccount.authToken;
 			const authToken = encryptedAuthToken ? decrypt(encryptedAuthToken) : "";
 			return twilio.validateRequest(authToken, twilioSignature, smsUrl, body);
 		});

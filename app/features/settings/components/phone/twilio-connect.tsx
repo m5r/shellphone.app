@@ -20,7 +20,7 @@ export default function TwilioConnect() {
 
 	const topErrorMessage = actionData?.errors?.general;
 	const isError = typeof topErrorMessage !== "undefined";
-	const isCurrentFormTransition = transition.submission?.formData.get("_action") === "changePassword";
+	const isCurrentFormTransition = transition.submission?.formData.get("_action") === "setTwilioCredentials";
 	const isSubmitting = isCurrentFormTransition && transition.state === "submitting";
 
 	return (

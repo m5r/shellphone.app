@@ -151,7 +151,7 @@ CREATE TABLE "PhoneNumber" (
     "isCurrent" BOOLEAN NOT NULL,
     "isFetchingMessages" BOOLEAN,
     "isFetchingCalls" BOOLEAN,
-    "organizationId" TEXT NOT NULL,
+    "twilioAccountSid" TEXT NOT NULL,
 
     CONSTRAINT "PhoneNumber_pkey" PRIMARY KEY ("id")
 );
@@ -195,7 +195,7 @@ CREATE INDEX "Message_phoneNumberId_recipient_idx" ON "Message"("phoneNumberId",
 CREATE INDEX "PhoneCall_phoneNumberId_recipient_idx" ON "PhoneCall"("phoneNumberId", "recipient");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "PhoneNumber_organizationId_isCurrent_key" ON "PhoneNumber"("organizationId", "isCurrent") WHERE ("isCurrent" = true);
+CREATE UNIQUE INDEX "PhoneNumber_twilioAccountSid_isCurrent_key" ON "PhoneNumber"("twilioAccountSid", "isCurrent") WHERE ("isCurrent" = true);
 
 -- CreateIndex
 CREATE UNIQUE INDEX "NotificationSubscription_endpoint_key" ON "NotificationSubscription"("endpoint");
@@ -228,7 +228,7 @@ ALTER TABLE "Message" ADD CONSTRAINT "Message_phoneNumberId_fkey" FOREIGN KEY ("
 ALTER TABLE "PhoneCall" ADD CONSTRAINT "PhoneCall_phoneNumberId_fkey" FOREIGN KEY ("phoneNumberId") REFERENCES "PhoneNumber"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PhoneNumber" ADD CONSTRAINT "PhoneNumber_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "PhoneNumber" ADD CONSTRAINT "PhoneNumber_twilioAccountSid_fkey" FOREIGN KEY ("twilioAccountSid") REFERENCES "TwilioAccount"("accountSid") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "NotificationSubscription" ADD CONSTRAINT "NotificationSubscription_membershipId_fkey" FOREIGN KEY ("membershipId") REFERENCES "Membership"("id") ON DELETE CASCADE ON UPDATE CASCADE;

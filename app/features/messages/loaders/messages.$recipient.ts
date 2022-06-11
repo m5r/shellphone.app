@@ -5,6 +5,7 @@ import { type Message, Prisma } from "@prisma/client";
 
 import db from "~/utils/db.server";
 import { requireLoggedIn } from "~/utils/auth.server";
+import { redirect } from "@remix-run/node";
 
 type ConversationType = {
 	recipient: string;
@@ -17,16 +18,20 @@ export type ConversationLoaderData = {
 };
 
 const loader: LoaderFunction = async ({ request, params }) => {
-	const { organization } = await requireLoggedIn(request);
+	const { twilio } = await requireLoggedIn(request);
+	if (!twilio) {
+		return redirect("/messages");
+	}
+
+	const twilioAccountSid = twilio.accountSid;
 	const recipient = decodeURIComponent(params.recipient ?? "");
 	const conversation = await getConversation(recipient);
 
 	return json<ConversationLoaderData>({ conversation });
 
 	async function getConversation(recipient: string): Promise<ConversationType> {
-		const organizationId = organization.id;
 		const phoneNumber = await db.phoneNumber.findUnique({
-			where: { organizationId_isCurrent: { organizationId, isCurrent: true } },
+			where: { twilioAccountSid_isCurrent: { twilioAccountSid, isCurrent: true } },
 		});
 		if (!phoneNumber || phoneNumber.isFetchingMessages) {
 			throw new Error("unreachable");

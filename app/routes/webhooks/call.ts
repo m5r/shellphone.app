@@ -22,36 +22,45 @@ export const action: ActionFunction = async ({ request }) => {
 		const organizationId = body.From.slice("client:".length).split("__")[0];
 
 		try {
+			const twilioAccount = await db.twilioAccount.findUnique({ where: { organizationId } });
+			if (!twilioAccount) {
+				// this shouldn't be happening
+				return new Response(null, { status: 402 });
+			}
+
 			const phoneNumber = await db.phoneNumber.findUnique({
-				where: { organizationId_isCurrent: { organizationId, isCurrent: true } },
+				where: { twilioAccountSid_isCurrent: { twilioAccountSid: twilioAccount.accountSid, isCurrent: true } },
 				include: {
-					organization: {
+					twilioAccount: {
 						include: {
-							subscriptions: {
-								where: {
-									OR: [
-										{ status: { not: SubscriptionStatus.deleted } },
-										{
-											status: SubscriptionStatus.deleted,
-											cancellationEffectiveDate: { gt: new Date() },
+							organization: {
+								select: {
+									subscriptions: {
+										where: {
+											OR: [
+												{ status: { not: SubscriptionStatus.deleted } },
+												{
+													status: SubscriptionStatus.deleted,
+													cancellationEffectiveDate: { gt: new Date() },
+												},
+											],
 										},
-									],
+										orderBy: { lastEventTime: Prisma.SortOrder.desc },
+									},
 								},
-								orderBy: { lastEventTime: Prisma.SortOrder.desc },
 							},
-							twilioAccount: true,
 						},
 					},
 				},
 			});
 
-			if (phoneNumber?.organization.subscriptions.length === 0) {
+			if (phoneNumber?.twilioAccount.organization.subscriptions.length === 0) {
 				// decline the outgoing call because
 				// the organization is on the free plan
 				return new Response(null, { status: 402 });
 			}
 
-			const encryptedAuthToken = phoneNumber?.organization.twilioAccount?.authToken;
+			const encryptedAuthToken = phoneNumber?.twilioAccount.authToken;
 			const authToken = encryptedAuthToken ? decrypt(encryptedAuthToken) : "";
 			if (
 				!phoneNumber ||

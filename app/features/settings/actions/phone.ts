@@ -41,7 +41,15 @@ const action: ActionFunction = async ({ request }) => {
 export type SetPhoneNumberActionData = FormActionData<typeof validations, "setPhoneNumber">;
 
 async function setPhoneNumber(request: Request, formData: unknown) {
-	const { organization } = await requireLoggedIn(request);
+	const { organization, twilio } = await requireLoggedIn(request);
+	if (!twilio) {
+		return badRequest<SetPhoneNumberActionData>({
+			setPhoneNumber: {
+				errors: { general: "Connect your Twilio account first" },
+			},
+		});
+	}
+
 	const validation = validate(validations.setPhoneNumber, formData);
 	if (validation.errors) {
 		return badRequest<SetPhoneNumberActionData>({ setPhoneNumber: { errors: validation.errors } });
@@ -49,7 +57,7 @@ async function setPhoneNumber(request: Request, formData: unknown) {
 
 	try {
 		await db.phoneNumber.update({
-			where: { organizationId_isCurrent: { organizationId: organization.id, isCurrent: true } },
+			where: { twilioAccountSid_isCurrent: { twilioAccountSid: twilio.accountSid, isCurrent: true } },
 			data: { isCurrent: false },
 		});
 	} catch (error: any) {
@@ -150,7 +158,7 @@ async function setTwilioCredentials(request: Request, formData: unknown) {
 				await db.phoneNumber.create({
 					data: {
 						id: phoneNumberId,
-						organizationId: organization.id,
+						twilioAccountSid,
 						number: phoneNumber.phoneNumber,
 						isCurrent: false,
 						isFetchingCalls: true,
@@ -187,7 +195,7 @@ async function setTwilioCredentials(request: Request, formData: unknown) {
 }
 
 async function refreshPhoneNumbers(request: Request) {
-	const { organization, twilio } = await requireLoggedIn(request);
+	const { twilio } = await requireLoggedIn(request);
 	if (!twilio) {
 		throw new Error("unreachable");
 	}
@@ -205,28 +213,28 @@ async function refreshPhoneNumbers(request: Request) {
 				await db.phoneNumber.create({
 					data: {
 						id: phoneNumberId,
-						organizationId: organization.id,
+						twilioAccountSid: twilioAccount.accountSid,
 						number: phoneNumber.phoneNumber,
 						isCurrent: false,
 						isFetchingCalls: true,
 						isFetchingMessages: true,
 					},
 				});
-
-				await Promise.all([
-					fetchPhoneCallsQueue.add(`fetch calls of id=${phoneNumberId}`, {
-						phoneNumberId,
-					}),
-					fetchMessagesQueue.add(`fetch messages of id=${phoneNumberId}`, {
-						phoneNumberId,
-					}),
-				]);
 			} catch (error: any) {
 				if (error.code !== "P2002") {
 					// if it's not a duplicate, it's a real error we need to handle
 					throw error;
 				}
 			}
+
+			await Promise.all([
+				fetchPhoneCallsQueue.add(`fetch calls of id=${phoneNumberId}`, {
+					phoneNumberId,
+				}),
+				fetchMessagesQueue.add(`fetch messages of id=${phoneNumberId}`, {
+					phoneNumberId,
+				}),
+			]);
 		}),
 	);
 

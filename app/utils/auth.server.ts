@@ -199,7 +199,7 @@ async function buildSessionData(id: string): Promise<SessionData> {
 	}));
 	const { twilioAccount, ...organization } = organizations[0];
 	const phoneNumber = await db.phoneNumber.findUnique({
-		where: { organizationId_isCurrent: { organizationId: organization.id, isCurrent: true } },
+		where: { twilioAccountSid_isCurrent: { twilioAccountSid: twilioAccount?.accountSid ?? "", isCurrent: true } },
 	});
 	return {
 		user: rest,
