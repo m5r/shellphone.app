@@ -19,12 +19,10 @@ type Conversation = {
 };
 
 const loader: LoaderFunction = async ({ request }) => {
-	const sessionData = await requireLoggedIn(request);
-	const phoneNumber =
-		sessionData.phoneNumber &&
-		(await db.phoneNumber.findUnique({
-			where: { id: sessionData.phoneNumber.id },
-		}));
+	const { twilio } = await requireLoggedIn(request);
+	const phoneNumber = await db.phoneNumber.findUnique({
+		where: { twilioAccountSid_isCurrent: { twilioAccountSid: twilio?.accountSid ?? "", isCurrent: true } },
+	});
 	return json<MessagesLoaderData>({
 		hasPhoneNumber: Boolean(phoneNumber),
 		isFetchingMessages: phoneNumber?.isFetchingMessages ?? null,

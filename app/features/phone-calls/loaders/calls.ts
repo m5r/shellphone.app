@@ -26,20 +26,12 @@ export type PhoneCallsLoaderData = {
 );
 
 const loader: LoaderFunction = async ({ request }) => {
-	const sessionData = await requireLoggedIn(request);
-	const hasOngoingSubscription = true; // TODO
-	const hasPhoneNumber = Boolean(sessionData.phoneNumber);
-	if (!sessionData.phoneNumber) {
-		return json<PhoneCallsLoaderData>({
-			hasOngoingSubscription,
-			hasPhoneNumber: false,
-			isFetchingCalls: false,
-		});
-	}
-
+	const { twilio } = await requireLoggedIn(request);
 	const phoneNumber = await db.phoneNumber.findUnique({
-		where: { id: sessionData.phoneNumber.id },
+		where: { twilioAccountSid_isCurrent: { twilioAccountSid: twilio?.accountSid ?? "", isCurrent: true } },
 	});
+	const hasPhoneNumber = Boolean(phoneNumber);
+	const hasOngoingSubscription = true; // TODO
 	if (!phoneNumber || phoneNumber.isFetchingCalls) {
 		return json<PhoneCallsLoaderData>({
 			hasOngoingSubscription,

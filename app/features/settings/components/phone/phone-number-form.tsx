@@ -10,7 +10,7 @@ import type { SetPhoneNumberActionData } from "~/features/settings/actions/phone
 import clsx from "clsx";
 
 export default function PhoneNumberForm() {
-	const { twilio, phoneNumber } = useSession();
+	const { twilio } = useSession();
 	const fetcher = useFetcher();
 	const transition = useTransition();
 	const actionData = useActionData<SetPhoneNumberActionData>()?.setPhoneNumber;

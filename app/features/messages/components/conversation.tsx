@@ -7,13 +7,11 @@ import { Direction } from "@prisma/client";
 import NewMessageArea from "./new-message-area";
 import { formatDate, formatTime } from "~/features/core/helpers/date-formatter";
 import { type ConversationLoaderData } from "~/features/messages/loaders/messages.$recipient";
-import useSession from "~/features/core/hooks/use-session";
 
 export default function Conversation() {
-	const { phoneNumber } = useSession();
 	const params = useParams<{ recipient: string }>();
 	const recipient = decodeURIComponent(params.recipient ?? "");
-	const { conversation } = useLoaderData<ConversationLoaderData>();
+	const { conversation, currentPhoneNumber } = useLoaderData<ConversationLoaderData>();
 	const transition = useTransition();
 	const messagesListRef = useRef<HTMLUListElement>(null);
 
@@ -21,8 +19,8 @@ export default function Conversation() {
 	if (transition.submission) {
 		messages.push({
 			id: "temp",
-			phoneNumberId: phoneNumber!.id,
-			from: phoneNumber!.number,
+			phoneNumberId: currentPhoneNumber!.id,
+			from: currentPhoneNumber!.number,
 			to: recipient,
 			recipient,
 			sentAt: new Date(),
