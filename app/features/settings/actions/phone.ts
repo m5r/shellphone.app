@@ -75,16 +75,8 @@ async function setPhoneNumber(request: Request, formData: unknown) {
 		phoneNumberId: validation.data.phoneNumberSid,
 		organizationId: organization.id,
 	});
-	const { session } = await refreshSessionData(request);
 
-	return json<SetPhoneNumberActionData>(
-		{ setPhoneNumber: { submitted: true } },
-		{
-			headers: {
-				"Set-Cookie": await commitSession(session),
-			},
-		},
-	);
+	return json<SetPhoneNumberActionData>({ setPhoneNumber: { submitted: true } });
 }
 
 export type SetTwilioCredentialsActionData = FormActionData<typeof validations, "setTwilioCredentials">;

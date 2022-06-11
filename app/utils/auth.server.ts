@@ -1,7 +1,7 @@
 import { redirect, type Session } from "@remix-run/node";
 import type { FormStrategyVerifyParams } from "remix-auth-form";
 import SecurePassword from "secure-password";
-import type { MembershipRole, Organization, PhoneNumber, TwilioAccount, User } from "@prisma/client";
+import type { MembershipRole, Organization, TwilioAccount, User } from "@prisma/client";
 
 import db from "./db.server";
 import logger from "./logger.server";
@@ -11,12 +11,10 @@ import { commitSession, destroySession, getSession } from "./session.server";
 
 type SessionTwilioAccount = Pick<TwilioAccount, "accountSid" | "authToken">;
 type SessionOrganization = Pick<Organization, "id"> & { role: MembershipRole; membershipId: string };
-type SessionPhoneNumber = Pick<PhoneNumber, "id" | "number">;
 export type SessionUser = Pick<User, "id" | "role" | "email" | "fullName">;
 export type SessionData = {
 	user: SessionUser;
 	organization: SessionOrganization;
-	phoneNumber: SessionPhoneNumber | null;
 	twilio: SessionTwilioAccount | null;
 };
 
@@ -198,13 +196,9 @@ async function buildSessionData(id: string): Promise<SessionData> {
 		membershipId: membership.id,
 	}));
 	const { twilioAccount, ...organization } = organizations[0];
-	const phoneNumber = await db.phoneNumber.findUnique({
-		where: { twilioAccountSid_isCurrent: { twilioAccountSid: twilioAccount?.accountSid ?? "", isCurrent: true } },
-	});
 	return {
 		user: rest,
 		organization,
-		phoneNumber,
 		twilio: twilioAccount,
 	};
 }

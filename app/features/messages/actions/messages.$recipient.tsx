@@ -8,12 +8,17 @@ import getTwilioClient, { translateMessageDirection, translateMessageStatus } fr
 export type NewMessageActionData = {};
 
 const action: ActionFunction = async ({ params, request }) => {
-	const { phoneNumber, twilio } = await requireLoggedIn(request);
+	const { twilio } = await requireLoggedIn(request);
 	if (!twilio) {
 		throw new Error("unreachable");
 	}
-	const twilioAccount = await db.twilioAccount.findUnique({ where: { accountSid: twilio.accountSid } });
-	if (!twilioAccount) {
+	const [phoneNumber, twilioAccount] = await Promise.all([
+		db.phoneNumber.findUnique({
+			where: { twilioAccountSid_isCurrent: { twilioAccountSid: twilio.accountSid ?? "", isCurrent: true } },
+		}),
+		db.twilioAccount.findUnique({ where: { accountSid: twilio.accountSid } }),
+	]);
+	if (!phoneNumber || !twilioAccount) {
 		throw new Error("unreachable");
 	}
 
@@ -24,11 +29,11 @@ const action: ActionFunction = async ({ params, request }) => {
 		const message = await twilioClient.messages.create({
 			body: formData.content.toString(),
 			to: recipient,
-			from: phoneNumber!.number,
+			from: phoneNumber.number,
 		});
 		await db.message.create({
 			data: {
-				phoneNumberId: phoneNumber!.id,
+				phoneNumberId: phoneNumber.id,
 				id: message.sid,
 				to: message.to,
 				recipient: message.to,

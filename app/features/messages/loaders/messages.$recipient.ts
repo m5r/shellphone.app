@@ -1,7 +1,7 @@
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "superjson-remix";
 import { parsePhoneNumber } from "awesome-phonenumber";
-import { type Message, Prisma } from "@prisma/client";
+import { type Message, type PhoneNumber, Prisma } from "@prisma/client";
 
 import db from "~/utils/db.server";
 import { requireLoggedIn } from "~/utils/auth.server";
@@ -15,6 +15,7 @@ type ConversationType = {
 
 export type ConversationLoaderData = {
 	conversation: ConversationType;
+	currentPhoneNumber: Pick<PhoneNumber, "id" | "number">;
 };
 
 const loader: LoaderFunction = async ({ request, params }) => {
@@ -24,10 +25,26 @@ const loader: LoaderFunction = async ({ request, params }) => {
 	}
 
 	const twilioAccountSid = twilio.accountSid;
+	const currentPhoneNumber = await db.phoneNumber.findUnique({
+		where: {
+			twilioAccountSid_isCurrent: {
+				twilioAccountSid,
+				isCurrent: true,
+			},
+		},
+		select: {
+			id: true,
+			number: true,
+		},
+	});
+	if (!currentPhoneNumber) {
+		return redirect("/messages");
+	}
+
 	const recipient = decodeURIComponent(params.recipient ?? "");
 	const conversation = await getConversation(recipient);
 
-	return json<ConversationLoaderData>({ conversation });
+	return json<ConversationLoaderData>({ conversation, currentPhoneNumber });
 
 	async function getConversation(recipient: string): Promise<ConversationType> {
 		const phoneNumber = await db.phoneNumber.findUnique({

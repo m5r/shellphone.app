@@ -12,7 +12,10 @@ export type KeypadLoaderData = {
 };
 
 const loader: LoaderFunction = async ({ request }) => {
-	const { phoneNumber } = await requireLoggedIn(request);
+	const { twilio } = await requireLoggedIn(request);
+	const phoneNumber = await db.phoneNumber.findUnique({
+		where: { twilioAccountSid_isCurrent: { twilioAccountSid: twilio?.accountSid ?? "", isCurrent: true } },
+	});
 	const hasOngoingSubscription = true; // TODO
 	const hasPhoneNumber = Boolean(phoneNumber);
 	const lastCall =
