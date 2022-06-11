@@ -1,26 +1,26 @@
 import { useEffect, useState } from "react";
-import { type TwilioError, Call, Device } from "@twilio/voice-sdk";
 import { useFetcher } from "@remix-run/react";
+import { type TwilioError, Call, Device } from "@twilio/voice-sdk";
+import { useAtom, atom } from "jotai";
 
 import type { TwilioTokenLoaderData } from "~/features/phone-calls/loaders/twilio-token";
 
 export default function useDevice() {
 	const jwt = useDeviceToken();
-	const [device, setDevice] = useState<Device | null>(null);
-	const [isDeviceReady, setIsDeviceReady] = useState(() => device?.state === Device.State.Registered);
+	const [device, setDevice] = useAtom(deviceAtom);
+	const [isDeviceReady, setIsDeviceReady] = useState(device?.state === Device.State.Registered);
 
 	useEffect(() => {
+		// init token
 		jwt.refresh();
 	}, []);
 
 	useEffect(() => {
-		if (jwt.token && device?.state === Device.State.Registered && device?.token !== jwt.token) {
-			device.updateToken(jwt.token);
+		// init device
+		if (!jwt.token) {
+			return;
 		}
-	}, [jwt.token, device]);
-
-	useEffect(() => {
-		if (!jwt.token || device?.state === Device.State.Registered) {
+		if (device && device.state !== Device.State.Unregistered) {
 			return;
 		}
 
@@ -30,9 +30,16 @@ export default function useDevice() {
 				[Device.SoundName.Disconnect]: undefined, // TODO
 			},
 		});
-		newDevice.register(); // TODO throwing an error
+		newDevice.register();
 		setDevice(newDevice);
-	}, [device?.state, jwt.token, setDevice]);
+	}, [device, jwt.token]);
+
+	useEffect(() => {
+		// refresh token
+		if (jwt.token && device?.state === Device.State.Registered && device?.token !== jwt.token) {
+			device.updateToken(jwt.token);
+		}
+	}, [device, jwt.token]);
 
 	useEffect(() => {
 		if (!device) {
@@ -99,6 +106,8 @@ export default function useDevice() {
 		}
 	}
 }
+
+const deviceAtom = atom<Device | null>(null);
 
 function useDeviceToken() {
 	const fetcher = useFetcher<TwilioTokenLoaderData>();

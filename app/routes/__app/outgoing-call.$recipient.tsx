@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import type { MetaFunction } from "@remix-run/node";
 import { useParams } from "@remix-run/react";
 import { IoCall } from "react-icons/io5";
@@ -37,6 +37,12 @@ export default function OutgoingCallPage() {
 		}),
 		[call, pressDigit],
 	);
+
+	useEffect(() => {
+		if (isDeviceReady) {
+			call.makeCall();
+		}
+	}, [call, isDeviceReady]);
 
 	return (
 		<div className="w-96 h-full flex flex-col justify-around py-5 mx-auto text-center text-black bg-white">

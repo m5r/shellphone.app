@@ -4,6 +4,10 @@ import { IoDownloadOutline } from "react-icons/io5";
 export default function ServiceWorkerUpdateNotifier() {
 	const [hasUpdate, setHasUpdate] = useState(false);
 	useEffect(() => {
+		if (!("serviceWorker" in navigator)) {
+			return;
+		}
+
 		(async () => {
 			const registration = await navigator.serviceWorker.getRegistration();
 			if (!registration) {

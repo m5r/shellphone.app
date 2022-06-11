@@ -15,14 +15,14 @@ export const action: ActionFunction = async ({ request }) => {
 		return badRequest("Invalid header X-Twilio-Signature");
 	}
 
-	const body: Body = await request.json();
+	const body: Body = Object.fromEntries(await request.formData()) as any;
 	const isOutgoingCall = body.From.startsWith("client:");
 	if (isOutgoingCall) {
 		const recipient = body.To;
-		const organizationId = body.From.slice("client:".length).split("__")[0];
+		const accountSid = body.From.slice("client:".length).split("__")[0];
 
 		try {
-			const twilioAccount = await db.twilioAccount.findUnique({ where: { organizationId } });
+			const twilioAccount = await db.twilioAccount.findUnique({ where: { accountSid } });
 			if (!twilioAccount) {
 				// this shouldn't be happening
 				return new Response(null, { status: 402 });
@@ -57,7 +57,8 @@ export const action: ActionFunction = async ({ request }) => {
 			if (phoneNumber?.twilioAccount.organization.subscriptions.length === 0) {
 				// decline the outgoing call because
 				// the organization is on the free plan
-				return new Response(null, { status: 402 });
+				console.log("no active subscription"); // TODO: uncomment the line below
+				// return new Response(null, { status: 402 });
 			}
 
 			const encryptedAuthToken = phoneNumber?.twilioAccount.authToken;

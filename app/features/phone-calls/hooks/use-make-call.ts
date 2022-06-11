@@ -32,6 +32,7 @@ export default function useMakeCall({ recipient, onHangUp }: Params) {
 
 	const makeCall = useCallback(
 		async function makeCall() {
+			console.log({ device, isDeviceReady });
 			if (!device || !isDeviceReady) {
 				console.warn("device is not ready yet, can't make the call");
 				return;
