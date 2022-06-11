@@ -1,6 +1,6 @@
 import { deleteCaches } from "./cache-utils";
 
-declare let self: ServiceWorkerGlobalScope;
+declare const self: ServiceWorkerGlobalScope;
 
 export default async function handleActivate(event: ExtendableEvent) {
 	console.debug("Service worker activated");

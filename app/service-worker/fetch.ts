@@ -1,25 +1,25 @@
 import {
-	cacheAsset,
-	cacheDocument,
-	cacheLoaderData,
+	fetchAsset,
+	fetchDocument,
+	fetchLoaderData,
 	isAssetRequest,
 	isDocumentGetRequest,
 	isLoaderRequest,
 } from "./cache-utils";
 
-declare let self: ServiceWorkerGlobalScope;
+declare const self: ServiceWorkerGlobalScope;
 
 export default async function handleFetch(event: FetchEvent) {
 	if (isAssetRequest(event.request)) {
-		return cacheAsset(event);
+		return fetchAsset(event);
 	}
 
 	if (isLoaderRequest(event.request)) {
-		return cacheLoaderData(event);
+		return fetchLoaderData(event);
 	}
 
 	if (isDocumentGetRequest(event.request)) {
-		return cacheDocument(event);
+		return fetchDocument(event);
 	}
 
 	return fetch(event.request);

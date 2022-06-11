@@ -1,6 +1,6 @@
 import { removeBadge } from "~/utils/pwa.client";
 
-declare let self: ServiceWorkerGlobalScope;
+declare const self: ServiceWorkerGlobalScope;
 
 // noinspection TypeScriptUnresolvedVariable
 export default async function handleNotificationClick(event: NotificationEvent) {

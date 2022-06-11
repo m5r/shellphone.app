@@ -1,8 +1,8 @@
 import { json } from "@remix-run/server-runtime";
 
-export const ASSET_CACHE = "asset-cache";
-export const DATA_CACHE = "data-cache";
-export const DOCUMENT_CACHE = "document-cache";
+declare const ASSET_CACHE: string;
+declare const DATA_CACHE: string;
+declare const DOCUMENT_CACHE: string;
 
 export function isAssetRequest(request: Request) {
 	return ["font", "image", "script", "style"].includes(request.destination);
@@ -17,7 +17,7 @@ export function isDocumentGetRequest(request: Request) {
 	return request.method.toLowerCase() === "get" && request.mode === "navigate";
 }
 
-export function cacheAsset(event: FetchEvent): Promise<Response> {
+export function fetchAsset(event: FetchEvent): Promise<Response> {
 	// stale-while-revalidate
 	const url = new URL(event.request.url);
 	return caches
@@ -53,7 +53,7 @@ export function cacheAsset(event: FetchEvent): Promise<Response> {
 // stores the timestamp for when each URL's cached response has been revalidated
 const lastTimeRevalidated: Record<string, number> = {};
 
-export function cacheLoaderData(event: FetchEvent): Promise<Response> {
+export function fetchLoaderData(event: FetchEvent): Promise<Response> {
 	const url = new URL(event.request.url);
 	const path = url.pathname + url.search;
 
@@ -145,7 +145,7 @@ async function areResponsesEqual(a: Response, b: Response): Promise<boolean> {
 	return true;
 }
 
-export function cacheDocument(event: FetchEvent): Promise<Response> {
+export function fetchDocument(event: FetchEvent): Promise<Response> {
 	// network-first
 	const url = new URL(event.request.url);
 	console.debug("Serving document from network", url.pathname);
@@ -170,6 +170,7 @@ export function cacheDocument(event: FetchEvent): Promise<Response> {
 
 export async function deleteCaches() {
 	const allCaches = await caches.keys();
-	await Promise.all(allCaches.map((cacheName) => caches.delete(cacheName)));
+	const cachesToDelete = allCaches.filter((cacheName) => cacheName !== ASSET_CACHE);
+	await Promise.all(cachesToDelete.map((cacheName) => caches.delete(cacheName)));
 	console.debug("Caches deleted");
 }

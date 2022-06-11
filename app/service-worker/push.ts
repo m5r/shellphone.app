@@ -1,7 +1,7 @@
 import type { NotificationPayload } from "~/utils/web-push.server";
 import { addBadge } from "~/utils/pwa.client";
 
-declare let self: ServiceWorkerGlobalScope;
+declare const self: ServiceWorkerGlobalScope;
 
 const defaultOptions: NotificationOptions = {
 	icon: "/icons/android-chrome-192x192.png",

@@ -7,7 +7,7 @@ import handleNotificationClick from "./service-worker/notification-click";
 import handleFetch from "./service-worker/fetch";
 import handleMessage from "./service-worker/message";
 
-declare let self: ServiceWorkerGlobalScope;
+declare const self: ServiceWorkerGlobalScope;
 
 self.addEventListener("install", (event) => {
 	event.waitUntil(handleInstall(event).then(() => self.skipWaiting()));
