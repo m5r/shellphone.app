@@ -13,16 +13,20 @@ export const action: ActionFunction = async () => {
 	const phoneNumber = await db.phoneNumber.findUnique({
 		where: { id: "PN4f11f0c4155dfb5d5ac8bbab2cc23cbc" },
 		select: {
-			organization: {
-				select: {
-					memberships: {
-						select: { notificationSubscription: true },
+			twilioAccount: {
+				include: {
+					organization: {
+						select: {
+							memberships: {
+								select: { notificationSubscription: true },
+							},
+						},
 					},
 				},
 			},
 		},
 	});
-	const subscriptions = phoneNumber!.organization.memberships.flatMap(
+	const subscriptions = phoneNumber!.twilioAccount.organization.memberships.flatMap(
 		(membership) => membership.notificationSubscription,
 	);
 	await notify(subscriptions, {

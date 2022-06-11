@@ -8,16 +8,16 @@ datasource db {
 }
 
 model TwilioAccount {
-  accountSid   String   @id
-  createdAt    DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt    DateTime @updatedAt @db.Timestamptz(6)
-  authToken    String
-  twimlAppSid  String?
-  apiKeySid    String?
-  apiKeySecret String?
-
-  organizationId String       @unique
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  accountSid     String        @id
+  createdAt      DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime      @updatedAt @db.Timestamptz(6)
+  authToken      String
+  twimlAppSid    String?
+  apiKeySid      String?
+  apiKeySecret   String?
+  organizationId String        @unique
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  phoneNumbers   PhoneNumber[]
 }
 
 model Organization {
@@ -27,7 +27,6 @@ model Organization {
 
   twilioAccount TwilioAccount?
   memberships   Membership[]
-  phoneNumbers  PhoneNumber[]
   subscriptions Subscription[] // many subscriptions to keep a history
 }
 
@@ -133,18 +132,18 @@ model PhoneCall {
 }
 
 model PhoneNumber {
-  id                 String       @id
-  createdAt          DateTime     @default(now()) @db.Timestamptz(6)
+  id                 String        @id
+  createdAt          DateTime      @default(now()) @db.Timestamptz(6)
   number             String
   isCurrent          Boolean
   isFetchingMessages Boolean?
   isFetchingCalls    Boolean?
-  organizationId     String
-  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  twilioAccountSid   String
+  twilioAccount      TwilioAccount @relation(fields: [twilioAccountSid], references: [accountSid], onDelete: Cascade)
   messages           Message[]
   phoneCalls         PhoneCall[]
 
-  @@unique([organizationId, isCurrent])
+  @@unique([twilioAccountSid, isCurrent])
 }
 
 model NotificationSubscription {

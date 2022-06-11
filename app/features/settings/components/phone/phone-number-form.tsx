@@ -10,13 +10,16 @@ import type { SetPhoneNumberActionData } from "~/features/settings/actions/phone
 import clsx from "clsx";
 
 export default function PhoneNumberForm() {
-	const { twilio } = useSession();
+	const { twilio, phoneNumber } = useSession();
 	const fetcher = useFetcher();
 	const transition = useTransition();
 	const actionData = useActionData<SetPhoneNumberActionData>()?.setPhoneNumber;
 	const availablePhoneNumbers = useLoaderData<PhoneSettingsLoaderData>().phoneNumbers;
 
-	const isSubmitting = transition.state === "submitting";
+	const actionSubmitted = transition.submission?.formData.get("_action");
+	const isCurrentFormTransition =
+		!!actionSubmitted && ["setPhoneNumber", "refreshPhoneNumbers"].includes(actionSubmitted.toString());
+	const isSubmitting = isCurrentFormTransition && transition.state === "submitting";
 	const isSuccess = actionData?.submitted === true;
 	const errors = actionData?.errors;
 	const topErrorMessage = errors?.general ?? errors?.phoneNumberSid;

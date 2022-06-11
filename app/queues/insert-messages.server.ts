@@ -13,10 +13,7 @@ type Payload = {
 
 export default Queue<Payload>("insert messages", async ({ data }) => {
 	const { messages, phoneNumberId } = data;
-	const phoneNumber = await db.phoneNumber.findUnique({
-		where: { id: phoneNumberId },
-		include: { organization: true },
-	});
+	const phoneNumber = await db.phoneNumber.findUnique({ where: { id: phoneNumberId } });
 	if (!phoneNumber) {
 		return;
 	}

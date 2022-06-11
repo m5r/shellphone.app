@@ -20,7 +20,7 @@ const loader: LoaderFunction = async ({ request }) => {
 	}
 
 	const phoneNumbers = await db.phoneNumber.findMany({
-		where: { organizationId: organization.id },
+		where: { twilioAccount: { organizationId: organization.id } },
 		select: { id: true, number: true, isCurrent: true },
 		orderBy: { id: Prisma.SortOrder.desc },
 	});

@@ -14,22 +14,18 @@ type Payload = {
 export default Queue<Payload>("set twilio webhooks", async ({ data }) => {
 	const { phoneNumberId, organizationId } = data;
 	const phoneNumber = await db.phoneNumber.findFirst({
-		where: { id: phoneNumberId, organizationId },
+		where: { id: phoneNumberId, twilioAccount: { organizationId } },
 		include: {
-			organization: {
-				select: {
-					twilioAccount: {
-						select: { accountSid: true, twimlAppSid: true, authToken: true },
-					},
-				},
+			twilioAccount: {
+				select: { accountSid: true, twimlAppSid: true, authToken: true },
 			},
 		},
 	});
-	if (!phoneNumber || !phoneNumber.organization.twilioAccount) {
+	if (!phoneNumber) {
 		return;
 	}
 
-	const twilioAccount = phoneNumber.organization.twilioAccount;
+	const twilioAccount = phoneNumber.twilioAccount;
 	const authToken = decrypt(twilioAccount.authToken);
 	const twilioClient = twilio(twilioAccount.accountSid, authToken);
 	const twimlApp = await getTwimlApplication(twilioClient, twilioAccount.twimlAppSid);
