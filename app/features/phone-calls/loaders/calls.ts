@@ -44,15 +44,20 @@ const loader: LoaderFunction = async ({ request }) => {
 		where: { phoneNumberId: phoneNumber.id },
 		orderBy: { createdAt: Prisma.SortOrder.desc },
 	});
-	return json<PhoneCallsLoaderData>({
-		hasOngoingSubscription,
-		hasPhoneNumber,
-		phoneCalls: phoneCalls.map((phoneCall) => ({
-			...phoneCall,
-			fromMeta: getPhoneNumberMeta(phoneCall.from),
-			toMeta: getPhoneNumberMeta(phoneCall.to),
-		})),
-	});
+	return json<PhoneCallsLoaderData>(
+		{
+			hasOngoingSubscription,
+			hasPhoneNumber,
+			phoneCalls: phoneCalls.map((phoneCall) => ({
+				...phoneCall,
+				fromMeta: getPhoneNumberMeta(phoneCall.from),
+				toMeta: getPhoneNumberMeta(phoneCall.to),
+			})),
+		},
+		{
+			headers: { Vary: "Cookie" },
+		},
+	);
 };
 
 export default loader;

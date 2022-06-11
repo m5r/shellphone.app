@@ -23,11 +23,16 @@ const loader: LoaderFunction = async ({ request }) => {
 	const phoneNumber = await db.phoneNumber.findUnique({
 		where: { twilioAccountSid_isCurrent: { twilioAccountSid: twilio?.accountSid ?? "", isCurrent: true } },
 	});
-	return json<MessagesLoaderData>({
-		hasPhoneNumber: Boolean(phoneNumber),
-		isFetchingMessages: phoneNumber?.isFetchingMessages ?? null,
-		conversations: await getConversations(phoneNumber),
-	});
+	return json<MessagesLoaderData>(
+		{
+			hasPhoneNumber: Boolean(phoneNumber),
+			isFetchingMessages: phoneNumber?.isFetchingMessages ?? null,
+			conversations: await getConversations(phoneNumber),
+		},
+		{
+			headers: { Vary: "Cookie" },
+		},
+	);
 };
 
 export default loader;
