@@ -59,6 +59,10 @@ const lastTimeRevalidated: Record<string, number> = {};
 
 export function fetchLoaderData(event: FetchEvent): Promise<Response> {
 	const url = new URL(event.request.url);
+	if (url.pathname === "/outgoing-call/twilio-token") {
+		return fetch(event.request);
+	}
+
 	const path = url.pathname + url.search;
 
 	return caches.match(event.request, { cacheName: DATA_CACHE }).then((cachedResponse) => {

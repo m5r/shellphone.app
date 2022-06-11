@@ -17,9 +17,9 @@ export default function getTwilioClient({
 	return twilio(accountSid, decrypt(authToken));
 }
 
-export const smsUrl = `https://${serverConfig.app.baseUrl}/webhook/message`;
+export const smsUrl = `${serverConfig.app.baseUrl}/webhook/message`;
 
-export const voiceUrl = `https://${serverConfig.app.baseUrl}/webhook/call`;
+export const voiceUrl = `${serverConfig.app.baseUrl}/webhook/call`;
 
 export function getTwiMLName() {
 	switch (serverConfig.app.baseUrl) {
