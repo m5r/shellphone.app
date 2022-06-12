@@ -12,8 +12,17 @@ const defaultOptions: NotificationOptions = {
 };
 
 export default async function handlePush(event: PushEvent) {
-	const { title, ...payload }: NotificationPayload = event.data!.json();
+	const payload: NotificationPayload = event.data!.json();
 	const options = Object.assign({}, defaultOptions, payload);
-	await self.registration.showNotification(title, options);
-	await addBadge(1);
+
+	const clients = await self.clients.matchAll({ type: "window" });
+	const hasOpenTab = clients.some((client) => client.focused === true);
+	if (hasOpenTab) {
+		const channel = new BroadcastChannel("notifications");
+		channel.postMessage(JSON.stringify(payload));
+		channel.close();
+	} else {
+		await self.registration.showNotification(payload.title, options);
+		await addBadge(1);
+	}
 }

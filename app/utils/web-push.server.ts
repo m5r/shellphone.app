@@ -1,13 +1,20 @@
 import webpush, { type PushSubscription, WebPushError } from "web-push";
-import type { NotificationSubscription } from "@prisma/client";
+import type { MessageInstance } from "twilio/lib/rest/api/v2010/account/message";
+import { parsePhoneNumber } from "awesome-phonenumber";
+import { type NotificationSubscription, Direction } from "@prisma/client";
 
 import serverConfig from "~/config/config.server";
 import db from "~/utils/db.server";
 import logger from "~/utils/logger.server";
+import { translateMessageDirection } from "~/utils/twilio.server";
 
-export type NotificationPayload = NotificationOptions & {
+export type NotificationPayload = Omit<NotificationOptions, "data"> & {
 	title: string; // max 50 characters
 	body: string; // max 150 characters
+	data: {
+		recipient: string;
+		type: "message" | "call";
+	};
 };
 
 export async function notify(subscriptions: NotificationSubscription[], payload: NotificationPayload) {
@@ -49,4 +56,20 @@ function truncate(str: string, maxLength: number) {
 	}
 
 	return str.substring(0, maxLength - 1) + "\u2026";
+}
+
+export function buildMessageNotificationPayload(message: MessageInstance): NotificationPayload {
+	const direction = translateMessageDirection(message.direction);
+	const recipient = direction === Direction.Outbound ? message.to : message.from;
+	return {
+		title: parsePhoneNumber(recipient).getNumber("international"),
+		body: message.body,
+		actions: [
+			{
+				action: "reply",
+				title: "Reply",
+			},
+		],
+		data: { recipient, type: "message" },
+	};
 }
