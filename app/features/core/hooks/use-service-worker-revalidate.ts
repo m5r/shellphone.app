@@ -1,16 +1,17 @@
 import { useEffect } from "react";
-import { useFetcher } from "@remix-run/react";
+
+import useRevalidate from "./use-revalidate";
 
 export default function useServiceWorkerRevalidate() {
-	const fetcher = useFetcher();
+	const revalidate = useRevalidate();
 
 	useEffect(() => {
-		const channel = new BroadcastChannel("sw-messages");
+		const channel = new BroadcastChannel("revalidate");
 		function onMessage(event: MessageEvent) {
 			const isRefresh = event.data === "revalidateLoaderData";
 			if (isRefresh) {
 				console.debug("Revalidating loaders data");
-				fetcher.submit({}, { method: "post", action: "/dev/null" });
+				revalidate();
 			}
 		}
 
@@ -19,5 +20,5 @@ export default function useServiceWorkerRevalidate() {
 			channel.removeEventListener("message", onMessage);
 			channel.close();
 		};
-	}, [fetcher]);
+	}, [revalidate]);
 }

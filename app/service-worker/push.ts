@@ -15,12 +15,17 @@ export default async function handlePush(event: PushEvent) {
 	const payload: NotificationPayload = event.data!.json();
 	const options = Object.assign({}, defaultOptions, payload);
 
+	const revalidateChannel = new BroadcastChannel("revalidate");
+	// should revalidate just "/messages" and `/messages/${encodeURIComponent(payload.data.recipient)}`
+	revalidateChannel.postMessage("revalidateLoaderData");
+	revalidateChannel.close();
+
 	const clients = await self.clients.matchAll({ type: "window" });
 	const hasOpenTab = clients.some((client) => client.focused === true);
 	if (hasOpenTab) {
-		const channel = new BroadcastChannel("notifications");
-		channel.postMessage(JSON.stringify(payload));
-		channel.close();
+		const notifyChannel = new BroadcastChannel("notifications");
+		notifyChannel.postMessage(JSON.stringify(payload));
+		notifyChannel.close();
 	} else {
 		await self.registration.showNotification(payload.title, options);
 		await addBadge(1);
