@@ -117,7 +117,7 @@ export function fetchLoaderData(event: FetchEvent): Promise<Response> {
 							// and if we had returned a cached response
 							// tell the UI to fetch the latest data
 							console.debug("Revalidate loader data", path);
-							const channel = new BroadcastChannel("sw-messages");
+							const channel = new BroadcastChannel("revalidate");
 							channel.postMessage("revalidateLoaderData");
 							lastTimeRevalidated[path] = Date.now();
 						}
@@ -193,7 +193,7 @@ export async function purgeMutatedLoaders(event: FetchEvent) {
 		const cachedPathname = new URL(loader.url).pathname;
 		const shouldPurge = cachedPathname.startsWith(rootPathname);
 
-		if (url.pathname === "/settings/phone") {
+		if (["/dev/null", "/settings/phone"].includes(url.pathname)) {
 			// changes phone number or twilio account credentials
 			// so purge messages and phone calls from cache
 			return (
