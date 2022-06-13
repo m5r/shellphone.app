@@ -1,6 +1,6 @@
 import { type ActionFunction } from "@remix-run/node";
-import { type CallInstance } from "twilio/lib/rest/api/v2010/account/call";
 import { badRequest, serverError } from "remix-utils";
+import { z } from "zod";
 import { Direction, Prisma, SubscriptionStatus } from "@prisma/client";
 
 import logger from "~/utils/logger.server";
@@ -8,6 +8,7 @@ import db from "~/utils/db.server";
 import twilio from "twilio";
 import { voiceUrl, translateCallStatus } from "~/utils/twilio.server";
 import { decrypt } from "~/utils/encryption";
+import { validate } from "~/utils/validation.server";
 
 export const action: ActionFunction = async ({ request }) => {
 	const twilioSignature = request.headers.get("X-Twilio-Signature") || request.headers.get("x-twilio-signature");
@@ -15,9 +16,16 @@ export const action: ActionFunction = async ({ request }) => {
 		return badRequest("Invalid header X-Twilio-Signature");
 	}
 
-	const body: Body = Object.fromEntries(await request.formData()) as any;
-	const isOutgoingCall = body.From.startsWith("client:");
+	const formData = Object.fromEntries(await request.formData());
+	const isOutgoingCall = formData.Caller?.toString().startsWith("client:");
 	if (isOutgoingCall) {
+		const validation = validate(validations.outgoing, formData);
+		if (validation.errors) {
+			logger.error(validation.errors);
+			return badRequest("");
+		}
+
+		const body = validation.data;
 		const recipient = body.To;
 		const accountSid = body.From.slice("client:".length).split("__")[0];
 
@@ -101,46 +109,57 @@ export const action: ActionFunction = async ({ request }) => {
 	}
 };
 
-type OutgoingCallBody = {
-	AccountSid: string;
-	ApiVersion: string;
-	ApplicationSid: string;
-	CallSid: string;
-	CallStatus: CallInstance["status"];
-	Called: string;
-	Caller: string;
-	Direction: `outbound${string}`;
-	From: string;
-	To: string;
-};
+const CallStatus = z.union([
+	z.literal("busy"),
+	z.literal("canceled"),
+	z.literal("completed"),
+	z.literal("failed"),
+	z.literal("in-progress"),
+	z.literal("no-answer"),
+	z.literal("queued"),
+	z.literal("ringing"),
+]);
 
-type IncomingCallBody = {
-	AccountSid: string;
-	ApiVersion: string;
-	ApplicationSid: string;
-	CallSid: string;
-	CallStatus: CallInstance["status"];
-	Called: string;
-	CalledCity: string;
-	CalledCountry: string;
-	CalledState: string;
-	CalledZip: string;
-	Caller: string;
-	CallerCity: string;
-	CallerCountry: string;
-	CallerState: string;
-	CallerZip: string;
-	Direction: "inbound";
-	From: string;
-	FromCity: string;
-	FromCountry: string;
-	FromState: string;
-	FromZip: string;
-	To: string;
-	ToCity: string;
-	ToCountry: string;
-	ToState: string;
-	ToZip: string;
+const validations = {
+	outgoing: z.object({
+		AccountSid: z.string(),
+		ApiVersion: z.string(),
+		ApplicationSid: z.string(),
+		CallSid: z.string(),
+		CallStatus,
+		Called: z.string(),
+		Caller: z.string(),
+		// Direction: z.string().refine((direction) => direction.startsWith("outbound")),
+		Direction: z.string(),
+		From: z.string(),
+		To: z.string(),
+	}),
+	incoming: z.object({
+		AccountSid: z.string(),
+		ApiVersion: z.string(),
+		ApplicationSid: z.string(),
+		CallSid: z.string(),
+		CallStatus,
+		Called: z.string(),
+		CalledCity: z.string(),
+		CalledCountry: z.string(),
+		CalledState: z.string(),
+		CalledZip: z.string(),
+		Caller: z.string(),
+		CallerCity: z.string(),
+		CallerCountry: z.string(),
+		CallerState: z.string(),
+		CallerZip: z.string(),
+		Direction: z.literal("inbound"),
+		From: z.string(),
+		FromCity: z.string(),
+		FromCountry: z.string(),
+		FromState: z.string(),
+		FromZip: z.string(),
+		To: z.string(),
+		ToCity: z.string(),
+		ToCountry: z.string(),
+		ToState: z.string(),
+		ToZip: z.string(),
+	}),
 };
-
-type Body = OutgoingCallBody | IncomingCallBody;
