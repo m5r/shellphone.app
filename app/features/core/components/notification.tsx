@@ -4,11 +4,13 @@ import { Transition } from "@headlessui/react";
 import { useAtom } from "jotai";
 
 import useNotifications, { notificationDataAtom } from "~/features/core/hooks/use-notifications";
+import useCall from "~/features/phone-calls/hooks/use-call";
 
 export default function Notification() {
 	useNotifications();
 	const navigate = useNavigate();
 	const [notificationData] = useAtom(notificationDataAtom);
+	const [call, setCall] = useCall();
 	const [show, setShow] = useState(notificationData !== null);
 	const close = () => setShow(false);
 	const actions = buildActions();
@@ -78,7 +80,7 @@ export default function Notification() {
 			message: [
 				{
 					title: "Reply",
-					onClick: () => {
+					onClick() {
 						navigate(`/messages/${encodeURIComponent(notificationData.data.recipient)}`);
 						close();
 					},
@@ -86,8 +88,21 @@ export default function Notification() {
 				{ title: "Close", onClick: close },
 			],
 			call: [
-				{ title: "Answer", onClick: close },
-				{ title: "Decline", onClick: close },
+				{
+					title: "Answer",
+					onClick() {
+						navigate(`/incoming-call/${encodeURIComponent(notificationData.data.recipient)}`);
+						close();
+					},
+				},
+				{
+					title: "Decline",
+					onClick() {
+						call?.reject();
+						setCall(null);
+						close();
+					},
+				},
 			],
 		}[notificationData.data.type];
 	}

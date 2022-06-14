@@ -7,6 +7,7 @@ import Footer from "~/features/core/components/footer";
 import ServiceWorkerUpdateNotifier from "~/features/core/components/service-worker-update-notifier";
 import Notification from "~/features/core/components/notification";
 import useServiceWorkerRevalidate from "~/features/core/hooks/use-service-worker-revalidate";
+import useDevice from "~/features/phone-calls/hooks/use-device";
 import footerStyles from "~/features/core/components/footer.css";
 import appStyles from "~/styles/app.css";
 
@@ -32,6 +33,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export default function __App() {
+	useDevice();
 	useServiceWorkerRevalidate();
 	const matches = useMatches();
 	const hideFooter = matches.some((match) => match.handle?.hideFooter === true);

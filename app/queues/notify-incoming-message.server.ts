@@ -39,5 +39,6 @@ export default Queue<Payload>("notify incoming message", async ({ data }) => {
 	const message = await twilioClient.messages.get(messageSid).fetch();
 	const payload = buildMessageNotificationPayload(message);
 
+	// TODO: implement WS/SSE to push new messages for users who haven't enabled push notifications
 	await notify(subscriptions, payload);
 });

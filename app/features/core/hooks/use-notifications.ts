@@ -19,7 +19,7 @@ export default function useNotifications() {
 			channel.removeEventListener("message", eventHandler);
 			channel.close();
 		};
-	}, []);
+	}, [setNotificationData]);
 
 	useEffect(() => {
 		if (!notificationData) {
@@ -28,7 +28,7 @@ export default function useNotifications() {
 
 		const timeout = setTimeout(() => setNotificationData(null), 5000);
 		return () => clearTimeout(timeout);
-	}, [notificationData]);
+	}, [notificationData, setNotificationData]);
 }
 
 export const notificationDataAtom = atom<NotificationPayload | null>(null);
