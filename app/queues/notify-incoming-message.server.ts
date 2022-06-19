@@ -1,8 +1,9 @@
 import { Queue } from "~/utils/queue.server";
 import db from "~/utils/db.server";
 import logger from "~/utils/logger.server";
-import { buildMessageNotificationPayload, notify } from "~/utils/web-push.server";
 import getTwilioClient from "~/utils/twilio.server";
+import { buildMessageNotificationPayload, notify } from "~/utils/web-push.server";
+import { notifySSE } from "~/utils/events.server";
 
 type Payload = {
 	messageSid: string;
@@ -39,6 +40,6 @@ export default Queue<Payload>("notify incoming message", async ({ data }) => {
 	const message = await twilioClient.messages.get(messageSid).fetch();
 	const payload = buildMessageNotificationPayload(message);
 
-	// TODO: implement WS/SSE to push new messages for users who haven't enabled push notifications
 	await notify(subscriptions, payload);
+	await notifySSE(payload);
 });

@@ -1,8 +1,10 @@
 import { useCallback, useEffect } from "react";
 import type { Call } from "@twilio/voice-sdk";
 import { atom, useAtom } from "jotai";
+import { notificationDataAtom } from "~/features/core/hooks/use-notifications";
 
 export default function useCall() {
+	const [, setNotificationData] = useAtom(notificationDataAtom);
 	const [call, setCall] = useAtom(callAtom);
 	const endCall = useCallback(
 		function endCallFn() {
@@ -10,8 +12,9 @@ export default function useCall() {
 			call?.removeListener("disconnect", endCall);
 			call?.disconnect();
 			setCall(null);
+			setNotificationData(null);
 		},
-		[call, setCall],
+		[call, setCall, setNotificationData],
 	);
 	const onError = useCallback(
 		function onErrorFn(error: any) {
@@ -19,9 +22,10 @@ export default function useCall() {
 			call?.removeListener("disconnect", endCall);
 			call?.disconnect();
 			setCall(null);
+			setNotificationData(null);
 			throw error; // TODO: might not get caught by error boundary
 		},
-		[call, setCall, endCall],
+		[call, setCall, endCall, setNotificationData],
 	);
 
 	const eventHandlers = [

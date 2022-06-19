@@ -5,7 +5,8 @@ import useAppLoaderData from "~/features/core/hooks/use-app-loader-data";
 
 export default function useNotifications() {
 	const isServiceWorkerSupported = useMemo(() => "serviceWorker" in navigator, []);
-	const [subscription, setSubscription] = useState<PushSubscription | null>(null);
+	const isWebPushSupported = useMemo(() => "PushManager" in window, []);
+	const [subscription, setSubscription] = useState<PushSubscription | null>();
 	const { webPushPublicKey } = useAppLoaderData().config;
 	const fetcher = useFetcher();
 	const subscribeToNotifications = (subscription: PushSubscriptionJSON) => {
@@ -29,7 +30,7 @@ export default function useNotifications() {
 
 	useEffect(() => {
 		(async () => {
-			if (!isServiceWorkerSupported) {
+			if (!isServiceWorkerSupported || !isWebPushSupported) {
 				return;
 			}
 
@@ -37,10 +38,10 @@ export default function useNotifications() {
 			const subscription = await registration.pushManager.getSubscription();
 			setSubscription(subscription);
 		})();
-	}, [isServiceWorkerSupported]);
+	}, [isServiceWorkerSupported, isWebPushSupported]);
 
 	async function subscribe() {
-		if (!isServiceWorkerSupported || subscription !== null || fetcher.state !== "idle") {
+		if (!isServiceWorkerSupported || !isWebPushSupported || subscription !== null || fetcher.state !== "idle") {
 			return;
 		}
 
@@ -54,7 +55,7 @@ export default function useNotifications() {
 	}
 
 	async function unsubscribe() {
-		if (!isServiceWorkerSupported || !subscription || fetcher.state !== "idle") {
+		if (!isServiceWorkerSupported || !isWebPushSupported || !subscription || fetcher.state !== "idle") {
 			return;
 		}
 
@@ -69,7 +70,7 @@ export default function useNotifications() {
 	}
 
 	return {
-		isServiceWorkerSupported,
+		isNotificationSupported: isServiceWorkerSupported && isWebPushSupported,
 		subscription,
 		subscribe,
 		unsubscribe,

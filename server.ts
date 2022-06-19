@@ -46,7 +46,27 @@ app.all("*", (req, res, next) => {
 });
 
 app.disable("x-powered-by");
-app.use(compression());
+app.use(
+	compression({
+		filter(req, res) {
+			const contentTypeHeader = res.getHeader("Content-Type");
+			let contentType = "";
+			if (contentTypeHeader) {
+				if (Array.isArray(contentTypeHeader)) {
+					contentType = contentTypeHeader.join(" ");
+				} else {
+					contentType = String(contentTypeHeader);
+				}
+			}
+
+			if (contentType.includes("text/event-stream")) {
+				return false;
+			}
+
+			return true;
+		},
+	}),
+);
 
 // cache static and immutable assets
 app.use(express.static("public", { immutable: true, maxAge: "1y" }));

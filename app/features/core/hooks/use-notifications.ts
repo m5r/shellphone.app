@@ -7,22 +7,39 @@ export default function useNotifications() {
 	const [notificationData, setNotificationData] = useAtom(notificationDataAtom);
 
 	useEffect(() => {
-		const channel = new BroadcastChannel("notifications");
+		const eventSource = new EventSource("/sse/notifications");
+		eventSource.addEventListener("message", onMessage);
+
+		return () => {
+			eventSource.removeEventListener("message", onMessage);
+			eventSource.close();
+		};
+
+		function onMessage(event: MessageEvent) {
+			console.log("event.data", JSON.parse(event.data));
+			const notifyChannel = new BroadcastChannel("notifications");
+			notifyChannel.postMessage(event.data);
+			notifyChannel.close();
+		}
+	}, []);
+
+	useEffect(() => {
+		const notifyChannel = new BroadcastChannel("notifications");
 		async function eventHandler(event: MessageEvent) {
 			const payload: NotificationPayload = JSON.parse(event.data);
 			setNotificationData(payload);
 		}
 
-		channel.addEventListener("message", eventHandler);
+		notifyChannel.addEventListener("message", eventHandler);
 
 		return () => {
-			channel.removeEventListener("message", eventHandler);
-			channel.close();
+			notifyChannel.removeEventListener("message", eventHandler);
+			notifyChannel.close();
 		};
 	}, [setNotificationData]);
 
 	useEffect(() => {
-		if (!notificationData) {
+		if (!notificationData || notificationData.data.type === "call") {
 			return;
 		}
 
