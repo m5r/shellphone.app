@@ -2,43 +2,16 @@ import type { ActionFunction } from "@remix-run/node";
 import { ClientOnly } from "remix-utils";
 import { Form } from "@remix-run/react";
 
-import db from "~/utils/db.server";
-import { notify } from "~/utils/web-push.server";
 import Button from "~/features/settings/components/button";
 import NotificationsSettings, {
 	FallbackNotificationsSettings,
 } from "~/features/settings/components/settings/notifications-settings";
+import notifyIncomingMessageQueue from "~/queues/notify-incoming-message.server";
 
 export const action: ActionFunction = async () => {
-	const phoneNumber = await db.phoneNumber.findUnique({
-		where: { id: "PN4f11f0c4155dfb5d5ac8bbab2cc23cbc" },
-		select: {
-			twilioAccount: {
-				include: {
-					organization: {
-						select: {
-							memberships: {
-								select: { notificationSubscription: true },
-							},
-						},
-					},
-				},
-			},
-		},
-	});
-	const subscriptions = phoneNumber!.twilioAccount.organization.memberships.flatMap(
-		(membership) => membership.notificationSubscription,
-	);
-	await notify(subscriptions, {
-		title: "+33 6 13 37 07 87",
-		body: "wesh le zin, wesh la zine, copain copine mais si y'a moyen on pine",
-		actions: [
-			{
-				action: "reply",
-				title: "Reply",
-			},
-		],
-		data: { recipient: "+33613370787", type: "message" },
+	await notifyIncomingMessageQueue.add("ddd", {
+		messageSid: "SM07ef9eb508f4e04bff596f11ac90e835",
+		phoneNumberId: "PNb77c9690c394368bdbaf20ea6fe5e9fc",
 	});
 	return null;
 };

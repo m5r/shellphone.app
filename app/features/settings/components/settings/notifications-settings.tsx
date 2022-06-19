@@ -3,9 +3,13 @@ import useNotifications from "~/features/core/hooks/use-notifications.client";
 import { useEffect, useState } from "react";
 
 export default function NotificationsSettings() {
-	const { subscription, subscribe, unsubscribe } = useNotifications();
+	const { isNotificationSupported, subscription, subscribe, unsubscribe } = useNotifications();
 	const [notificationsEnabled, setNotificationsEnabled] = useState(!!subscription);
-	const [errorMessage, setErrorMessage] = useState("");
+	const [errorMessage, setErrorMessage] = useState(() =>
+		isNotificationSupported
+			? ""
+			: "Your browser does not support web push notifications. You will still receive in-app notifications as long as you have Shellphone open.",
+	);
 	const [isChanging, setIsChanging] = useState(false);
 	const onChange = async (checked: boolean) => {
 		if (isChanging) {
@@ -46,6 +50,11 @@ export default function NotificationsSettings() {
 		setNotificationsEnabled(!!subscription);
 	}, [subscription]);
 
+	if (typeof subscription === "undefined") {
+		return <FallbackNotificationsSettings />;
+	}
+
+	// TODO: allow disabling in-app notifications
 	return (
 		<ul className="mt-2 divide-y divide-gray-200">
 			<Toggle

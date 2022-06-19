@@ -30,5 +30,9 @@ self.addEventListener("message", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
+	if (event.request.headers.get("Accept") === "text/event-stream") {
+		return;
+	}
+
 	event.respondWith(handleFetch(event));
 });

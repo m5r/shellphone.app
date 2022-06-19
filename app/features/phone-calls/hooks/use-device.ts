@@ -82,8 +82,7 @@ export default function useDevice() {
 
 			setCall(incomingCall);
 			console.log("incomingCall.parameters", incomingCall.parameters);
-			// TODO prevent making a new call when there is a pending incoming call
-			const channel = new BroadcastChannel("notifications");
+			const notifyChannel = new BroadcastChannel("notifications");
 			const recipient = incomingCall.parameters.From;
 			const message: NotificationPayload = {
 				title: recipient, // TODO:
@@ -100,7 +99,8 @@ export default function useDevice() {
 				],
 				data: { recipient, type: "call" },
 			};
-			channel.postMessage(JSON.stringify(message));
+			notifyChannel.postMessage(JSON.stringify(message));
+			notifyChannel.close();
 		},
 		[call, setCall],
 	);

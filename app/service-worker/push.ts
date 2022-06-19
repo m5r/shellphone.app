@@ -20,14 +20,6 @@ export default async function handlePush(event: PushEvent) {
 	revalidateChannel.postMessage("revalidateLoaderData");
 	revalidateChannel.close();
 
-	const clients = await self.clients.matchAll({ type: "window" });
-	const hasOpenTab = clients.some((client) => client.focused === true);
-	if (hasOpenTab) {
-		const notifyChannel = new BroadcastChannel("notifications");
-		notifyChannel.postMessage(JSON.stringify(payload));
-		notifyChannel.close();
-	} else {
-		await self.registration.showNotification(payload.title, options);
-		await addBadge(1);
-	}
+	await self.registration.showNotification(payload.title, options);
+	await addBadge(1);
 }
