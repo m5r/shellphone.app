@@ -103,7 +103,7 @@ async function handleIncomingCall(formData: unknown, twilioSignature: string) {
 	const identity = `${phoneNumber.twilioAccount.accountSid}__${user.id}`;
 	const voiceResponse = new twilio.twiml.VoiceResponse();
 	const dial = voiceResponse.dial({ answerOnBridge: true });
-	dial.client(identity);
+	dial.client(identity); // TODO: si le device n'est pas registered => call failed *shrug*
 	console.log("twiml voiceResponse", voiceResponse.toString());
 
 	return new Response(voiceResponse.toString(), { headers: { "Content-Type": "text/xml" } });
@@ -190,7 +190,7 @@ async function handleOutgoingCall(formData: unknown, twilioSignature: string) {
 			answerOnBridge: true,
 			callerId: phoneNumber!.number,
 		});
-		dial.number(recipient); // TODO: si le device n'est pas registered => call failed *shrug*
+		dial.number(recipient);
 		console.log("twiml voiceResponse", voiceResponse.toString());
 
 		return new Response(voiceResponse.toString(), { headers: { "Content-Type": "text/xml" } });
