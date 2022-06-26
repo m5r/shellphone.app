@@ -190,7 +190,7 @@ async function handleOutgoingCall(formData: unknown, twilioSignature: string) {
 			answerOnBridge: true,
 			callerId: phoneNumber!.number,
 		});
-		dial.number(recipient);
+		dial.number(recipient); // TODO: si le device n'est pas registered => call failed *shrug*
 		console.log("twiml voiceResponse", voiceResponse.toString());
 
 		return new Response(voiceResponse.toString(), { headers: { "Content-Type": "text/xml" } });
