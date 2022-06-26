@@ -9,8 +9,8 @@ const watch = args.includes("--watch");
 esbuild
 	.build({
 		write: true,
-		outfile: path.join(basePath, "server.js"),
-		entryPoints: [path.join(basePath, "server.ts")],
+		outfile: path.join(basePath, "server/index.js"),
+		entryPoints: [path.join(basePath, "server/index.ts")],
 		platform: "node",
 		format: "cjs",
 		bundle: true,
@@ -19,7 +19,7 @@ esbuild
 			{
 				name: "remix-bundle-external",
 				setup(build) {
-					build.onResolve({ filter: /^\.\/build$/ }, () => ({ external: true }));
+					build.onResolve({ filter: /^\.\.\/build$/ }, () => ({ external: true }));
 				},
 			},
 		],
@@ -37,7 +37,7 @@ esbuild
 							process.exit(1);
 						}
 
-						console.log("Server rebuilt successfully");
+						console.log("Server rebuilt successfully"); // TODO: find a way to restart the dev server process
 					},
 			  }
 			: false,

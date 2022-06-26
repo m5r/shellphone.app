@@ -36,6 +36,7 @@ invariant(
 	typeof process.env.WEB_PUSH_VAPID_PUBLIC_KEY === "string",
 	`Please define the "WEB_PUSH_VAPID_PUBLIC_KEY" environment variable`,
 );
+invariant(typeof process.env.SENTRY_DSN === "string", `Please define the "SENTRY_DSN" environment variable`);
 
 export default {
 	app: {
@@ -53,6 +54,9 @@ export default {
 	redis: {
 		url: process.env.REDIS_URL,
 		password: process.env.REDIS_PASSWORD,
+	},
+	sentry: {
+		dsn: process.env.SENTRY_DSN,
 	},
 	twilio: {
 		authToken: process.env.TWILIO_AUTH_TOKEN,

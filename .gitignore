@@ -5,7 +5,7 @@ node_modules
 /public/build
 /public/entry.worker.js
 /build
-server.js
+/server/index.js
 /app/styles/tailwind.css
 
 /.idea
