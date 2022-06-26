@@ -37,6 +37,10 @@ invariant(
 	`Please define the "WEB_PUSH_VAPID_PUBLIC_KEY" environment variable`,
 );
 invariant(typeof process.env.SENTRY_DSN === "string", `Please define the "SENTRY_DSN" environment variable`);
+invariant(
+	typeof process.env.PANELBEAR_SITE_ID === "string",
+	`Please define the "PANELBEAR_SITE_ID" environment variable`,
+);
 
 export default {
 	app: {
@@ -50,6 +54,9 @@ export default {
 		accessKeyId: process.env.AWS_SES_ACCESS_KEY_ID,
 		secretAccessKey: process.env.AWS_SES_ACCESS_KEY_SECRET,
 		fromEmail: process.env.AWS_SES_FROM_EMAIL,
+	},
+	panelBear: {
+		siteId: process.env.PANELBEAR_SITE_ID,
 	},
 	redis: {
 		url: process.env.REDIS_URL,

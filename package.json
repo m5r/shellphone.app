@@ -52,6 +52,7 @@
 		"@bull-board/express": "3.11.0",
 		"@headlessui/react": "1.6.4",
 		"@maizzle/framework": "3.7.3",
+		"@panelbear/panelbear-js": "1.3.3",
 		"@prisma/client": "3.14.0",
 		"@react-aria/interactions": "3.9.0",
 		"@remix-run/express": "1.5.1",
