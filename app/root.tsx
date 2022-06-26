@@ -13,6 +13,7 @@ import {
 } from "@remix-run/react";
 
 import config from "~/config/config.server";
+import usePanelbear from "~/features/core/hooks/use-panelbear";
 import Logo from "~/features/core/components/logo";
 
 import styles from "./styles/tailwind.css";
@@ -20,27 +21,38 @@ import styles from "./styles/tailwind.css";
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
 type LoaderData = {
-	shellphoneConfig: string;
+	shellphoneConfig: {
+		sentry: {
+			dsn: string;
+		};
+		panelbear: {
+			siteId: string;
+		};
+	};
 };
 export const loader: LoaderFunction = () => {
 	return json<LoaderData>({
-		shellphoneConfig: JSON.stringify({
+		shellphoneConfig: {
 			sentry: {
 				dsn: config.sentry.dsn,
 			},
-		}),
+			panelbear: {
+				siteId: config.panelBear.siteId,
+			},
+		},
 	});
 };
 
 export default function App() {
 	const { shellphoneConfig } = useLoaderData<LoaderData>();
+	usePanelbear(shellphoneConfig.panelbear.siteId);
 	return (
 		<Document>
 			<Outlet />
 			<script
 				suppressHydrationWarning
 				dangerouslySetInnerHTML={{
-					__html: `window.shellphoneConfig=${shellphoneConfig};`,
+					__html: `window.shellphoneConfig=${JSON.stringify(shellphoneConfig)};`,
 				}}
 			/>
 		</Document>
