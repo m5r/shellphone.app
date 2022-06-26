@@ -40,7 +40,14 @@ export default function TwilioConnect() {
 						<IoHelpCircle className="w-6 h-6 text-primary-700" />
 					</button>
 					<article className="mb-6">
-						Shellphone needs some informations about your Twilio account to securely use your phone numbers.
+						<p>
+							To connect your Twilio Account you will need to provide us your Twilio account SID and auth
+							token.
+						</p>
+						<p>
+							Both values can be found on your{" "}
+							<a href="https://www.twilio.com/user/account/settings">Twilio account page</a>.
+						</p>
 					</article>
 
 					{twilio !== null ? (
