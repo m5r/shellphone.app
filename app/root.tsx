@@ -1,17 +1,48 @@
 import type { FunctionComponent, PropsWithChildren } from "react";
-import type { LinksFunction } from "@remix-run/node";
-import { Link, Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useCatch } from "@remix-run/react";
+import { type LinksFunction, type LoaderFunction, json } from "@remix-run/node";
+import {
+	Link,
+	Links,
+	LiveReload,
+	Meta,
+	Outlet,
+	Scripts,
+	ScrollRestoration,
+	useCatch,
+	useLoaderData,
+} from "@remix-run/react";
 
+import config from "~/config/config.server";
 import Logo from "~/features/core/components/logo";
 
 import styles from "./styles/tailwind.css";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
+type LoaderData = {
+	shellphoneConfig: string;
+};
+export const loader: LoaderFunction = () => {
+	return json<LoaderData>({
+		shellphoneConfig: JSON.stringify({
+			sentry: {
+				dsn: config.sentry.dsn,
+			},
+		}),
+	});
+};
+
 export default function App() {
+	const { shellphoneConfig } = useLoaderData<LoaderData>();
 	return (
 		<Document>
 			<Outlet />
+			<script
+				suppressHydrationWarning
+				dangerouslySetInnerHTML={{
+					__html: `window.shellphoneConfig=${shellphoneConfig};`,
+				}}
+			/>
 		</Document>
 	);
 }

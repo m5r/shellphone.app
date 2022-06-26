@@ -1,5 +1,6 @@
 import { type LinksFunction, type LoaderFunction, json } from "@remix-run/node";
-import { Outlet, useCatch, useMatches } from "@remix-run/react";
+import { Outlet, useCatch, useLoaderData, useMatches } from "@remix-run/react";
+import * as Sentry from "@sentry/browser";
 
 import serverConfig from "~/config/config.server";
 import { type SessionData, requireLoggedIn } from "~/utils/auth.server";
@@ -10,6 +11,7 @@ import useServiceWorkerRevalidate from "~/features/core/hooks/use-service-worker
 import useDevice from "~/features/phone-calls/hooks/use-device";
 import footerStyles from "~/features/core/components/footer.css";
 import appStyles from "~/styles/app.css";
+import { useEffect } from "react";
 
 export const links: LinksFunction = () => [
 	{ rel: "stylesheet", href: appStyles },
@@ -35,8 +37,13 @@ export const loader: LoaderFunction = async ({ request }) => {
 export default function __App() {
 	useDevice();
 	useServiceWorkerRevalidate();
+	const { sessionData } = useLoaderData<AppLoaderData>();
 	const matches = useMatches();
 	const hideFooter = matches.some((match) => match.handle?.hideFooter === true);
+
+	useEffect(() => {
+		Sentry.setUser(sessionData.user);
+	}, []);
 
 	return (
 		<>

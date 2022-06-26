@@ -1,18 +1,20 @@
-import path from "node:path";
-import express, { type NextFunction, type Request, type Response } from "express";
+import express from "express";
 import compression from "compression";
 import morgan from "morgan";
 import { createRequestHandler } from "@remix-run/express";
-import { createBullBoard } from "@bull-board/api";
-import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
-import { ExpressAdapter } from "@bull-board/express";
-import { GlobalRole } from "@prisma/client";
+import * as Sentry from "@sentry/node";
 
-import cronJobs from "~/cron-jobs";
-import queues from "~/queues";
+import config from "~/config/config.server";
 import logger from "~/utils/logger.server";
-import { __getSession } from "~/utils/session.server";
-import { type SessionData } from "~/utils/auth.server";
+import { adminMiddleware, setupBullBoard } from "./queues";
+import { registerSentry, sentryLoadContext } from "./sentry-remix";
+
+Sentry.init({
+	dsn: config.sentry.dsn,
+	integrations: [new Sentry.Integrations.Http({ tracing: true })],
+	tracesSampleRate: 1.0,
+	environment: process.env.NODE_ENV,
+});
 
 const app = express();
 app.use((req, res, next) => {
@@ -83,46 +85,21 @@ app.all("*", (req, res, next) => {
 	}
 
 	return createRequestHandler({
-		build: require("./build"),
+		build: registerSentry(require("../build")),
 		mode: process.env.NODE_ENV,
+		getLoadContext: sentryLoadContext,
 	})(req, res, next);
 });
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
-	require("./build"); // preload the build so we're ready for the first request
 	logger.info(`Server listening on port ${port}`);
 });
 
-async function adminMiddleware(req: Request, res: Response, next: NextFunction) {
-	const session = await __getSession(req.headers.cookie);
-	const sessionData: SessionData | undefined = session.data.user;
-	if (!sessionData || sessionData.user.role !== GlobalRole.SUPERADMIN) {
-		return res.setHeader("Location", "/sign-in").status(302).end();
-	}
-
-	next();
-}
-
-function setupBullBoard() {
-	const serverAdapter = new ExpressAdapter();
-	const cronJobsQueues = registerCronJobs();
-	createBullBoard({
-		queues: [...queues, ...cronJobsQueues].map((queue) => new BullMQAdapter(queue)),
-		serverAdapter,
-	});
-	serverAdapter.setBasePath("/admin/queues");
-	return serverAdapter;
-}
-
-function registerCronJobs() {
-	return cronJobs.map((registerCronJob) => registerCronJob());
-}
-
-const buildDir = path.join(process.cwd(), "build");
 function purgeRequireCache() {
+	const resolved = require.resolve("../build");
 	for (const key in require.cache) {
-		if (key.startsWith(buildDir)) {
+		if (key.startsWith(resolved)) {
 			delete require.cache[key];
 		}
 	}
