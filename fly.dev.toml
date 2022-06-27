@@ -1,4 +1,4 @@
-app = "shellphone-prod"
+app = "shellphone-dev"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []
@@ -7,7 +7,7 @@ processes = []
   release_command = "npx prisma migrate deploy"
 
 [env]
-  APP_BASE_URL = "https://www.shellphone.app"
+  APP_BASE_URL = "https://dev.shellphone.app"
   AWS_SES_FROM_EMAIL = "\"Mokhtar from Shellphone\" <mokhtar@shellphone.app>"
   AWS_SES_REGION = "eu-central-1"
   NODE_ENV = "production"

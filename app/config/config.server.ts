@@ -21,10 +21,6 @@ invariant(
 );
 invariant(typeof process.env.REDIS_URL === "string", `Please define the "REDIS_URL" environment variable`);
 invariant(
-	typeof process.env.TWILIO_AUTH_TOKEN === "string",
-	`Please define the "TWILIO_AUTH_TOKEN" environment variable`,
-);
-invariant(
 	typeof process.env.MASTER_ENCRYPTION_KEY === "string",
 	`Please define the "MASTER_ENCRYPTION_KEY" environment variable`,
 );
@@ -64,9 +60,6 @@ export default {
 	},
 	sentry: {
 		dsn: process.env.SENTRY_DSN,
-	},
-	twilio: {
-		authToken: process.env.TWILIO_AUTH_TOKEN,
 	},
 	webPush: {
 		privateKey: process.env.WEB_PUSH_VAPID_PRIVATE_KEY,

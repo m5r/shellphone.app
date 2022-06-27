@@ -23,11 +23,11 @@ export const voiceUrl = `${serverConfig.app.baseUrl}/webhook/call`;
 
 export function getTwiMLName() {
 	switch (serverConfig.app.baseUrl) {
-		case "local.shellphone.app":
+		case "https://local.shellphone.app":
 			return "Shellphone LOCAL";
-		case "dev.shellphone.app":
+		case "https://dev.shellphone.app":
 			return "Shellphone DEV";
-		case "www.shellphone.app":
+		case "https://www.shellphone.app":
 			return "Shellphone";
 	}
 }
