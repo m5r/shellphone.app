@@ -68,7 +68,6 @@ export function fetchLoaderData(event: FetchEvent): Promise<Response> {
 
 	return caches.match(event.request, { cacheName: DATA_CACHE }).then((cachedResponse) => {
 		console.debug(`Serving data from ${cachedResponse ? "cache" : "network"}`, path);
-		cachedResponse?.headers.set("X-Remix-Worker", "yes");
 
 		const timestamp = lastTimeRevalidated[path] ?? 0;
 		const diff = Date.now() - timestamp;

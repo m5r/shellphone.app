@@ -30,7 +30,11 @@ self.addEventListener("message", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-	if (event.request.headers.get("Accept") === "text/event-stream") {
+	const isSSERequest = event.request.headers.get("Accept") === "text/event-stream";
+	const isOutsideRequest = !["localhost", "dev.shellphone.app", "www.shellphone.app"].includes(
+		new URL(event.request.url).hostname,
+	);
+	if (isSSERequest || isOutsideRequest) {
 		return;
 	}
 
