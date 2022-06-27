@@ -4,9 +4,8 @@ module.exports = {
 	theme: {
 		extend: {
 			fontFamily: {
-				sans: ["Inter var", ...defaultTheme.fontFamily.sans],
-				inter: ["Inter var", "sans-serif"],
-				mackinac: ["P22 Mackinac Pro", "ui-serif", "Georgia", "Cambria", "Times New Roman", "Times", "serif"],
+				inter: ["Inter var", ...defaultTheme.fontFamily.sans],
+				mackinac: ['"P22 Mackinac Pro"', ...defaultTheme.fontFamily.serif],
 			},
 			colors: {
 				rebeccapurple: {
