@@ -15,53 +15,9 @@ jobs:
             - run: npm ci
             - run: npm run lint
 
-    e2e:
-        name: E2E tests
-        runs-on: ubuntu-latest
-        services:
-            postgres:
-                image: postgres:13-alpine
-                options: >-
-                    --health-cmd pg_isready
-                    --health-interval 10s
-                    --health-timeout 5s
-                    --health-retries 5
-                env:
-                    POSTGRES_USER: pgremixtape
-                    POSTGRES_PASSWORD: pgpassword
-                    POSTGRES_DB: remixtape
-                ports:
-                    - "5432:5432"
-            redis:
-                image: redis:6-alpine
-                options: >-
-                    --health-cmd "redis-cli ping"
-                    --health-interval 10s
-                    --health-timeout 5s
-                    --health-retries 5
-                ports:
-                    - "6379:6379"
-        env:
-            DATABASE_URL: postgresql://pgremixtape:pgpassword@localhost:5432/remixtape
-            REDIS_URL: redis://localhost:6379
-            CI: true
-        steps:
-            - uses: actions/checkout@v2
-            - run: cp .env.example .env
-            - uses: actions/setup-node@v2
-              with:
-                  node-version: 16
-                  cache: "npm"
-            - run: npm ci
-            - run: npm run db:setup
-            - run: npm run build
-            - run: npx dotenv npm run e2e:ci
-
     typecheck:
         name: Typecheck
         runs-on: ubuntu-latest
-        env:
-            HUSKY_SKIP_INSTALL: 1
         steps:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v2
@@ -70,10 +26,29 @@ jobs:
             - run: npm ci
             - run: npx tsc
 
-    deploy:
+    deploy_development:
         if: github.ref == 'refs/heads/master'
-        needs: [lint, e2e, typecheck]
-        name: Deploy to Fly.io
+        needs: [lint, typecheck]
+        name: Deploy development environment
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: superfly/flyctl-actions@master
+              env:
+                  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+              with:
+                  args: "deploy --strategy rolling -c ./fly.dev.toml"
+            - uses: appleboy/discord-action@master
+              with:
+                  webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+                  webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+                  args: "https://dev.shellphone.app deployed with commit `${{ github.event.head_commit.message }}` (`${{ github.sha }}`) from branch `${{ github.ref }}`"
+
+
+    deploy_production:
+        if: github.ref == 'refs/heads/production'
+        needs: [lint, typecheck]
+        name: Deploy production environment
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
@@ -82,3 +57,8 @@ jobs:
                   FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
               with:
                   args: "deploy --strategy rolling"
+            - uses: appleboy/discord-action@master
+              with:
+                  webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+                  webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+                  args: "https://www.shellphone.app deployed with commit `${{ github.event.head_commit.message }}` (`${{ github.sha }}`) from branch `${{ github.ref }}`"

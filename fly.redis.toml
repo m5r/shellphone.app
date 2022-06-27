@@ -1,18 +1,18 @@
-app = "shellphoneappremixed-redis"
+app = "shellphone-redis"
 kill_signal = "SIGINT"
 kill_timeout = 5
-processes = [ ]
+processes = []
 
 [build]
 image = "flyio/redis:6.2.6"
 
 [experimental]
-allowed_public_ports = [ ]
+allowed_public_ports = []
 auto_rollback = true
 
 [[mounts]]
 destination = "/data"
-source = "shellphoneappremixed_redis_data"
+source = "shellphone_redis_data"
 
 [metrics]
 port = 9_091
