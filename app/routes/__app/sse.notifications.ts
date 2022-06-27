@@ -12,27 +12,39 @@ export let loader: LoaderFunction = ({ request }) => {
 		new ReadableStream({
 			start(controller) {
 				const encoder = new TextEncoder();
-				const onNotification = (notification: NotificationPayload) => {
-					controller.enqueue(encoder.encode(`data: ${JSON.stringify(notification)}\n\n`));
-				};
-
+				let keepAliveTimeout = setTimeout(keepAlive, 30 * 1000);
 				let closed = false;
-				function close() {
-					if (closed) {
-						return;
-					}
-
-					closed = true;
-					events.removeListener("notification", onNotification);
-					request.signal.removeEventListener("abort", close);
-					controller.close();
-				}
 
 				events.addListener("notification", onNotification);
 				request.signal.addEventListener("abort", close);
 				if (request.signal.aborted) {
 					close();
 					return;
+				}
+
+				function onNotification(notification: NotificationPayload) {
+					controller.enqueue(encoder.encode(`data: ${JSON.stringify(notification)}\n\n`));
+				}
+
+				function keepAlive() {
+					if (closed) {
+						return;
+					}
+
+					controller.enqueue(encoder.encode(":\n\n"));
+					keepAliveTimeout = setTimeout(keepAlive, 30 * 1000);
+				}
+
+				function close() {
+					if (closed) {
+						return;
+					}
+
+					closed = true;
+					clearTimeout(keepAliveTimeout);
+					events.removeListener("notification", onNotification);
+					request.signal.removeEventListener("abort", close);
+					controller.close();
 				}
 			},
 		}),
