@@ -136,6 +136,7 @@ const Document: FunctionComponent<PropsWithChildren<{}>> = ({ children }) => (
 		<body className="h-full">
 			{children}
 			<ScrollRestoration />
+			<script async data-api="/_hive" src="/bee.js" />
 			<Scripts />
 			<LiveReload />
 		</body>
