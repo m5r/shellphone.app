@@ -6,13 +6,15 @@ import { decrypt, encrypt } from "~/utils/encryption";
 import db from "~/utils/db.server";
 import { commitSession } from "~/utils/session.server";
 import getTwilioClient from "~/utils/twilio.server";
+import logger from "~/utils/logger.server";
 
 export type TwilioTokenLoaderData = string;
 
 const loader: LoaderFunction = async ({ request }) => {
 	const { user, twilio } = await requireLoggedIn(request);
 	if (!twilio) {
-		throw new Error("unreachable");
+		logger.warn("Twilio account is not connected");
+		return null;
 	}
 
 	const twilioAccount = await db.twilioAccount.findUnique({ where: { accountSid: twilio.accountSid } });
