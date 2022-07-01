@@ -13,20 +13,30 @@ import {
 } from "@remix-run/react";
 
 import config from "~/config/config.server";
-import usePanelbear from "~/features/core/hooks/use-panelbear";
+import useFathom from "~/features/core/hooks/use-fathom";
 import Logo from "~/features/core/components/logo";
 
 import styles from "./styles/tailwind.css";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
+declare global {
+	interface Window {
+		shellphoneConfig: LoaderData["shellphoneConfig"];
+	}
+}
+
 type LoaderData = {
 	shellphoneConfig: {
 		sentry: {
-			dsn: string;
+			dsn?: string;
 		};
-		panelbear: {
+		fathom: {
 			siteId: string;
+			domain?: string;
+		};
+		app: {
+			baseUrl: string;
 		};
 	};
 };
@@ -36,8 +46,12 @@ export const loader: LoaderFunction = () => {
 			sentry: {
 				dsn: config.sentry.dsn,
 			},
-			panelbear: {
-				siteId: config.panelBear.siteId,
+			fathom: {
+				siteId: config.fathom.siteId,
+				domain: config.fathom.domain,
+			},
+			app: {
+				baseUrl: config.app.baseUrl,
 			},
 		},
 	});
@@ -45,7 +59,7 @@ export const loader: LoaderFunction = () => {
 
 export default function App() {
 	const { shellphoneConfig } = useLoaderData<LoaderData>();
-	usePanelbear(shellphoneConfig.panelbear.siteId);
+	useFathom();
 	return (
 		<Document>
 			<Outlet />
@@ -136,7 +150,6 @@ const Document: FunctionComponent<PropsWithChildren<{}>> = ({ children }) => (
 		<body className="h-full">
 			{children}
 			<ScrollRestoration />
-			<script async data-api="/_hive" src="/bee.js" />
 			<Scripts />
 			<LiveReload />
 		</body>

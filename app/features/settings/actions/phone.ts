@@ -145,6 +145,7 @@ async function setTwilioCredentials(request: Request, formData: unknown) {
 	await Promise.all(
 		phoneNumbers.map(async (phoneNumber) => {
 			const phoneNumberId = phoneNumber.sid;
+			logger.info(`Importing phone number with id=${phoneNumberId}`);
 			try {
 				await db.phoneNumber.create({
 					data: {
@@ -166,6 +167,8 @@ async function setTwilioCredentials(request: Request, formData: unknown) {
 					}),
 				]);
 			} catch (error: any) {
+				logger.error(error);
+
 				if (error.code !== "P2002") {
 					// if it's not a duplicate, it's a real error we need to handle
 					throw error;

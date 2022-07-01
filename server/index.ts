@@ -9,12 +9,14 @@ import logger from "~/utils/logger.server";
 import { adminMiddleware, setupBullBoard } from "./queues";
 import { registerSentry, sentryLoadContext } from "./sentry-remix";
 
-Sentry.init({
-	dsn: config.sentry.dsn,
-	integrations: [new Sentry.Integrations.Http({ tracing: true })],
-	tracesSampleRate: 1.0,
-	environment: process.env.NODE_ENV,
-});
+if (config.sentry.dsn) {
+	Sentry.init({
+		dsn: config.sentry.dsn,
+		integrations: [new Sentry.Integrations.Http({ tracing: true })],
+		tracesSampleRate: 1.0,
+		environment: process.env.NODE_ENV,
+	});
+}
 
 const app = express();
 app.use((req, res, next) => {

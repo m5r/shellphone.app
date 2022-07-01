@@ -33,8 +33,8 @@ self.addEventListener("fetch", (event) => {
 	const url = new URL(event.request.url);
 	const isSSERequest = event.request.headers.get("Accept") === "text/event-stream";
 	const isOutsideRequest = !["localhost", "dev.shellphone.app", "www.shellphone.app"].includes(url.hostname);
-	const isSplitbeeProxiedRequest = url.pathname.startsWith("/_hive") || url.pathname === "/bee.js";
-	if (isSSERequest || isOutsideRequest || isSplitbeeProxiedRequest) {
+
+	if (isSSERequest || isOutsideRequest) {
 		return;
 	}
 
