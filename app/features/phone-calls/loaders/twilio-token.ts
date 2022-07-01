@@ -19,7 +19,10 @@ const loader: LoaderFunction = async ({ request }) => {
 
 	const twilioAccount = await db.twilioAccount.findUnique({ where: { accountSid: twilio.accountSid } });
 	if (!twilioAccount || !twilioAccount.twimlAppSid) {
-		throw new Error("unreachable");
+		logger.warn(
+			"Twilio account is connected but the background jobs didn't run properly, this shouldn't be happening",
+		);
+		return null;
 	}
 
 	const twilioClient = getTwilioClient(twilioAccount);
