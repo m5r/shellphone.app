@@ -13,8 +13,10 @@ type Payload = {
 
 export default Queue<Payload>("insert messages", async ({ data }) => {
 	const { messages, phoneNumberId } = data;
+	logger.info(`Inserting ${messages.length} messages for phone number with id=${phoneNumberId}`);
 	const phoneNumber = await db.phoneNumber.findUnique({ where: { id: phoneNumberId } });
 	if (!phoneNumber) {
+		logger.warn(`No phone number found with id=${phoneNumberId}`);
 		return;
 	}
 
@@ -37,7 +39,7 @@ export default Queue<Payload>("insert messages", async ({ data }) => {
 		.sort((a, b) => a.sentAt.getTime() - b.sentAt.getTime());
 
 	const { count } = await db.message.createMany({ data: sms, skipDuplicates: true });
-	logger.info(`inserted ${count} new messages for phoneNumberId=${phoneNumberId}`);
+	logger.info(`Inserted ${count} new messages for phone number with id=${phoneNumberId}`);
 
 	if (!phoneNumber.isFetchingMessages) {
 		return;

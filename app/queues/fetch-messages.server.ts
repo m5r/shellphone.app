@@ -10,6 +10,7 @@ type Payload = {
 
 export default Queue<Payload>("fetch messages", async ({ data }) => {
 	const { phoneNumberId } = data;
+	logger.info(`Fetching messages for phone number with id=${phoneNumberId}`);
 	const phoneNumber = await db.phoneNumber.findUnique({
 		where: { id: phoneNumberId },
 		include: { twilioAccount: true },
@@ -26,8 +27,11 @@ export default Queue<Payload>("fetch messages", async ({ data }) => {
 	]);
 	const messagesSent = sent.filter((message) => message.direction.startsWith("outbound"));
 	const messagesReceived = received.filter((message) => message.direction === "inbound");
-	const messages = [...messagesSent, ...messagesReceived];
+	logger.info(
+		`Found ${messagesSent.length} outbound messages and ${messagesReceived.length} inbound messages for phone number with id=${phoneNumberId}`,
+	);
 
+	const messages = [...messagesSent, ...messagesReceived];
 	await insertMessagesQueue.add(`insert messages of id=${phoneNumberId}`, {
 		phoneNumberId,
 		messages,

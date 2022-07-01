@@ -10,6 +10,7 @@ type Payload = {
 
 export default Queue<Payload>("fetch phone calls", async ({ data }) => {
 	const { phoneNumberId } = data;
+	logger.info(`Fetching phone calls for phone number with id=${phoneNumberId}`);
 	const phoneNumber = await db.phoneNumber.findUnique({
 		where: { id: phoneNumberId },
 		include: { twilioAccount: true },
@@ -24,8 +25,11 @@ export default Queue<Payload>("fetch phone calls", async ({ data }) => {
 		twilioClient.calls.list({ from: phoneNumber.number }),
 		twilioClient.calls.list({ to: phoneNumber.number }),
 	]);
-	const calls = [...callsSent, ...callsReceived];
+	logger.info(
+		`Found ${callsSent.length} outbound calls and ${callsReceived.length} inbound calls for phone number with id=${phoneNumberId}`,
+	);
 
+	const calls = [...callsSent, ...callsReceived];
 	await insertCallsQueue.add(`insert calls of id=${phoneNumberId}`, {
 		phoneNumberId,
 		calls,

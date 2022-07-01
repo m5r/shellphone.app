@@ -13,8 +13,10 @@ type Payload = {
 
 export default Queue<Payload>("insert phone calls", async ({ data }) => {
 	const { calls, phoneNumberId } = data;
+	logger.info(`Inserting ${calls.length} phone calls for phone number with id=${phoneNumberId}`);
 	const phoneNumber = await db.phoneNumber.findUnique({ where: { id: phoneNumberId } });
 	if (!phoneNumber) {
+		logger.warn(`No phone number found with id=${phoneNumberId}`);
 		return;
 	}
 
@@ -37,7 +39,7 @@ export default Queue<Payload>("insert phone calls", async ({ data }) => {
 		.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
 	const { count } = await db.phoneCall.createMany({ data: phoneCalls, skipDuplicates: true });
-	logger.info(`inserted ${count} new phone calls for phoneNumberId=${phoneNumberId}`);
+	logger.info(`Inserted ${count} new phone calls for phone number with id=${phoneNumberId}`);
 
 	if (!phoneNumber.isFetchingCalls) {
 		return;
