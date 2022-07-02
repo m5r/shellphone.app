@@ -21,9 +21,11 @@ const redisOptions: RedisOptions = {
 // create a new connection to the Redis with every change either.
 if (process.env.NODE_ENV === "production") {
 	redis = new Redis(serverConfig.redis.url, redisOptions);
+	redis.setMaxListeners(32);
 } else {
 	if (!global.__redis) {
 		global.__redis = new Redis(serverConfig.redis.url, redisOptions);
+		global.__redis.setMaxListeners(32);
 	}
 	redis = global.__redis;
 }
