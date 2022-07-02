@@ -1,6 +1,7 @@
 const path = require("path");
 const esbuild = require("esbuild");
 const { nodeExternalsPlugin } = require("esbuild-node-externals");
+const ps = require("ps-node");
 
 const basePath = process.cwd();
 const args = process.argv.slice(2);
@@ -14,6 +15,7 @@ esbuild
 		platform: "node",
 		format: "cjs",
 		bundle: true,
+		sourcemap: "inline",
 		plugins: [
 			nodeExternalsPlugin({ packagePath: path.join(basePath, "package.json") }),
 			{
@@ -37,7 +39,31 @@ esbuild
 							process.exit(1);
 						}
 
-						console.log("Server rebuilt successfully"); // TODO: find a way to restart the dev server process
+						ps.lookup(
+							{
+								command: "node",
+								arguments: "./server/index.js",
+							},
+							(error, processes) => {
+								if (error) {
+									throw new Error(error);
+								}
+
+								if (processes.length === 0) {
+									return;
+								}
+
+								const devServerProcess = processes.reduce((prev, current) => {
+									if (prev.pid > current.pid) {
+										return prev;
+									}
+
+									return current;
+								}, processes[0]);
+								process.kill(devServerProcess.pid, "SIGUSR2");
+							},
+						);
+						console.log("Server rebuilt successfully");
 					},
 			  }
 			: false,

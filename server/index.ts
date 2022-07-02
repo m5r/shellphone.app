@@ -8,13 +8,16 @@ import config from "~/config/config.server";
 import logger from "~/utils/logger.server";
 import { adminMiddleware, setupBullBoard } from "./queues";
 import { registerSentry, sentryLoadContext } from "./sentry-remix";
+import { purgeRequireCache } from "./purge-require-cache";
+
+const environment = process.env.NODE_ENV;
 
 if (config.sentry.dsn) {
 	Sentry.init({
 		dsn: config.sentry.dsn,
 		integrations: [new Sentry.Integrations.Http({ tracing: true })],
 		tracesSampleRate: 1.0,
-		environment: process.env.NODE_ENV,
+		environment,
 	});
 }
 
@@ -82,13 +85,13 @@ app.use("/admin/queues", setupBullBoard().getRouter());
 app.use(morgan("tiny"));
 
 app.all("*", (req, res, next) => {
-	if (process.env.NODE_ENV !== "production") {
+	if (environment !== "production") {
 		purgeRequireCache();
 	}
 
 	return createRequestHandler({
 		build: registerSentry(require("../build")),
-		mode: process.env.NODE_ENV,
+		mode: environment,
 		getLoadContext: sentryLoadContext,
 	})(req, res, next);
 });
@@ -98,11 +101,18 @@ app.listen(port, () => {
 	logger.info(`Server listening on port ${port}`);
 });
 
-function purgeRequireCache() {
-	const resolved = require.resolve("../build");
-	for (const key in require.cache) {
-		if (key.startsWith(resolved)) {
-			delete require.cache[key];
+if (environment !== "production") {
+	process.on("SIGUSR2", () => process.exit(229));
+
+	process.on("exit", (exitCode) => {
+		if (exitCode !== 229) {
+			return;
 		}
-	}
+
+		require("child_process").spawn(process.argv.shift(), process.argv, {
+			cwd: process.cwd(),
+			detached: true,
+			stdio: "inherit",
+		});
+	});
 }
