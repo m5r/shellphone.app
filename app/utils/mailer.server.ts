@@ -18,7 +18,7 @@ export default async function sendEmail({ text, html, subject, recipients }: Sen
 		subject,
 		encoding: "UTF-8",
 		to: recipients,
-		from: serverConfig.awsSes.fromEmail,
+		from: serverConfig.aws.ses.fromEmail,
 	};
 
 	if (process.env.NODE_ENV !== "production" || process.env.CI) {
@@ -27,10 +27,10 @@ export default async function sendEmail({ text, html, subject, recipients }: Sen
 
 	const transporter = createTransport({
 		SES: new SES({
-			region: serverConfig.awsSes.awsRegion,
+			region: serverConfig.aws.region,
 			credentials: new Credentials({
-				accessKeyId: serverConfig.awsSes.accessKeyId,
-				secretAccessKey: serverConfig.awsSes.secretAccessKey,
+				accessKeyId: serverConfig.aws.ses.accessKeyId,
+				secretAccessKey: serverConfig.aws.ses.secretAccessKey,
 			}),
 		}),
 	});

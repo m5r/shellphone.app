@@ -6,7 +6,15 @@ invariant(
 	`Please define the "INVITATION_TOKEN_SECRET" environment variable`,
 );
 invariant(typeof process.env.SESSION_SECRET === "string", `Please define the "SESSION_SECRET" environment variable`);
-invariant(typeof process.env.AWS_SES_REGION === "string", `Please define the "AWS_SES_REGION" environment variable`);
+invariant(typeof process.env.AWS_REGION === "string", `Please define the "AWS_REGION" environment variable`);
+invariant(
+	typeof process.env.AWS_S3_ACCESS_KEY_ID === "string",
+	`Please define the "AWS_S3_ACCESS_KEY_ID" environment variable`,
+);
+invariant(
+	typeof process.env.AWS_S3_ACCESS_KEY_SECRET === "string",
+	`Please define the "AWS_S3_ACCESS_KEY_SECRET" environment variable`,
+);
 invariant(
 	typeof process.env.AWS_SES_ACCESS_KEY_ID === "string",
 	`Please define the "AWS_SES_ACCESS_KEY_ID" environment variable`,
@@ -41,11 +49,17 @@ export default {
 		sessionSecret: process.env.SESSION_SECRET,
 		encryptionKey: process.env.MASTER_ENCRYPTION_KEY,
 	},
-	awsSes: {
-		awsRegion: process.env.AWS_SES_REGION,
-		accessKeyId: process.env.AWS_SES_ACCESS_KEY_ID,
-		secretAccessKey: process.env.AWS_SES_ACCESS_KEY_SECRET,
-		fromEmail: process.env.AWS_SES_FROM_EMAIL,
+	aws: {
+		region: process.env.AWS_REGION,
+		ses: {
+			accessKeyId: process.env.AWS_SES_ACCESS_KEY_ID,
+			secretAccessKey: process.env.AWS_SES_ACCESS_KEY_SECRET,
+			fromEmail: process.env.AWS_SES_FROM_EMAIL,
+		},
+		s3: {
+			accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
+			secretAccessKey: process.env.AWS_S3_ACCESS_KEY_SECRET,
+		},
 	},
 	fathom: {
 		siteId: process.env.FATHOM_SITE_ID,
