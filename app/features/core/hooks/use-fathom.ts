@@ -15,7 +15,6 @@ export default function useFathom() {
 	}, []);
 
 	useEffect(() => {
-		console.log(`tracking ${location.pathname}`);
 		Fathom.trackPageview();
 	}, [location]);
 }
