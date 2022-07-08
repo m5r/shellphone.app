@@ -21,6 +21,8 @@ export const smsUrl = `${serverConfig.app.baseUrl}/webhook/message`;
 
 export const voiceUrl = `${serverConfig.app.baseUrl}/webhook/call`;
 
+export const voiceFallbackUrl = `${serverConfig.app.baseUrl}/webhook/call/fallback`;
+
 export function getTwiMLName() {
 	switch (serverConfig.app.baseUrl) {
 		case "https://local.shellphone.app":

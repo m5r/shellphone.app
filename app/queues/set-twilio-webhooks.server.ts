@@ -3,7 +3,7 @@ import type { ApplicationInstance } from "twilio/lib/rest/api/v2010/account/appl
 
 import { Queue } from "~/utils/queue.server";
 import db from "~/utils/db.server";
-import { getTwiMLName, smsUrl, voiceUrl } from "~/utils/twilio.server";
+import { getTwiMLName, smsUrl, voiceFallbackUrl, voiceUrl } from "~/utils/twilio.server";
 import { decrypt } from "~/utils/encryption";
 
 type Payload = {
@@ -77,6 +77,10 @@ async function updateTwimlApplication(twilioClient: twilio.Twilio, twimlAppSid: 
 		smsMethod: "POST",
 		voiceUrl,
 		voiceMethod: "POST",
+		voiceFallbackUrl,
+		voiceFallbackMethod: "POST",
+		// statusCallback: voiceStatusCallbackUrl, // TODO
+		// statusCallbackMethod: "POST",
 	});
 
 	return twilioClient.applications.get(twimlAppSid).fetch();

@@ -13,3 +13,7 @@ export const events = global.notifications;
 export function notifySSE(payload: NotificationPayload) {
 	global.notifications.emit("notification", payload);
 }
+
+export function notifyReadyToAnswer() {
+	global.notifications.emit("readyToAnswer");
+}

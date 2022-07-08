@@ -9,7 +9,6 @@ import twilio from "twilio";
 import { voiceUrl, translateCallStatus } from "~/utils/twilio.server";
 import { decrypt } from "~/utils/encryption";
 import { validate } from "~/utils/validation.server";
-import { notify } from "~/utils/web-push.server";
 
 export const action: ActionFunction = async ({ request }) => {
 	const twilioSignature = request.headers.get("X-Twilio-Signature") || request.headers.get("x-twilio-signature");
@@ -19,7 +18,6 @@ export const action: ActionFunction = async ({ request }) => {
 
 	const formData = Object.fromEntries(await request.formData());
 	const isOutgoingCall = formData.Caller?.toString().startsWith("client:");
-	console.log("isOutgoingCall", isOutgoingCall);
 	if (isOutgoingCall) {
 		return handleOutgoingCall(formData, twilioSignature);
 	}
@@ -28,11 +26,11 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 async function handleIncomingCall(formData: unknown, twilioSignature: string) {
-	console.log("formData", formData);
-	const validation = validate(validations.incoming, formData);
+	console.log("/webhook/call");
+	const validation = validate(webhookCallValidations.incoming, formData);
 	if (validation.errors) {
 		logger.error(validation.errors);
-		return badRequest("");
+		return badRequest("Invalid webhook data");
 	}
 
 	const body = validation.data;
@@ -69,7 +67,8 @@ async function handleIncomingCall(formData: unknown, twilioSignature: string) {
 	});
 	if (!phoneNumber) {
 		// this shouldn't be happening
-		return new Response(null, { status: 402 });
+		logger.error(`No phone number found with number="${body.To}" and accountSid="${body.AccountSid}"`);
+		return badRequest("Invalid webhook");
 	}
 
 	if (phoneNumber.twilioAccount.organization.subscriptions.length === 0) {
@@ -98,19 +97,18 @@ async function handleIncomingCall(formData: unknown, twilioSignature: string) {
 		},
 	});
 
-	// await notify(); TODO
 	const user = phoneNumber.twilioAccount.organization.memberships[0].user!;
 	const identity = `${phoneNumber.twilioAccount.accountSid}__${user.id}`;
 	const voiceResponse = new twilio.twiml.VoiceResponse();
 	const dial = voiceResponse.dial({ answerOnBridge: true });
-	dial.client(identity); // TODO: si le device n'est pas registered => call failed *shrug*
+	dial.client(identity);
 	console.log("twiml voiceResponse", voiceResponse.toString());
 
 	return new Response(voiceResponse.toString(), { headers: { "Content-Type": "text/xml" } });
 }
 
 async function handleOutgoingCall(formData: unknown, twilioSignature: string) {
-	const validation = validate(validations.outgoing, formData);
+	const validation = validate(webhookCallValidations.outgoing, formData);
 	if (validation.errors) {
 		logger.error(validation.errors);
 		return badRequest("");
@@ -212,7 +210,7 @@ const CallStatus = z.union([
 	z.literal("ringing"),
 ]);
 
-const validations = {
+export const webhookCallValidations = {
 	outgoing: z.object({
 		AccountSid: z.string(),
 		ApiVersion: z.string(),
