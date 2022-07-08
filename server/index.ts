@@ -100,19 +100,3 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
 	logger.info(`Server listening on port ${port}`);
 });
-
-if (environment !== "production") {
-	process.on("SIGUSR2", () => process.exit(229));
-
-	process.on("exit", (exitCode) => {
-		if (exitCode !== 229) {
-			return;
-		}
-
-		require("child_process").spawn(process.argv.shift(), process.argv, {
-			cwd: process.cwd(),
-			detached: true,
-			stdio: "inherit",
-		});
-	});
-}

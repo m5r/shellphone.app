@@ -39,30 +39,6 @@ esbuild
 							process.exit(1);
 						}
 
-						ps.lookup(
-							{
-								command: "node",
-								arguments: "./server/index.js",
-							},
-							(error, processes) => {
-								if (error) {
-									throw new Error(error);
-								}
-
-								if (processes.length === 0) {
-									return;
-								}
-
-								const devServerProcess = processes.reduce((prev, current) => {
-									if (prev.pid > current.pid) {
-										return prev;
-									}
-
-									return current;
-								}, processes[0]);
-								process.kill(devServerProcess.pid, "SIGUSR2");
-							},
-						);
 						console.log("Server rebuilt successfully");
 					},
 			  }
