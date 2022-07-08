@@ -56,3 +56,13 @@
 	@apply font-mackinac tracking-tight font-bold;
 	word-spacing: 0.025em;
 }
+
+.background-primary {
+	@apply bg-gradient-to-br from-rebeccapurple-500 to-indigo-600;
+}
+
+.landing-hero {
+	height: calc(100vh - 120px);
+	margin-top: -120px;
+	@apply flex flex-col justify-center;
+}
