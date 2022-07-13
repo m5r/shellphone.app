@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { type LinksFunction, type LoaderFunction, json } from "@remix-run/node";
 import { Outlet, useCatch, useLoaderData, useMatches } from "@remix-run/react";
 import * as Sentry from "@sentry/browser";
@@ -11,7 +12,6 @@ import useServiceWorkerRevalidate from "~/features/core/hooks/use-service-worker
 import useDevice from "~/features/phone-calls/hooks/use-device";
 import footerStyles from "~/features/core/components/footer.css";
 import appStyles from "~/styles/app.css";
-import { useEffect } from "react";
 
 export const links: LinksFunction = () => [
 	{ rel: "stylesheet", href: appStyles },
