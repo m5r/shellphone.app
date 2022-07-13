@@ -10,4 +10,6 @@ export const action = registerAction;
 export const loader = registerLoader;
 export const meta: MetaFunction = () => ({
 	...getSeoMeta({ title: "Register" }),
+	robots: "noindex",
+	googlebot: "noindex",
 });

@@ -10,4 +10,6 @@ export const action = resetPasswordAction;
 export const loader = resetPasswordLoader;
 export const meta: MetaFunction = () => ({
 	...getSeoMeta({ title: "Reset password" }),
+	robots: "noindex",
+	googlebot: "noindex",
 });

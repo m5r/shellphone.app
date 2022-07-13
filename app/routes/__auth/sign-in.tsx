@@ -10,4 +10,6 @@ export const action = signInAction;
 export const loader = signInLoader;
 export const meta: MetaFunction = () => ({
 	...getSeoMeta({ title: "Sign in" }),
+	robots: "noindex",
+	googlebot: "noindex",
 });

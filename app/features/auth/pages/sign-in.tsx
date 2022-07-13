@@ -16,7 +16,7 @@ export default function SignInPage() {
 		<section>
 			<header>
 				<h2 className="mt-6 text-center text-3xl leading-9 font-extrabold text-gray-900">Welcome back!</h2>
-				<p className="mt-2 text-center text-sm leading-5 text-gray-600">
+				{/*<p className="mt-2 text-center text-sm leading-5 text-gray-600">
 					Need an account?&nbsp;
 					<Link
 						to="/register"
@@ -25,7 +25,7 @@ export default function SignInPage() {
 					>
 						Create yours for free
 					</Link>
-				</p>
+				</p>*/}
 			</header>
 
 			<Form method="post" action={`./?${searchParams}`} className="mt-8 mx-auto w-full max-w-sm">
@@ -62,11 +62,7 @@ export default function SignInPage() {
 					}
 				/>
 
-				<Button
-					type="submit"
-					disabled={transition.state === "submitting"}
-					tabIndex={3}
-				>
+				<Button type="submit" disabled={transition.state === "submitting"} tabIndex={3}>
 					Sign in
 				</Button>
 			</Form>
