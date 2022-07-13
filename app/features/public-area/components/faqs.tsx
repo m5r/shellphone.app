@@ -4,7 +4,7 @@ import clsx from "clsx";
 
 import Container from "./container";
 
-import backgroundImage from "../images/background-faqs.jpg";
+import backgroundImage from "../images/background-faqs.webp";
 
 export default function Faqs() {
 	return (

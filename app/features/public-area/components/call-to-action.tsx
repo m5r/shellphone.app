@@ -7,7 +7,7 @@ import { TextField } from "./fields";
 
 import Alert from "~/features/core/components/alert";
 
-import backgroundImage from "../images/background-call-to-action.jpg";
+import backgroundImage from "../images/background-call-to-action.webp";
 
 export default function CallToAction() {
 	const actionData = useActionData<JoinWaitlistActionData>();
