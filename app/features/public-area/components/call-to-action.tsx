@@ -5,8 +5,9 @@ import Button from "./button";
 import Container from "./container";
 import { TextField } from "./fields";
 
-import backgroundImage from "../images/background-call-to-action.jpg";
 import Alert from "~/features/core/components/alert";
+
+import backgroundImage from "../images/background-call-to-action.jpg";
 
 export default function CallToAction() {
 	const actionData = useActionData<JoinWaitlistActionData>();
@@ -31,7 +32,10 @@ export default function CallToAction() {
 					</p>
 				</div>
 
-				<Form method="post" className="max-w-2xl mx-auto flex mt-10 space-x-4">
+				<Form
+					method="post"
+					className="max-w-2xl mx-auto flex flex-col space-y-4 items-center mt-10 sm:flex-row sm:space-y-0 sm:space-x-4"
+				>
 					{actionData?.submitted ? (
 						<div className="m-auto">
 							<Alert
@@ -48,6 +52,7 @@ export default function CallToAction() {
 								type="email"
 								autoComplete="email"
 								className="w-full"
+								placeholder="Enter your email address"
 								required
 							/>
 							<Button type="submit" variant="solid" color="white" className="w-40">

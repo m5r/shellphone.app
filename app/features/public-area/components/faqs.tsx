@@ -3,52 +3,8 @@ import { Disclosure, Transition } from "@headlessui/react";
 import clsx from "clsx";
 
 import Container from "./container";
-import backgroundImage from "../images/background-faqs.jpg";
 
-const faqs = [
-	[
-		{
-			question: "Does TaxPal handle VAT?",
-			answer: "Well no, but if you move your company offshore you can probably ignore it.",
-		},
-		{
-			question: "Can I pay for my subscription via purchase order?",
-			answer: "Absolutely, we are happy to take your money in all forms.",
-		},
-		{
-			question: "How do I apply for a job at TaxPal?",
-			answer: "We only hire our customers, so subscribe for a minimum of 6 months and then let’s talk.",
-		},
-	],
-	[
-		{
-			question: "What was that testimonial about tax fraud all about?",
-			answer: "TaxPal is just a software application, ultimately your books are your responsibility.",
-		},
-		{
-			question: "TaxPal sounds horrible but why do I still feel compelled to purchase?",
-			answer: "This is the power of excellent visual design. You just can’t resist it, no matter how poorly it actually functions.",
-		},
-		{
-			question: "I found other companies called TaxPal, are you sure you can use this name?",
-			answer: "Honestly not sure at all. We haven’t actually incorporated or anything, we just thought it sounded cool and made this website.",
-		},
-	],
-	[
-		{
-			question: "How do you generate reports?",
-			answer: "You just tell us what data you need a report for, and we get our kids to create beautiful charts for you using only the finest crayons.",
-		},
-		{
-			question: "Can we expect more inventory features?",
-			answer: "In life it’s really better to never expect anything at all.",
-		},
-		{
-			question: "I lost my password, how do I get into my account?",
-			answer: "Send us an email and we will send you a copy of our latest password spreadsheet so you can find your information.",
-		},
-	],
-];
+import backgroundImage from "../images/background-faqs.jpg";
 
 export default function Faqs() {
 	return (
@@ -84,6 +40,16 @@ export default function Faqs() {
 						using a phone number internationally but they are still subject to some irky limitations. For
 						example, you can only use an eSIM on one device at a time and you are still subject to
 						exorbitant rates from your carrier.
+					</Accordion>
+					<Accordion title="Does it work with 2FA messages?">
+						Some banks and online services refuse to send two-factor authentication messages to a virtual
+						phone number and we do not have a solution around this yet. Moreover, Twilio does not support
+						receiving incoming SMS from external Alphanumeric Sender IDs is to protect accounts getting
+						bombarded from spam messages from these IDs which are used to send one-way SMS.
+						<br />
+						With that said, we have successfully received 2FA messages from many services including WhatsApp
+						and Uber. We recognize this is a common problem for people who want to switch to a virtual phone
+						number and we are doing our best to find a long-term solution to receive 2FA messages.
 					</Accordion>
 					<span className="block border-t border-gray-200" aria-hidden="true" />
 				</ul>
