@@ -11,7 +11,7 @@
 		"dev:init": "NODE_ENV=development dotenv run-s build:remix build:server",
 		"dev": "npm run dev:init && run-p dev:build dev:worker dev:css dev:remix dev:server",
 		"build:server": "node ./scripts/build-server.js",
-		"build:css": "tailwindcss -i ./styles/tailwind.css -o ./app/styles/tailwind.css",
+		"build:css": "tailwindcss -i ./styles/tailwind.css -o ./app/styles/tailwind.css -m",
 		"build:remix": "remix build",
 		"build:worker": "node ./scripts/build-worker.js",
 		"build": "NODE_ENV=production run-s build:css build:remix build:worker build:server",
