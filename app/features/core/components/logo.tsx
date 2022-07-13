@@ -6,7 +6,7 @@ type Props = {
 
 const Logo: FunctionComponent<Props> = ({ className }) => (
 	<div className={className}>
-		<img src="/shellphone.png" alt="app logo" />
+		<img src="/shellphone.webp" alt="app logo" />
 	</div>
 );
 
