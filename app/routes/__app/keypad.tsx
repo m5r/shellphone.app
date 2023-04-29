@@ -11,7 +11,6 @@ import useOnBackspacePress from "~/features/keypad/hooks/use-on-backspace-press"
 import Keypad from "~/features/keypad/components/keypad";
 import BlurredKeypad from "~/features/keypad/components/blurred-keypad";
 import MissingTwilioCredentials from "~/features/core/components/missing-twilio-credentials";
-import InactiveSubscription from "~/features/core/components/inactive-subscription";
 import { getSeoMeta } from "~/utils/seo";
 import { usePhoneNumber, usePressDigit, useRemoveDigit } from "~/features/keypad/hooks/atoms";
 
@@ -22,17 +21,13 @@ export const meta: MetaFunction = () => ({
 export const loader = keypadLoader;
 
 export default function KeypadPage() {
-	const { hasOngoingSubscription, hasPhoneNumber, lastRecipientCalled } = useLoaderData<KeypadLoaderData>();
+	const { hasPhoneNumber, lastRecipientCalled } = useLoaderData<KeypadLoaderData>();
 	const navigate = useNavigate();
 	const [phoneNumber, setPhoneNumber] = usePhoneNumber();
 	const removeDigit = useRemoveDigit();
 	const pressDigit = usePressDigit();
 	const onBackspacePress = useOnBackspacePress();
 	useKeyPress((key) => {
-		if (!hasOngoingSubscription) {
-			return;
-		}
-
 		if (key === "Backspace") {
 			return removeDigit();
 		}
@@ -49,15 +44,6 @@ export default function KeypadPage() {
 		);
 	}
 
-	if (!hasOngoingSubscription) {
-		return (
-			<>
-				<InactiveSubscription />
-				<BlurredKeypad />
-			</>
-		);
-	}
-
 	return (
 		<>
 			<div className="w-96 h-full flex flex-col justify-around py-5 mx-auto text-center text-black">
@@ -68,7 +54,7 @@ export default function KeypadPage() {
 				<Keypad>
 					<button
 						onClick={async () => {
-							if (!hasPhoneNumber || !hasOngoingSubscription) {
+							if (!hasPhoneNumber) {
 								return;
 							}
 

@@ -84,26 +84,3 @@ export function Queue<Payload>(
 
 	return queue;
 }
-
-export function CronJob(
-	name: string,
-	handler: Processor<undefined>,
-	cronSchedule: string,
-	defaultJobOptions: Exclude<JobsOptions, "repeat"> = {},
-) {
-	const jobOptions: JobsOptions = {
-		...defaultJobOptions,
-		repeat: { cron: cronSchedule },
-	};
-
-	return function register() {
-		if (registeredQueues.has(name)) {
-			return registeredQueues.get(name)!.queue;
-		}
-
-		const queue = Queue<undefined>(name, handler, jobOptions);
-		queue.add(name, undefined, jobOptions);
-		logger.debug(`registered cron job "${name}"`);
-		return queue;
-	};
-}

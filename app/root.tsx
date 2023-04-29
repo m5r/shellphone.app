@@ -1,74 +1,17 @@
 import type { FunctionComponent, PropsWithChildren } from "react";
-import { type LinksFunction, type LoaderFunction, json } from "@remix-run/node";
-import {
-	Link,
-	Links,
-	LiveReload,
-	Meta,
-	Outlet,
-	Scripts,
-	ScrollRestoration,
-	useCatch,
-	useLoaderData,
-} from "@remix-run/react";
+import type { LinksFunction } from "@remix-run/node";
+import { Link, Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useCatch } from "@remix-run/react";
 
-import config from "~/config/config.server";
-import useFathom from "~/features/core/hooks/use-fathom";
 import Logo from "~/features/core/components/logo";
 
 import styles from "./styles/tailwind.css";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
-declare global {
-	interface Window {
-		shellphoneConfig: LoaderData["shellphoneConfig"];
-	}
-}
-
-type LoaderData = {
-	shellphoneConfig: {
-		sentry: {
-			dsn?: string;
-		};
-		fathom: {
-			siteId: string;
-			domain?: string;
-		};
-		app: {
-			baseUrl: string;
-		};
-	};
-};
-export const loader: LoaderFunction = () => {
-	return json<LoaderData>({
-		shellphoneConfig: {
-			sentry: {
-				dsn: config.sentry.dsn,
-			},
-			fathom: {
-				siteId: config.fathom.siteId,
-				domain: config.fathom.domain,
-			},
-			app: {
-				baseUrl: config.app.baseUrl,
-			},
-		},
-	});
-};
-
 export default function App() {
-	const { shellphoneConfig } = useLoaderData<LoaderData>();
-	useFathom();
 	return (
 		<Document>
 			<Outlet />
-			<script
-				suppressHydrationWarning
-				dangerouslySetInnerHTML={{
-					__html: `window.shellphoneConfig=${JSON.stringify(shellphoneConfig)};`,
-				}}
-			/>
 		</Document>
 	);
 }

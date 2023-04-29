@@ -5,7 +5,7 @@ import { z } from "zod";
 import db from "~/utils/db.server";
 import logger from "~/utils/logger.server";
 import { validate } from "~/utils/validation.server";
-import { requireLoggedIn } from "~/utils/auth.server";
+import { getSession } from "~/utils/session.server";
 
 const action: ActionFunction = async ({ request }) => {
 	const formData = await request.clone().formData();
@@ -31,7 +31,6 @@ const action: ActionFunction = async ({ request }) => {
 export default action;
 
 async function subscribe(request: Request) {
-	const { organization } = await requireLoggedIn(request);
 	const formData = await request.formData();
 	const body = {
 		subscription: JSON.parse(formData.get("subscription")?.toString() ?? "{}"),
@@ -42,17 +41,16 @@ async function subscribe(request: Request) {
 	}
 
 	const { subscription } = validation.data;
-	const membership = await db.membership.findFirst({
-		where: { id: organization.membershipId },
-	});
-	if (!membership) {
-		return notFound("Phone number not found");
+	const session = await getSession(request);
+	const twilio = session.get("twilio");
+	if (!twilio) {
+		throw new Error("unreachable");
 	}
 
 	try {
 		await db.notificationSubscription.create({
 			data: {
-				membershipId: membership.id,
+				twilioAccountSid: twilio.accountSid,
 				endpoint: subscription.endpoint,
 				expirationTime: subscription.expirationTime,
 				keys_p256dh: subscription.keys.p256dh,

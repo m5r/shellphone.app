@@ -4,7 +4,7 @@ import { parsePhoneNumber } from "awesome-phonenumber";
 import { type PhoneCall, Prisma } from "@prisma/client";
 
 import db from "~/utils/db.server";
-import { requireLoggedIn } from "~/utils/auth.server";
+import { getSession } from "~/utils/session.server";
 
 type PhoneCallMeta = {
 	formattedPhoneNumber: string;
@@ -12,7 +12,6 @@ type PhoneCallMeta = {
 };
 
 export type PhoneCallsLoaderData = {
-	hasOngoingSubscription: boolean;
 	hasPhoneNumber: boolean;
 } & (
 	| {
@@ -26,15 +25,14 @@ export type PhoneCallsLoaderData = {
 );
 
 const loader: LoaderFunction = async ({ request }) => {
-	const { twilio } = await requireLoggedIn(request);
+	const session = await getSession(request);
+	const twilio = session.get("twilio");
 	const phoneNumber = await db.phoneNumber.findUnique({
 		where: { twilioAccountSid_isCurrent: { twilioAccountSid: twilio?.accountSid ?? "", isCurrent: true } },
 	});
 	const hasPhoneNumber = Boolean(phoneNumber);
-	const hasOngoingSubscription = true; // TODO
 	if (!phoneNumber || phoneNumber.isFetchingCalls) {
 		return json<PhoneCallsLoaderData>({
-			hasOngoingSubscription,
 			hasPhoneNumber,
 			isFetchingCalls: phoneNumber?.isFetchingCalls ?? false,
 		});
@@ -46,7 +44,6 @@ const loader: LoaderFunction = async ({ request }) => {
 	});
 	return json<PhoneCallsLoaderData>(
 		{
-			hasOngoingSubscription,
 			hasPhoneNumber,
 			phoneCalls: phoneCalls.map((phoneCall) => ({
 				...phoneCall,

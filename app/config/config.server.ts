@@ -40,23 +40,6 @@ invariant(
 	typeof process.env.WEB_PUSH_VAPID_PUBLIC_KEY === "string",
 	`Please define the "WEB_PUSH_VAPID_PUBLIC_KEY" environment variable`,
 );
-invariant(typeof process.env.FATHOM_SITE_ID === "string", `Please define the "FATHOM_SITE_ID" environment variable`);
-invariant(
-	typeof process.env.MAILCHIMP_API_KEY === "string",
-	`Please define the "MAILCHIMP_API_KEY" environment variable`,
-);
-invariant(
-	typeof process.env.MAILCHIMP_AUDIENCE_ID === "string",
-	`Please define the "MAILCHIMP_AUDIENCE_ID" environment variable`,
-);
-invariant(
-	typeof process.env.DISCORD_WEBHOOK_ID === "string",
-	`Please define the "DISCORD_WEBHOOK_ID" environment variable`,
-);
-invariant(
-	typeof process.env.DISCORD_WEBHOOK_TOKEN === "string",
-	`Please define the "DISCORD_WEBHOOK_TOKEN" environment variable`,
-);
 
 export default {
 	app: {
@@ -67,34 +50,14 @@ export default {
 	},
 	aws: {
 		region: process.env.AWS_REGION,
-		ses: {
-			accessKeyId: process.env.AWS_SES_ACCESS_KEY_ID,
-			secretAccessKey: process.env.AWS_SES_ACCESS_KEY_SECRET,
-			fromEmail: process.env.AWS_SES_FROM_EMAIL,
-		},
 		s3: {
 			accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
 			secretAccessKey: process.env.AWS_S3_ACCESS_KEY_SECRET,
 		},
 	},
-	discord: {
-		webhookId: process.env.DISCORD_WEBHOOK_ID,
-		webhookToken: process.env.DISCORD_WEBHOOK_TOKEN,
-	},
-	fathom: {
-		siteId: process.env.FATHOM_SITE_ID,
-		domain: process.env.FATHOM_CUSTOM_DOMAIN,
-	},
-	mailchimp: {
-		apiKey: process.env.MAILCHIMP_API_KEY,
-		audienceId: process.env.MAILCHIMP_AUDIENCE_ID,
-	},
 	redis: {
 		url: process.env.REDIS_URL,
 		password: process.env.REDIS_PASSWORD,
-	},
-	sentry: {
-		dsn: process.env.SENTRY_DSN,
 	},
 	webPush: {
 		privateKey: process.env.WEB_PUSH_VAPID_PRIVATE_KEY,

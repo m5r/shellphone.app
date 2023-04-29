@@ -10,20 +10,14 @@ import { formatRelativeDate } from "~/features/core/helpers/date-formatter";
 import type { PhoneCallsLoaderData } from "~/features/phone-calls/loaders/calls";
 
 export default function PhoneCallsList() {
-	const { hasOngoingSubscription, isFetchingCalls, phoneCalls } = useLoaderData<PhoneCallsLoaderData>();
+	const { isFetchingCalls, phoneCalls } = useLoaderData<PhoneCallsLoaderData>();
 
-	if (!hasOngoingSubscription) {
-		if (!phoneCalls || phoneCalls.length === 0) {
-			return null;
-		}
-	} else {
-		if (isFetchingCalls || !phoneCalls) {
-			return <PhoneInitLoader />;
-		}
+	if (isFetchingCalls || !phoneCalls) {
+		return <PhoneInitLoader />;
+	}
 
-		if (phoneCalls.length === 0) {
-			return hasOngoingSubscription ? <EmptyCalls /> : null;
-		}
+	if (phoneCalls.length === 0) {
+		return <EmptyCalls />;
 	}
 
 	return (

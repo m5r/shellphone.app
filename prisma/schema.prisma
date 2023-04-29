@@ -8,97 +8,26 @@ datasource db {
 }
 
 model TwilioAccount {
-  accountSid     String        @id
-  createdAt      DateTime      @default(now()) @db.Timestamptz(6)
-  updatedAt      DateTime      @updatedAt @db.Timestamptz(6)
-  authToken      String
-  twimlAppSid    String?
-  apiKeySid      String?
-  apiKeySecret   String?
-  organizationId String        @unique
-  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  phoneNumbers   PhoneNumber[]
-}
-
-model Organization {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @db.Timestamptz(6)
-
-  twilioAccount TwilioAccount?
-  memberships   Membership[]
-  subscriptions Subscription[] // many subscriptions to keep a history
-}
-
-model Subscription {
-  createdAt                 DateTime           @default(now()) @db.Timestamptz(6)
-  updatedAt                 DateTime           @updatedAt @db.Timestamptz(6)
-  paddleSubscriptionId      Int                @id @unique
-  paddlePlanId              Int
-  paddleCheckoutId          String
-  status                    SubscriptionStatus
-  updateUrl                 String
-  cancelUrl                 String
-  currency                  String
-  unitPrice                 Float
-  nextBillDate              DateTime           @db.Date
-  lastEventTime             DateTime           @db.Timestamp(6)
-  cancellationEffectiveDate DateTime?          @db.Date
-  organizationId            String
-  organization              Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-}
-
-model Membership {
-  id                       String                     @id @default(cuid())
-  role                     MembershipRole
-  organizationId           String
-  userId                   String?
-  invitedEmail             String?
-  organization             Organization               @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  user                     User?                      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  invitationToken          Token?
-  notificationSubscription NotificationSubscription[]
-
-  @@unique([organizationId, invitedEmail])
-}
-
-model User {
-  id             String       @id @default(cuid())
-  createdAt      DateTime     @default(now()) @db.Timestamptz(6)
-  updatedAt      DateTime     @updatedAt @db.Timestamptz(6)
-  fullName       String
-  email          String       @unique
-  hashedPassword String?
-  role           GlobalRole   @default(CUSTOMER)
-  memberships    Membership[]
-  sessions       Session[]
-  tokens         Token[]
+  accountSid                String                     @id
+  createdAt                 DateTime                   @default(now()) @db.Timestamptz(6)
+  updatedAt                 DateTime                   @updatedAt @db.Timestamptz(6)
+  authToken                 String
+  twimlAppSid               String?
+  apiKeySid                 String?
+  apiKeySecret              String?
+  phoneNumbers              PhoneNumber[]
+  notificationSubscriptions NotificationSubscription[]
+  sessions                  Session[]
 }
 
 model Session {
-  id        String    @id @default(cuid())
-  createdAt DateTime  @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
-  expiresAt DateTime? @db.Timestamptz(6)
-  data      String
-  userId    String?
-  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Token {
-  id           String     @id @default(cuid())
-  createdAt    DateTime   @default(now()) @db.Timestamptz(6)
-  updatedAt    DateTime   @updatedAt @db.Timestamptz(6)
-  hashedToken  String
-  type         TokenType
-  expiresAt    DateTime   @db.Timestamptz(6)
-  sentTo       String
-  userId       String
-  membershipId String     @unique
-  membership   Membership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
-  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([hashedToken, type])
+  id               String         @id @default(cuid())
+  createdAt        DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime       @updatedAt @db.Timestamptz(6)
+  expiresAt        DateTime?      @db.Timestamptz(6)
+  data             String
+  twilioAccountSid String?
+  twilioAccount    TwilioAccount? @relation(fields: [twilioAccountSid], references: [accountSid], onDelete: Cascade)
 }
 
 model Message {
@@ -155,31 +84,8 @@ model NotificationSubscription {
   keys_p256dh    String
   keys_auth      String
 
-  membership   Membership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
-  membershipId String
-}
-
-enum SubscriptionStatus {
-  active
-  trialing
-  past_due
-  paused
-  deleted
-}
-
-enum MembershipRole {
-  OWNER
-  USER
-}
-
-enum GlobalRole {
-  SUPERADMIN
-  CUSTOMER
-}
-
-enum TokenType {
-  RESET_PASSWORD
-  INVITE_MEMBER
+  twilioAccount    TwilioAccount @relation(fields: [twilioAccountSid], references: [accountSid], onDelete: Cascade)
+  twilioAccountSid String
 }
 
 enum Direction {

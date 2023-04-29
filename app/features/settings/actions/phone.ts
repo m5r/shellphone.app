@@ -5,8 +5,7 @@ import type { Prisma } from "@prisma/client";
 
 import db from "~/utils/db.server";
 import { type FormActionData, validate } from "~/utils/validation.server";
-import { refreshSessionData, requireLoggedIn } from "~/utils/auth.server";
-import { commitSession } from "~/utils/session.server";
+import { commitSession, getSession } from "~/utils/session.server";
 import setTwilioWebhooksQueue from "~/queues/set-twilio-webhooks.server";
 import logger from "~/utils/logger.server";
 import { encrypt } from "~/utils/encryption";
@@ -40,7 +39,8 @@ const action: ActionFunction = async ({ request }) => {
 export type SetPhoneNumberActionData = FormActionData<typeof validations, "setPhoneNumber">;
 
 async function setPhoneNumber(request: Request, formData: unknown) {
-	const { organization, twilio } = await requireLoggedIn(request);
+	const session = await getSession(request);
+	const twilio = session.get("twilio");
 	if (!twilio) {
 		return badRequest<SetPhoneNumberActionData>({
 			setPhoneNumber: {
@@ -72,7 +72,6 @@ async function setPhoneNumber(request: Request, formData: unknown) {
 	});
 	await setTwilioWebhooksQueue.add(`set twilio webhooks for phoneNumberId=${validation.data.phoneNumberSid}`, {
 		phoneNumberId: validation.data.phoneNumberSid,
-		organizationId: organization.id,
 	});
 
 	return json<SetPhoneNumberActionData>({ setPhoneNumber: { submitted: true } });
@@ -81,7 +80,8 @@ async function setPhoneNumber(request: Request, formData: unknown) {
 export type SetTwilioCredentialsActionData = FormActionData<typeof validations, "setTwilioCredentials">;
 
 async function setTwilioCredentials(request: Request, formData: unknown) {
-	const { organization, twilio } = await requireLoggedIn(request);
+	const session = await getSession(request);
+	const twilio = session.get("twilio");
 	const validation = validate(validations.setTwilioCredentials, formData);
 	if (validation.errors) {
 		return badRequest<SetTwilioCredentialsActionData>({ setTwilioCredentials: { errors: validation.errors } });
@@ -99,10 +99,10 @@ async function setTwilioCredentials(request: Request, formData: unknown) {
 			throw error;
 		}
 
-		let session: Session | undefined;
 		if (twilio) {
+			console.log("fail");
 			await db.twilioAccount.delete({ where: { accountSid: twilio?.accountSid } });
-			session = (await refreshSessionData(request)).session;
+			session.unset("twilio");
 		}
 
 		return json<SetTwilioCredentialsActionData>(
@@ -112,11 +112,9 @@ async function setTwilioCredentials(request: Request, formData: unknown) {
 				},
 			},
 			{
-				headers: session
-					? {
-							"Set-Cookie": await commitSession(session),
-					  }
-					: {},
+				headers: {
+					"Set-Cookie": await commitSession(session),
+				},
 			},
 		);
 	}
@@ -128,13 +126,8 @@ async function setTwilioCredentials(request: Request, formData: unknown) {
 	const [phoneNumbers] = await Promise.all([
 		twilioClient.incomingPhoneNumbers.list(),
 		db.twilioAccount.upsert({
-			where: { organizationId: organization.id },
-			create: {
-				organization: {
-					connect: { id: organization.id },
-				},
-				...data,
-			},
+			where: { accountSid: twilioAccountSid },
+			create: data,
 			update: data,
 		}),
 	]);
@@ -143,11 +136,11 @@ async function setTwilioCredentials(request: Request, formData: unknown) {
 		accountSid: twilioAccountSid,
 	});
 	await Promise.all(
-		phoneNumbers.map(async (phoneNumber) => {
+		phoneNumbers.map(async (phoneNumber, index) => {
 			const phoneNumberId = phoneNumber.sid;
 			logger.info(`Importing phone number with id=${phoneNumberId}`);
 			try {
-				await db.phoneNumber.create({
+				await db.phoneNumber.createMany({
 					data: {
 						id: phoneNumberId,
 						twilioAccountSid,
@@ -156,6 +149,7 @@ async function setTwilioCredentials(request: Request, formData: unknown) {
 						isFetchingCalls: true,
 						isFetchingMessages: true,
 					},
+					skipDuplicates: true,
 				});
 
 				await Promise.all([
@@ -177,19 +171,25 @@ async function setTwilioCredentials(request: Request, formData: unknown) {
 		}),
 	);
 
-	const { session } = await refreshSessionData(request);
+	session.set("twilio", { accountSid: twilioAccountSid, authToken });
+	console.log("{ accountSid: twilioAccountSid, authToken }", { accountSid: twilioAccountSid, authToken });
+	console.log("session", session.get("twilio"), session.data);
+	const setCookie = await commitSession(session);
+	console.log("set twilio in session", setCookie);
+
 	return json<SetTwilioCredentialsActionData>(
 		{ setTwilioCredentials: { submitted: true } },
 		{
 			headers: {
-				"Set-Cookie": await commitSession(session),
+				"Set-Cookie": setCookie,
 			},
 		},
 	);
 }
 
 async function refreshPhoneNumbers(request: Request) {
-	const { twilio } = await requireLoggedIn(request);
+	const session = await getSession(request);
+	const twilio = session.get("twilio");
 	if (!twilio) {
 		throw new Error("unreachable");
 	}

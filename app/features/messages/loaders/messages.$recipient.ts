@@ -4,8 +4,8 @@ import { parsePhoneNumber } from "awesome-phonenumber";
 import { type Message, type PhoneNumber, Prisma } from "@prisma/client";
 
 import db from "~/utils/db.server";
-import { requireLoggedIn } from "~/utils/auth.server";
 import { redirect } from "@remix-run/node";
+import { getSession } from "~/utils/session.server";
 
 type ConversationType = {
 	recipient: string;
@@ -19,7 +19,8 @@ export type ConversationLoaderData = {
 };
 
 const loader: LoaderFunction = async ({ request, params }) => {
-	const { twilio } = await requireLoggedIn(request);
+	const session = await getSession(request);
+	const twilio = session.get("twilio");
 	if (!twilio) {
 		return redirect("/messages");
 	}

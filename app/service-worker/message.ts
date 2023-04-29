@@ -1,4 +1,4 @@
-import type { AssetsManifest } from "@remix-run/react/entry";
+import type { AssetsManifest } from "@remix-run/react/dist/entry";
 
 declare const ASSET_CACHE: string;
 declare const self: ServiceWorkerGlobalScope;

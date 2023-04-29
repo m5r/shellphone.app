@@ -8,13 +8,12 @@ import { decrypt } from "~/utils/encryption";
 
 type Payload = {
 	phoneNumberId: string;
-	organizationId: string;
 };
 
 export default Queue<Payload>("set twilio webhooks", async ({ data }) => {
-	const { phoneNumberId, organizationId } = data;
+	const { phoneNumberId } = data;
 	const phoneNumber = await db.phoneNumber.findFirst({
-		where: { id: phoneNumberId, twilioAccount: { organizationId } },
+		where: { id: phoneNumberId },
 		include: {
 			twilioAccount: {
 				select: { accountSid: true, twimlAppSid: true, authToken: true },
@@ -33,7 +32,7 @@ export default Queue<Payload>("set twilio webhooks", async ({ data }) => {
 
 	await Promise.all([
 		db.twilioAccount.update({
-			where: { organizationId },
+			where: { accountSid: twilioAccount.accountSid },
 			data: { twimlAppSid },
 		}),
 		twilioClient.incomingPhoneNumbers.get(phoneNumber.id).update({

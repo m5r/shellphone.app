@@ -2,25 +2,12 @@ import express from "express";
 import compression from "compression";
 import morgan from "morgan";
 import { createRequestHandler } from "@remix-run/express";
-import * as Sentry from "@sentry/node";
 
-import config from "~/config/config.server";
 import logger from "~/utils/logger.server";
-import { adminMiddleware, setupBullBoard } from "./queues";
-import { registerSentry, sentryLoadContext } from "./sentry-remix";
+import { setupBullBoard } from "./queues";
 import { purgeRequireCache } from "./purge-require-cache";
 
 const environment = process.env.NODE_ENV;
-
-if (config.sentry.dsn) {
-	Sentry.init({
-		dsn: config.sentry.dsn,
-		integrations: [new Sentry.Integrations.Http({ tracing: true })],
-		tracesSampleRate: 1.0,
-		environment,
-	});
-}
-
 const app = express();
 app.use((req, res, next) => {
 	res.set("X-Fly-Region", process.env.FLY_REGION ?? "unknown");
@@ -79,7 +66,6 @@ app.use(
 app.use(express.static("public", { immutable: true, maxAge: "1y" }));
 
 // setup background queues and cron jobs
-app.use("/admin", adminMiddleware);
 app.use("/admin/queues", setupBullBoard().getRouter());
 
 app.use(morgan("tiny"));
@@ -90,9 +76,8 @@ app.all("*", (req, res, next) => {
 	}
 
 	return createRequestHandler({
-		build: registerSentry(require("../build")),
+		build: require("../build"),
 		mode: environment,
-		getLoadContext: sentryLoadContext,
 	})(req, res, next);
 });
 

@@ -2,19 +2,21 @@ import { type ActionFunction } from "@remix-run/node";
 import { json } from "superjson-remix";
 
 import db from "~/utils/db.server";
-import { requireLoggedIn } from "~/utils/auth.server";
 import getTwilioClient, { translateMessageDirection, translateMessageStatus } from "~/utils/twilio.server";
+import { getSession } from "~/utils/session.server";
 
-export type NewMessageActionData = {};
+type NewMessageActionData = {};
 
 const action: ActionFunction = async ({ params, request }) => {
-	const { twilio } = await requireLoggedIn(request);
+	const session = await getSession(request);
+	const twilio = session.get("twilio");
 	if (!twilio) {
 		throw new Error("unreachable");
 	}
+
 	const [phoneNumber, twilioAccount] = await Promise.all([
 		db.phoneNumber.findUnique({
-			where: { twilioAccountSid_isCurrent: { twilioAccountSid: twilio.accountSid ?? "", isCurrent: true } },
+			where: { twilioAccountSid_isCurrent: { twilioAccountSid: twilio.accountSid, isCurrent: true } },
 		}),
 		db.twilioAccount.findUnique({ where: { accountSid: twilio.accountSid } }),
 	]);

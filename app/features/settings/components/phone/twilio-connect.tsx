@@ -13,9 +13,11 @@ import Button from "~/features/settings/components/button";
 
 export default function TwilioConnect() {
 	const { twilio } = useSession();
+	console.log("twilio", twilio);
 	const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 	const transition = useTransition();
-	const actionData = useActionData<SetTwilioCredentialsActionData>()?.setTwilioCredentials;
+	const actionData = useActionData<any>()
+		?.setTwilioCredentials as SetTwilioCredentialsActionData["setTwilioCredentials"];
 	const { accountSid, authToken } = useLoaderData<PhoneSettingsLoaderData>();
 
 	const topErrorMessage = actionData?.errors?.general;
@@ -50,7 +52,7 @@ export default function TwilioConnect() {
 						</p>
 					</article>
 
-					{twilio !== null ? (
+					{twilio != null ? (
 						<p className="text-green-700">✓ Your Twilio account is connected to Shellphone.</p>
 					) : null}
 

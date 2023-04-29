@@ -1,10 +1,10 @@
-import { type LoaderFunction, json } from "@remix-run/node";
+import { type LoaderArgs, json } from "@remix-run/node";
 import { type PhoneNumber, Prisma } from "@prisma/client";
 
 import db from "~/utils/db.server";
-import { requireLoggedIn } from "~/utils/auth.server";
 import logger from "~/utils/logger.server";
 import { decrypt } from "~/utils/encryption";
+import { getSession } from "~/utils/session.server";
 
 export type PhoneSettingsLoaderData = {
 	accountSid?: string;
@@ -12,20 +12,21 @@ export type PhoneSettingsLoaderData = {
 	phoneNumbers: Pick<PhoneNumber, "id" | "number" | "isCurrent">[];
 };
 
-const loader: LoaderFunction = async ({ request }) => {
-	const { organization, twilio } = await requireLoggedIn(request);
+const loader = async ({ request }: LoaderArgs) => {
+	const session = await getSession(request);
+	const twilio = session.get("twilio");
 	if (!twilio) {
 		logger.warn("Twilio account is not connected");
-		return json<PhoneSettingsLoaderData>({ phoneNumbers: [] });
+		return json({ phoneNumbers: [] });
 	}
 
 	const phoneNumbers = await db.phoneNumber.findMany({
-		where: { twilioAccount: { organizationId: organization.id } },
+		where: { twilioAccount: { accountSid: twilio.accountSid } },
 		select: { id: true, number: true, isCurrent: true },
 		orderBy: { id: Prisma.SortOrder.desc },
 	});
 
-	return json<PhoneSettingsLoaderData>({
+	return json({
 		accountSid: twilio.accountSid,
 		authToken: decrypt(twilio.authToken),
 		phoneNumbers,

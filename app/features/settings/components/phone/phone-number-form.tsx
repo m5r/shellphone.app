@@ -5,7 +5,7 @@ import Button from "../button";
 import SettingsSection from "../settings-section";
 import Alert from "~/features/core/components/alert";
 import useSession from "~/features/core/hooks/use-session";
-import type { PhoneSettingsLoaderData } from "~/features/settings/loaders/phone";
+import type loader from "~/features/settings/loaders/phone";
 import type { SetPhoneNumberActionData } from "~/features/settings/actions/phone";
 import clsx from "clsx";
 
@@ -13,8 +13,8 @@ export default function PhoneNumberForm() {
 	const { twilio } = useSession();
 	const fetcher = useFetcher();
 	const transition = useTransition();
-	const actionData = useActionData<SetPhoneNumberActionData>()?.setPhoneNumber;
-	const availablePhoneNumbers = useLoaderData<PhoneSettingsLoaderData>().phoneNumbers;
+	const actionData = useActionData<any>()?.setPhoneNumber;
+	const availablePhoneNumbers = useLoaderData<typeof loader>().phoneNumbers;
 
 	const actionSubmitted = transition.submission?.formData.get("_action");
 	const isCurrentFormTransition =
@@ -25,7 +25,7 @@ export default function PhoneNumberForm() {
 	const topErrorMessage = errors?.general ?? errors?.phoneNumberSid;
 	const isError = typeof topErrorMessage !== "undefined";
 	const currentPhoneNumber = availablePhoneNumbers.find((phoneNumber) => phoneNumber.isCurrent === true);
-	const hasFilledTwilioCredentials = twilio !== null;
+	const hasFilledTwilioCredentials = twilio != null;
 
 	if (!hasFilledTwilioCredentials) {
 		return null;

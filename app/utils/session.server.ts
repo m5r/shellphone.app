@@ -1,17 +1,21 @@
 import { type Session, type SessionIdStorageStrategy, createSessionStorage } from "@remix-run/node";
+import type { TwilioAccount } from "@prisma/client";
 
 import serverConfig from "~/config/config.server";
 import db from "./db.server";
 import logger from "./logger.server";
-import authenticator from "~/utils/authenticator.server";
-import type { SessionData } from "~/utils/auth.server";
+
+type SessionTwilioAccount = Pick<TwilioAccount, "accountSid" | "authToken">;
+export type SessionData = {
+	twilio?: SessionTwilioAccount | null;
+};
 
 const SECOND = 1;
 const MINUTE = 60 * SECOND;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 
-export const sessionStorage = createDatabaseSessionStorage({
+const sessionStorage = createDatabaseSessionStorage<SessionData>({
 	cookie: {
 		name: "__session",
 		httpOnly: true,
@@ -23,25 +27,26 @@ export const sessionStorage = createDatabaseSessionStorage({
 	},
 });
 
-export function getSession(request: Request): Promise<Session> {
+export function getSession(request: Request): Promise<Session<SessionData>> {
 	return sessionStorage.getSession(request.headers.get("Cookie"));
 }
 
-export const { commitSession, destroySession, getSession: __getSession } = sessionStorage;
+export const { commitSession } = sessionStorage;
 
-function createDatabaseSessionStorage({ cookie }: Pick<SessionIdStorageStrategy, "cookie">) {
-	return createSessionStorage({
+function createDatabaseSessionStorage<Data extends SessionData = SessionData>({
+	cookie,
+}: Pick<SessionIdStorageStrategy, "cookie">) {
+	return createSessionStorage<Data>({
 		cookie,
 		async createData(sessionData, expiresAt) {
-			let user;
-			const sessionAuthData: SessionData = sessionData[authenticator.sessionKey];
-			if (sessionAuthData) {
-				user = { connect: { id: sessionAuthData.user.id } };
+			let twilioAccount;
+			if (sessionData.twilio) {
+				twilioAccount = { connect: { accountSid: sessionData.twilio.accountSid } };
 			}
 			const { id } = await db.session.create({
 				data: {
 					expiresAt,
-					user,
+					twilioAccount,
 					data: JSON.stringify(sessionData),
 				},
 			});

@@ -1,10 +1,8 @@
-import { useEffect } from "react";
 import { type LinksFunction, type LoaderFunction, json } from "@remix-run/node";
-import { Outlet, useCatch, useLoaderData, useMatches } from "@remix-run/react";
-import * as Sentry from "@sentry/browser";
+import { Outlet, useCatch, useMatches } from "@remix-run/react";
 
 import serverConfig from "~/config/config.server";
-import { type SessionData, requireLoggedIn } from "~/utils/auth.server";
+import type { SessionData } from "~/utils/session.server";
 import Footer from "~/features/core/components/footer";
 import ServiceWorkerUpdateNotifier from "~/features/core/components/service-worker-update-notifier";
 import Notification from "~/features/core/components/notification";
@@ -12,6 +10,7 @@ import useServiceWorkerRevalidate from "~/features/core/hooks/use-service-worker
 import useDevice from "~/features/phone-calls/hooks/use-device";
 import footerStyles from "~/features/core/components/footer.css";
 import appStyles from "~/styles/app.css";
+import { getSession } from "~/utils/session.server";
 
 export const links: LinksFunction = () => [
 	{ rel: "stylesheet", href: appStyles },
@@ -24,10 +23,10 @@ export type AppLoaderData = {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-	const sessionData = await requireLoggedIn(request);
+	const session = await getSession(request);
 
 	return json<AppLoaderData>({
-		sessionData,
+		sessionData: { twilio: session.data.twilio },
 		config: {
 			webPushPublicKey: serverConfig.webPush.publicKey,
 		},
@@ -37,13 +36,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 export default function __App() {
 	useDevice();
 	useServiceWorkerRevalidate();
-	const { sessionData } = useLoaderData<AppLoaderData>();
 	const matches = useMatches();
 	const hideFooter = matches.some((match) => match.handle?.hideFooter === true);
-
-	useEffect(() => {
-		Sentry.setUser(sessionData.user);
-	}, []);
 
 	return (
 		<>
