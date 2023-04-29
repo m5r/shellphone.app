@@ -16,15 +16,7 @@ export default Queue<Payload>("notify incoming message", async ({ data }) => {
 		where: { id: phoneNumberId },
 		select: {
 			twilioAccount: {
-				include: {
-					organization: {
-						select: {
-							memberships: {
-								select: { notificationSubscription: true },
-							},
-						},
-					},
-				},
+				include: { notificationSubscriptions: true },
 			},
 		},
 	});
@@ -32,10 +24,7 @@ export default Queue<Payload>("notify incoming message", async ({ data }) => {
 		logger.warn(`No phone number found with id=${phoneNumberId}`);
 		return;
 	}
-	const subscriptions = phoneNumber.twilioAccount.organization.memberships.flatMap(
-		(membership) => membership.notificationSubscription,
-	);
-
+	const subscriptions = phoneNumber.twilioAccount.notificationSubscriptions;
 	const twilioClient = getTwilioClient(phoneNumber.twilioAccount);
 	const message = await twilioClient.messages.get(messageSid).fetch();
 	const payload = buildMessageNotificationPayload(message);

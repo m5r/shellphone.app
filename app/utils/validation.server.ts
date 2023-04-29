@@ -2,9 +2,7 @@ import type { z } from "zod";
 
 type ErrorMessage = string;
 type Errors<Schema> = Partial<Record<keyof Schema, ErrorMessage>>;
-export type FormError<Schema extends z.Schema<unknown>> = Partial<
-	Record<keyof Schema["_type"] | "general", ErrorMessage>
->;
+type FormError<Schema extends z.Schema<unknown>> = Partial<Record<keyof Schema["_type"] | "general", ErrorMessage>>;
 type ValidationResult<Data, Schema> = { data: Data; errors: undefined } | { data: undefined; errors: Errors<Schema> };
 
 export function validate<Data, Schema = z.Schema<Data>["_type"]>(

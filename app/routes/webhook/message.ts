@@ -2,7 +2,6 @@ import { type ActionFunction } from "@remix-run/node";
 import { badRequest, html, notFound, serverError } from "remix-utils";
 import twilio from "twilio";
 import { z } from "zod";
-import { Prisma, SubscriptionStatus } from "@prisma/client";
 
 import insertIncomingMessageQueue from "~/queues/insert-incoming-message.server";
 import notifyIncomingMessageQueue from "~/queues/notify-incoming-message.server";
@@ -30,26 +29,7 @@ export const action: ActionFunction = async ({ request }) => {
 		const phoneNumbers = await db.phoneNumber.findMany({
 			where: { number: body.To },
 			include: {
-				twilioAccount: {
-					include: {
-						organization: {
-							select: {
-								subscriptions: {
-									where: {
-										OR: [
-											{ status: { not: SubscriptionStatus.deleted } },
-											{
-												status: SubscriptionStatus.deleted,
-												cancellationEffectiveDate: { gt: new Date() },
-											},
-										],
-									},
-									orderBy: { lastEventTime: Prisma.SortOrder.desc },
-								},
-							},
-						},
-					},
-				},
+				twilioAccount: true,
 			},
 		});
 		if (phoneNumbers.length === 0) {

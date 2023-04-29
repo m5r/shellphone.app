@@ -1,7 +1,7 @@
 import { type ActionFunction } from "@remix-run/node";
 import { badRequest, serverError } from "remix-utils";
 import { z } from "zod";
-import { Direction, Prisma, SubscriptionStatus } from "@prisma/client";
+import { Direction, Prisma } from "@prisma/client";
 
 import logger from "~/utils/logger.server";
 import db from "~/utils/db.server";
@@ -42,41 +42,12 @@ async function handleIncomingCall(formData: unknown, twilioSignature: string) {
 			twilioAccountSid: body.AccountSid,
 		},
 		include: {
-			twilioAccount: {
-				include: {
-					organization: {
-						select: {
-							subscriptions: {
-								where: {
-									OR: [
-										{ status: { not: SubscriptionStatus.deleted } },
-										{
-											status: SubscriptionStatus.deleted,
-											cancellationEffectiveDate: { gt: new Date() },
-										},
-									],
-								},
-								orderBy: { lastEventTime: Prisma.SortOrder.desc },
-							},
-							memberships: {
-								select: { user: true },
-							},
-						},
-					},
-				},
-			},
+			twilioAccount: true,
 		},
 	});
 	if (!phoneNumber) {
 		// this shouldn't be happening
 		return new Response(null, { status: 402 });
-	}
-
-	if (phoneNumber.twilioAccount.organization.subscriptions.length === 0) {
-		// decline the outgoing call because
-		// the organization is on the free plan
-		console.log("no active subscription"); // TODO: uncomment the line below
-		// return new Response(null, { status: 402 });
 	}
 
 	const encryptedAuthToken = phoneNumber.twilioAccount.authToken;
@@ -99,8 +70,7 @@ async function handleIncomingCall(formData: unknown, twilioSignature: string) {
 	});
 
 	// await notify(); TODO
-	const user = phoneNumber.twilioAccount.organization.memberships[0].user!;
-	const identity = `${phoneNumber.twilioAccount.accountSid}__${user.id}`;
+	const identity = `shellphone__${phoneNumber.twilioAccount.accountSid}`;
 	const voiceResponse = new twilio.twiml.VoiceResponse();
 	const dial = voiceResponse.dial({ answerOnBridge: true });
 	dial.client(identity); // TODO: si le device n'est pas registered => call failed *shrug*
@@ -118,32 +88,15 @@ async function handleOutgoingCall(formData: unknown, twilioSignature: string) {
 
 	const body = validation.data;
 	const recipient = body.To;
-	const accountSid = body.From.slice("client:".length).split("__")[0];
+	const accountSid = body.From.slice("client:".length).split("__")[1];
 
 	try {
 		const twilioAccount = await db.twilioAccount.findUnique({
 			where: { accountSid },
-			include: {
-				organization: {
-					select: {
-						subscriptions: {
-							where: {
-								OR: [
-									{ status: { not: SubscriptionStatus.deleted } },
-									{
-										status: SubscriptionStatus.deleted,
-										cancellationEffectiveDate: { gt: new Date() },
-									},
-								],
-							},
-							orderBy: { lastEventTime: Prisma.SortOrder.desc },
-						},
-					},
-				},
-			},
 		});
 		if (!twilioAccount) {
 			// this shouldn't be happening
+			logger.warn("this shouldn't be happening, no twilio account found");
 			return new Response(null, { status: 402 });
 		}
 
@@ -152,14 +105,10 @@ async function handleOutgoingCall(formData: unknown, twilioSignature: string) {
 		});
 		if (!phoneNumber) {
 			// this shouldn't be happening
+			logger.warn(
+				`this shouldn't be happening, no phone number found for twilio account ${twilioAccount.accountSid}`,
+			);
 			return new Response(null, { status: 402 });
-		}
-
-		if (twilioAccount.organization.subscriptions.length === 0) {
-			// decline the outgoing call because
-			// the organization is on the free plan
-			console.log("no active subscription"); // TODO: uncomment the line below
-			// return new Response(null, { status: 402 });
 		}
 
 		const encryptedAuthToken = twilioAccount.authToken;

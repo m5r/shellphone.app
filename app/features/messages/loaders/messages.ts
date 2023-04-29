@@ -4,7 +4,7 @@ import { parsePhoneNumber } from "awesome-phonenumber";
 import { type Message, type PhoneNumber, Prisma } from "@prisma/client";
 
 import db from "~/utils/db.server";
-import { requireLoggedIn } from "~/utils/auth.server";
+import { getSession } from "~/utils/session.server";
 
 export type MessagesLoaderData = {
 	hasPhoneNumber: boolean;
@@ -19,7 +19,8 @@ type Conversation = {
 };
 
 const loader: LoaderFunction = async ({ request }) => {
-	const { twilio } = await requireLoggedIn(request);
+	const session = await getSession(request);
+	const twilio = session.get("twilio");
 	const phoneNumber = await db.phoneNumber.findUnique({
 		where: { twilioAccountSid_isCurrent: { twilioAccountSid: twilio?.accountSid ?? "", isCurrent: true } },
 	});

@@ -4,7 +4,7 @@ import morgan from "morgan";
 import { createRequestHandler } from "@remix-run/express";
 
 import logger from "~/utils/logger.server";
-import { adminMiddleware, setupBullBoard } from "./queues";
+import { setupBullBoard } from "./queues";
 import { purgeRequireCache } from "./purge-require-cache";
 
 const environment = process.env.NODE_ENV;
@@ -66,7 +66,6 @@ app.use(
 app.use(express.static("public", { immutable: true, maxAge: "1y" }));
 
 // setup background queues and cron jobs
-app.use("/admin", adminMiddleware);
 app.use("/admin/queues", setupBullBoard().getRouter());
 
 app.use(morgan("tiny"));

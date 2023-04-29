@@ -40,22 +40,6 @@ invariant(
 	typeof process.env.WEB_PUSH_VAPID_PUBLIC_KEY === "string",
 	`Please define the "WEB_PUSH_VAPID_PUBLIC_KEY" environment variable`,
 );
-invariant(
-	typeof process.env.MAILCHIMP_API_KEY === "string",
-	`Please define the "MAILCHIMP_API_KEY" environment variable`,
-);
-invariant(
-	typeof process.env.MAILCHIMP_AUDIENCE_ID === "string",
-	`Please define the "MAILCHIMP_AUDIENCE_ID" environment variable`,
-);
-invariant(
-	typeof process.env.DISCORD_WEBHOOK_ID === "string",
-	`Please define the "DISCORD_WEBHOOK_ID" environment variable`,
-);
-invariant(
-	typeof process.env.DISCORD_WEBHOOK_TOKEN === "string",
-	`Please define the "DISCORD_WEBHOOK_TOKEN" environment variable`,
-);
 
 export default {
 	app: {
@@ -66,23 +50,10 @@ export default {
 	},
 	aws: {
 		region: process.env.AWS_REGION,
-		ses: {
-			accessKeyId: process.env.AWS_SES_ACCESS_KEY_ID,
-			secretAccessKey: process.env.AWS_SES_ACCESS_KEY_SECRET,
-			fromEmail: process.env.AWS_SES_FROM_EMAIL,
-		},
 		s3: {
 			accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
 			secretAccessKey: process.env.AWS_S3_ACCESS_KEY_SECRET,
 		},
-	},
-	discord: {
-		webhookId: process.env.DISCORD_WEBHOOK_ID,
-		webhookToken: process.env.DISCORD_WEBHOOK_TOKEN,
-	},
-	mailchimp: {
-		apiKey: process.env.MAILCHIMP_API_KEY,
-		audienceId: process.env.MAILCHIMP_AUDIENCE_ID,
 	},
 	redis: {
 		url: process.env.REDIS_URL,

@@ -26,7 +26,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 					throw new Error(`Queue "${queueName}"'s scheduler is not running`);
 				}
 			}),
-			db.user.count(),
+			db.twilioAccount.count(),
 			fetch(url.toString(), { method: "HEAD" }).then((r) => {
 				if (!r.ok) return Promise.reject(r);
 			}),

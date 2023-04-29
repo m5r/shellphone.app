@@ -1,17 +1,17 @@
 import { type LoaderFunction } from "@remix-run/node";
 import Twilio from "twilio";
 
-import { refreshSessionData, requireLoggedIn } from "~/utils/auth.server";
 import { decrypt, encrypt } from "~/utils/encryption";
 import db from "~/utils/db.server";
-import { commitSession } from "~/utils/session.server";
+import { getSession } from "~/utils/session.server";
 import getTwilioClient from "~/utils/twilio.server";
 import logger from "~/utils/logger.server";
 
 export type TwilioTokenLoaderData = string;
 
 const loader: LoaderFunction = async ({ request }) => {
-	const { user, twilio } = await requireLoggedIn(request);
+	const session = await getSession(request);
+	const twilio = session.get("twilio");
 	if (!twilio) {
 		logger.warn("Twilio account is not connected");
 		return null;
@@ -26,7 +26,6 @@ const loader: LoaderFunction = async ({ request }) => {
 	}
 
 	const twilioClient = getTwilioClient(twilioAccount);
-	let shouldRefreshSession = false;
 	let { apiKeySid, apiKeySecret } = twilioAccount;
 	if (apiKeySid && apiKeySecret) {
 		try {
@@ -41,7 +40,6 @@ const loader: LoaderFunction = async ({ request }) => {
 		}
 	}
 	if (!apiKeySid || !apiKeySecret) {
-		shouldRefreshSession = true;
 		const apiKey = await twilioClient.newKeys.create({ friendlyName: "Shellphone" });
 		apiKeySid = apiKey.sid;
 		apiKeySecret = encrypt(apiKey.secret);
@@ -52,7 +50,7 @@ const loader: LoaderFunction = async ({ request }) => {
 	}
 
 	const accessToken = new Twilio.jwt.AccessToken(twilioAccount.accountSid, apiKeySid, decrypt(apiKeySecret), {
-		identity: `${twilio.accountSid}__${user.id}`,
+		identity: `shellphone__${twilio.accountSid}`,
 		ttl: 3600,
 	});
 	const grant = new Twilio.jwt.AccessToken.VoiceGrant({
@@ -62,11 +60,6 @@ const loader: LoaderFunction = async ({ request }) => {
 	accessToken.addGrant(grant);
 
 	const headers = new Headers({ "Content-Type": "text/plain" });
-	if (shouldRefreshSession) {
-		const { session } = await refreshSessionData(request);
-		headers.set("Set-Cookie", await commitSession(session));
-	}
-
 	return new Response(accessToken.toJwt(), { headers });
 };
 

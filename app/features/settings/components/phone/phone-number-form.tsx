@@ -25,7 +25,7 @@ export default function PhoneNumberForm() {
 	const topErrorMessage = errors?.general ?? errors?.phoneNumberSid;
 	const isError = typeof topErrorMessage !== "undefined";
 	const currentPhoneNumber = availablePhoneNumbers.find((phoneNumber) => phoneNumber.isCurrent === true);
-	const hasFilledTwilioCredentials = twilio !== null;
+	const hasFilledTwilioCredentials = twilio != null;
 
 	if (!hasFilledTwilioCredentials) {
 		return null;

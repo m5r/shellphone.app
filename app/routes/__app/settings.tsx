@@ -4,7 +4,6 @@ import clsx from "clsx";
 import {
 	IoLogOutOutline,
 	IoNotificationsOutline,
-	IoCardOutline,
 	IoCallOutline,
 	IoPersonCircleOutline,
 	IoHelpBuoyOutline,
@@ -14,11 +13,8 @@ import Divider from "~/features/settings/components/divider";
 import { getSeoMeta } from "~/utils/seo";
 
 const subNavigation = [
-	{ name: "Account", to: "/settings/account", icon: IoPersonCircleOutline },
 	{ name: "Phone", to: "/settings/phone", icon: IoCallOutline },
-	{ name: "Billing", to: "/settings/billing", icon: IoCardOutline },
 	{ name: "Notifications", to: "/settings/notifications", icon: IoNotificationsOutline },
-	{ name: "Support", to: "/settings/support", icon: IoHelpBuoyOutline },
 ];
 
 export const meta: MetaFunction = () => ({
@@ -62,15 +58,6 @@ export default function SettingsLayout() {
 									)}
 								</NavLink>
 							))}
-
-							<Divider />
-							<Link
-								to="/sign-out"
-								className="group text-gray-900 hover:text-gray-900 hover:bg-gray-50 rounded-md px-3 py-2 flex items-center text-sm font-medium"
-							>
-								<IoLogOutOutline className="text-gray-400 group-hover:text-gray-500 flex-shrink-0 -ml-1 mr-3 h-6 w-6" />
-								Log out
-							</Link>
 						</nav>
 					</aside>
 

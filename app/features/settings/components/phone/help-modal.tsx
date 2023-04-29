@@ -17,19 +17,6 @@ const HelpModal: FunctionComponent<Props> = ({ isHelpModalOpen, closeModal }) =>
 					<ModalTitle>Need some help?</ModalTitle>
 					<div className="mt-6 space-y-3 text-gray-500">
 						<p>
-							Try{" "}
-							<a className="underline" href="https://www.twilio.com/authorize/CN01675d385a9ee79e6aa58adf54abe3b3">
-								reconnecting your Twilio account
-							</a> to refresh the phone numbers.
-						</p>
-						<p>
-							If you are stuck, pick a date & time on{" "}
-							<a className="underline" href="https://calendly.com/shellphone-onboarding">
-								our calendly
-							</a>{" "}
-							and we will help you get started!
-						</p>
-						<p>
 							Don&#39;t miss out on free $10 Twilio credit by using{" "}
 							<a className="underline" href="https://www.twilio.com/referral/gNvX8p">
 								our referral link
