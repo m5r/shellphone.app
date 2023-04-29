@@ -1,7 +1,6 @@
 const path = require("path");
 const esbuild = require("esbuild");
 const { nodeExternalsPlugin } = require("esbuild-node-externals");
-const ps = require("ps-node");
 
 const basePath = process.cwd();
 const args = process.argv.slice(2);
