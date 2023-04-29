@@ -3,7 +3,7 @@ type ResponseObject = {
 	message: string;
 };
 
-// use case: prevent making phone calls / queue messages when offline
+// use case: prevent making phone calls / queue messages when offline -- TODO
 export async function checkConnectivity(online: () => void, offline: () => void): Promise<ResponseObject> {
 	try {
 		if (navigator.onLine) {
