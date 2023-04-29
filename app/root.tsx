@@ -13,7 +13,6 @@ import {
 } from "@remix-run/react";
 
 import config from "~/config/config.server";
-import useFathom from "~/features/core/hooks/use-fathom";
 import Logo from "~/features/core/components/logo";
 
 import styles from "./styles/tailwind.css";
@@ -31,13 +30,6 @@ type LoaderData = {
 		sentry: {
 			dsn?: string;
 		};
-		fathom: {
-			siteId: string;
-			domain?: string;
-		};
-		app: {
-			baseUrl: string;
-		};
 	};
 };
 export const loader: LoaderFunction = () => {
@@ -46,20 +38,12 @@ export const loader: LoaderFunction = () => {
 			sentry: {
 				dsn: config.sentry.dsn,
 			},
-			fathom: {
-				siteId: config.fathom.siteId,
-				domain: config.fathom.domain,
-			},
-			app: {
-				baseUrl: config.app.baseUrl,
-			},
 		},
 	});
 };
 
 export default function App() {
 	const { shellphoneConfig } = useLoaderData<LoaderData>();
-	useFathom();
 	return (
 		<Document>
 			<Outlet />

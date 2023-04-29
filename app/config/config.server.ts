@@ -40,7 +40,6 @@ invariant(
 	typeof process.env.WEB_PUSH_VAPID_PUBLIC_KEY === "string",
 	`Please define the "WEB_PUSH_VAPID_PUBLIC_KEY" environment variable`,
 );
-invariant(typeof process.env.FATHOM_SITE_ID === "string", `Please define the "FATHOM_SITE_ID" environment variable`);
 invariant(
 	typeof process.env.MAILCHIMP_API_KEY === "string",
 	`Please define the "MAILCHIMP_API_KEY" environment variable`,
@@ -80,10 +79,6 @@ export default {
 	discord: {
 		webhookId: process.env.DISCORD_WEBHOOK_ID,
 		webhookToken: process.env.DISCORD_WEBHOOK_TOKEN,
-	},
-	fathom: {
-		siteId: process.env.FATHOM_SITE_ID,
-		domain: process.env.FATHOM_CUSTOM_DOMAIN,
 	},
 	mailchimp: {
 		apiKey: process.env.MAILCHIMP_API_KEY,
