@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import type { ActionFunction, DataFunctionArgs, LoaderFunction, ServerBuild } from "@remix-run/node";
-import { isResponse } from "@remix-run/server-runtime/responses";
+import { isResponse } from "@remix-run/server-runtime/dist/responses";
 import type { Transaction } from "@sentry/types";
 import * as Sentry from "@sentry/node";
 import { v4 as uuid } from "uuid";
@@ -24,7 +24,7 @@ function wrapDataFunc(func: ActionFunction | LoaderFunction, routeId: string, me
 			Sentry.configureScope((scope) => scope.setUser(null));
 		}
 
-		const parentTransaction: Transaction | undefined = args.context && args.context.__sentry_transaction;
+		const parentTransaction: Transaction | undefined = args.context && (args.context.__sentry_transaction as any);
 		const transaction = parentTransaction?.startChild({
 			op: `${method}:${routeId}`,
 			description: `${method}: ${routeId}`,

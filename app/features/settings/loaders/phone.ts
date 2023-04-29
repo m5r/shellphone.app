@@ -1,4 +1,4 @@
-import { type LoaderFunction, json } from "@remix-run/node";
+import { type LoaderArgs, json } from "@remix-run/node";
 import { type PhoneNumber, Prisma } from "@prisma/client";
 
 import db from "~/utils/db.server";
@@ -12,11 +12,11 @@ export type PhoneSettingsLoaderData = {
 	phoneNumbers: Pick<PhoneNumber, "id" | "number" | "isCurrent">[];
 };
 
-const loader: LoaderFunction = async ({ request }) => {
+const loader = async ({ request }: LoaderArgs) => {
 	const { organization, twilio } = await requireLoggedIn(request);
 	if (!twilio) {
 		logger.warn("Twilio account is not connected");
-		return json<PhoneSettingsLoaderData>({ phoneNumbers: [] });
+		return json({ phoneNumbers: [] });
 	}
 
 	const phoneNumbers = await db.phoneNumber.findMany({
@@ -25,7 +25,7 @@ const loader: LoaderFunction = async ({ request }) => {
 		orderBy: { id: Prisma.SortOrder.desc },
 	});
 
-	return json<PhoneSettingsLoaderData>({
+	return json({
 		accountSid: twilio.accountSid,
 		authToken: decrypt(twilio.authToken),
 		phoneNumbers,
