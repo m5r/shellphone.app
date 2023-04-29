@@ -1,10 +1,7 @@
-import { useEffect } from "react";
 import { type LinksFunction, type LoaderFunction, json } from "@remix-run/node";
-import { Outlet, useCatch, useLoaderData, useMatches } from "@remix-run/react";
-import * as Sentry from "@sentry/browser";
+import { Outlet, useCatch, useMatches } from "@remix-run/react";
 
 import serverConfig from "~/config/config.server";
-import { type SessionData, requireLoggedIn } from "~/utils/auth.server";
 import Footer from "~/features/core/components/footer";
 import ServiceWorkerUpdateNotifier from "~/features/core/components/service-worker-update-notifier";
 import Notification from "~/features/core/components/notification";
@@ -19,15 +16,11 @@ export const links: LinksFunction = () => [
 ];
 
 export type AppLoaderData = {
-	sessionData: SessionData;
 	config: { webPushPublicKey: string };
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-	const sessionData = await requireLoggedIn(request);
-
 	return json<AppLoaderData>({
-		sessionData,
 		config: {
 			webPushPublicKey: serverConfig.webPush.publicKey,
 		},
@@ -37,13 +30,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 export default function __App() {
 	useDevice();
 	useServiceWorkerRevalidate();
-	const { sessionData } = useLoaderData<AppLoaderData>();
 	const matches = useMatches();
 	const hideFooter = matches.some((match) => match.handle?.hideFooter === true);
-
-	useEffect(() => {
-		Sentry.setUser(sessionData.user);
-	}, []);
 
 	return (
 		<>

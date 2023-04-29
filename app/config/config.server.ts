@@ -88,9 +88,6 @@ export default {
 		url: process.env.REDIS_URL,
 		password: process.env.REDIS_PASSWORD,
 	},
-	sentry: {
-		dsn: process.env.SENTRY_DSN,
-	},
 	webPush: {
 		privateKey: process.env.WEB_PUSH_VAPID_PRIVATE_KEY,
 		publicKey: process.env.WEB_PUSH_VAPID_PUBLIC_KEY,

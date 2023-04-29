@@ -1,15 +1,5 @@
 import { hydrate } from "react-dom";
 import { RemixBrowser } from "@remix-run/react";
-import * as Sentry from "@sentry/browser";
-import { Integrations } from "@sentry/tracing";
-
-if (window.shellphoneConfig.sentry.dsn) {
-	Sentry.init({
-		dsn: window.shellphoneConfig.sentry.dsn,
-		tracesSampleRate: 1.0,
-		integrations: [new Integrations.BrowserTracing()],
-	});
-}
 
 hydrate(<RemixBrowser />, document);
 
