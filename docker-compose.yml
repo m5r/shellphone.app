@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
     postgres:
-        image: postgres:13-alpine
+        image: postgres:14-alpine
         restart: unless-stopped
         volumes:
             - pg-data:/var/lib/postgresql/data
@@ -12,7 +12,7 @@ services:
         tty: true
 
     redis:
-        image: redis:6-alpine
+        image: redis:7-alpine
         command: >
             --maxmemory-policy noeviction
         restart: unless-stopped
@@ -21,7 +21,6 @@ services:
         ports:
             - "6379:6379"
         tty: true
-
 
 volumes:
     pg-data:
